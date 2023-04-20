@@ -1,0 +1,30 @@
+title: ESCU - Suspicious Rundll32 dllregisterserver - Rule
+description: The following analytic identifies rundll32.exe using dllregisterserver
+  on the command line to load a DLL. When a DLL is registered, the DllRegisterServer
+  method entry point in the DLL is invoked. This is typically seen when a DLL is being
+  registered on the system. Not every instance is considered malicious, but it will
+  capture malicious use of it. During investigation, review the parent process and
+  parrellel processes executing. Capture the DLL being loaded and inspect further.
+  Rundll32.exe is natively found in C:\Windows\system32 and C:\Windows\syswow64.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where `process_rundll32`\
+      \ Processes.process=*dllregisterserver* by Processes.dest Processes.user Processes.parent_process\
+      \ Processes.original_file_name Processes.process_name Processes.process Processes.process_id\
+      \ Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)` \n  -\
+      \  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `suspicious_rundll32_dllregisterserver_filter`"
+  level: critical
+tags:
+- T1218.011
+- 'System Binary Proxy Execution: Rundll32'
+- Defense Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

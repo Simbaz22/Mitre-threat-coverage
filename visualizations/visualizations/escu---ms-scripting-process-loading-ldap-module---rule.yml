@@ -1,0 +1,28 @@
+title: ESCU - MS Scripting Process Loading Ldap Module - Rule
+description: This search is to detect a suspicious MS scripting process such as wscript.exe
+  or cscript.exe that loading ldap module to process ldap query. This behavior was
+  seen in FIN7 implant where it uses javascript to execute ldap query to parse host
+  information that will send to its C2 server. this anomaly detections is a good initial
+  step to hunt further a suspicious ldap query or ldap related events to the host
+  that may give you good information regarding ldap or AD information processing or
+  might be a attacker.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode =7 Image IN (\"*\\\\wscript.exe\", \"*\\\\cscript.exe\"\
+      ) ImageLoaded IN (\"*\\\\Wldap32.dll\", \"*\\\\adsldp.dll\", \"*\\\\adsldpc.dll\"\
+      ) \n  -  stats min(_time) as firstTime max(_time) as lastTime count by Image\
+      \ EventCode process_name ProcessId ProcessGuid Computer ImageLoaded \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `ms_scripting_process_loading_ldap_module_filter`"
+  level: critical
+tags:
+- T1059.007
+- 'Command and Scripting Interpreter: JavaScript'
+- Execution
+references: Requires Sysmon data
+notes: .nan

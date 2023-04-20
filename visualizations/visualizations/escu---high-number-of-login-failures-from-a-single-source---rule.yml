@@ -1,0 +1,25 @@
+title: ESCU - High Number of Login Failures from a single source - Rule
+description: This search will detect more than 5 login failures in Office365 Azure
+  Active Directory from a single source IP address. Please adjust the threshold value
+  of 5 as suited for your environment.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: O365
+detection:
+  condition:
+    sigma: "`o365_management_activity` Operation=UserLoginFailed  record_type=AzureActiveDirectoryStsLogon\
+      \ app=AzureActiveDirectory \n  -  stats count dc(user) as accounts_locked values(user)\
+      \ as user values(LogonError) as LogonError values(authentication_method) as\
+      \ authentication_method values(signature) as signature values(UserAgent) as\
+      \ UserAgent by src_ip record_type Operation app \n  -  accounts_locked >= 5\n\
+      \  -  `high_number_of_login_failures_from_a_single_source_filter`"
+  level: critical
+tags:
+- "T1110.001\nT1110"
+- 'Brute Force: Password Guessing'
+- 'Brute Force: Password Guessing'
+references: .nan
+notes: .nan

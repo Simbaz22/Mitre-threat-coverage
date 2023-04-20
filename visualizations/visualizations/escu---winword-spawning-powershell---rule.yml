@@ -1,0 +1,30 @@
+title: ESCU - Winword Spawning PowerShell - Rule
+description: The following detection identifies Microsoft Word spawning PowerShell.
+  Typically, this is not common behavior and not default with winword.exe. Winword.exe
+  will generally be found in the following path `C:\Program Files\Microsoft Office\root\Office16`
+  (version will vary). PowerShell spawning from winword.exe is common for a spearphishing
+  attachment and is actively used. Albeit, the command executed will most likely be
+  encoded and captured via another detection. During triage, review parallel processes
+  and identify any files that may have been written.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.parent_process_name=\"\
+      winword.exe\" `process_powershell` by Processes.dest Processes.user Processes.parent_process\
+      \ Processes.process_name Processes.original_file_name Processes.process Processes.process_id\
+      \ Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)` \n  -\
+      \  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `winword_spawning_powershell_filter`"
+  level: critical
+tags:
+- "T1566\nT1566.001"
+- Phishing
+- Phishing
+references: .nan
+notes: .nan

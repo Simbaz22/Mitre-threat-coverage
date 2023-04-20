@@ -1,0 +1,25 @@
+title: ESCU - GetWmiObject Ds Computer with PowerShell Script Block - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the execution of the `Get-WmiObject` commandlet. The `DS_Computer` class
+  parameter leverages WMI to query for all domain computers. Red Teams and adversaries
+  may leverage this commandlet to enumerate domain computers for situational awareness
+  and Active Directory Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (Message=*Get-WmiObject* AND Message=\"*namespace\
+      \ root\\\\directory\\\\ldap*\" AND Message=\"*class ds_computer*\") \n  -  stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by EventCode Message\
+      \ ComputerName User \n  -  `security_content_ctime(firstTime)` \n  -  `getwmiobject_ds_computer_with_powershell_script_block_filter`"
+  level: critical
+tags:
+- T1018
+- Remote System Discovery
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

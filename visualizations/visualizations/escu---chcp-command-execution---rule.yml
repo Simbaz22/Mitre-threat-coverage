@@ -1,0 +1,26 @@
+title: ESCU - CHCP Command Execution - Rule
+description: This search is to detect execution of chcp.exe application. this utility
+  is used to change the active code page of the console. This technique was seen in
+  icedid malware to know the locale region/language/country of the compromise host.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=chcp.com\
+      \ Processes.parent_process_name = cmd.exe Processes.parent_process=*/c* by \
+      \ Processes.process_name Processes.process Processes.parent_process_name Processes.parent_process\
+      \ Processes.process_id Processes.parent_process_id Processes.dest Processes.user\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `chcp_command_execution_filter`"
+  level: critical
+tags:
+- T1059
+- Command and Scripting Interpreter
+- Execution
+references: Increase Windows logging to include command line data
+notes: .nan

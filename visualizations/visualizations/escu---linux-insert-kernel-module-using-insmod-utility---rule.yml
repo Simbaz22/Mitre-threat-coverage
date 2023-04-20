@@ -1,0 +1,28 @@
+title: ESCU - Linux Insert Kernel Module Using Insmod Utility - Rule
+description: This analytic looks for inserting of linux kernel module using insmod
+  utility function. This event can detect a installation of rootkit or malicious kernel
+  module to gain elevated privileges to their malicious code and bypassed detections.
+  This Anomaly detection is a good indicator that someone installing kernel module
+  in a linux host either admin or adversaries. filter is needed in this scenario
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name\
+      \ IN(\"kmod\", \"sudo\") AND Processes.process = *insmod* by Processes.dest\
+      \ Processes.user Processes.parent_process_name Processes.process_name Processes.process\
+      \ Processes.process_id Processes.parent_process_id Processes.process_guid \n\
+      \  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `linux_insert_kernel_module_using_insmod_utility_filter`"
+  level: critical
+tags:
+- "T1547.006\nT1547"
+- 'Boot or Logon Autostart Execution: Kernel Modules and Extensions'
+- 'Boot or Logon Autostart Execution: Kernel Modules and Extensions'
+references: Increase Linux Logs to include Command Line data
+notes: .nan

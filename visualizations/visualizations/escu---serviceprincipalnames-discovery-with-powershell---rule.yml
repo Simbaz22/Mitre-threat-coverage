@@ -1,0 +1,32 @@
+title: ESCU - ServicePrincipalNames Discovery with PowerShell - Rule
+description: "The following analytic identifies `powershell.exe` usage, using Script\
+  \ Block Logging EventCode 4104, related to querying the domain for Service Principle\
+  \ Names. typically, this is a precursor activity related to kerberoasting or the\
+  \ silver ticket attack. \nWhat is a ServicePrincipleName? \nA service principal\
+  \ name (SPN) is a unique identifier of a service instance. SPNs are used by Kerberos\
+  \ authentication to associate a service instance with a service logon account. This\
+  \ allows a client application to request that the service authenticate an account\
+  \ even if the client does not have the account name.\nThe following analytic identifies\
+  \ the use of KerberosRequestorSecurityToken class within the script block. Using\
+  \ .NET System.IdentityModel.Tokens.KerberosRequestorSecurityToken class in PowerShell\
+  \ is the equivelant of using setspn.exe. \nDuring triage, review parallel processes\
+  \ for further suspicious activity."
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: PowerShell
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 Message=\"*KerberosRequestorSecurityToken*\"\
+      \ \n  -  stats count min(_time) as firstTime max(_time) as lastTime by Message\
+      \ OpCode ComputerName User EventCode \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `serviceprincipalnames_discovery_with_powershell_filter`"
+  level: critical
+tags:
+- T1558.003
+- 'Steal or Forge Kerberos Tickets: Kerberoasting'
+- Credential Access
+references: Requires PowerShell logs
+notes: .nan

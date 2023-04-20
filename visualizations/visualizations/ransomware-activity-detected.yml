@@ -1,0 +1,18 @@
+title: Ransomware activity detected
+description: Detects Ransomware activity observed by EDR
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: EDR
+detection:
+  condition:
+    sigma: MISSING SPLUNK LOGIC
+  level: critical
+tags:
+- T1486
+- Data Encrypted for Impact
+- Impact
+references: Requires EDR data feed
+notes: "Securonix Logic:\nDeviceEventCategory contains ransomware"

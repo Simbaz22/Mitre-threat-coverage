@@ -1,0 +1,27 @@
+title: ESCU - Circle CI Disable Security Step - Rule
+description: This search looks for disable security step in CircleCI pipeline.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Cloud
+detection:
+  condition:
+    sigma: "`circleci` \n  -  rename workflows.job_id AS job_id \n  -  join job_id\
+      \ [ \n  -  `circleci` \n  -  stats values(name) as step_names count by job_id\
+      \ job_name ] \n  -  stats count by step_names job_id job_name vcs.committer_name\
+      \ vcs.subject vcs.url owners{} \n  -  rename vcs.* as * , owners{} as user \n\
+      \  -  lookup mandatory_step_for_job job_name OUTPUTNEW step_name AS mandatory_step\
+      \ \n  -  mandatory_step=* \n  -  eval mandatory_step_executed=if(like(step_names,\
+      \ \"%\".mandatory_step.\"%\"), 1, 0) \n  -  where mandatory_step_executed=0\
+      \ \n  -  rex field=url \"(?<repository>[^\\/]*\\/[^\\/]*)$\" \n  -  eval phase=\"\
+      build\" \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `circle_ci_disable_security_step_filter`"
+  level: critical
+tags:
+- T1554
+- Compromise Client Software Binary
+- Persistence
+references: .nan
+notes: 'Missing SourceType: CircleCI'

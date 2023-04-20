@@ -1,0 +1,23 @@
+title: ESCU - Splunk XSS in Monitoring Console - Rule
+description: On May 3rd, 2022, Splunk published a security advisory for a reflective
+  Cross-Site Scripting (XSS) vulnerability stemming from the lack of input validation
+  in the Distributed Monitoring Console app. This detection will alert on attempted
+  exploitation in patched versions of Splunk as well as actual exploitation in unpatched
+  version of Splunk.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Web
+detection:
+  condition:
+    sigma: "`splunkd_web` method=\"GET\" uri_query=\"description=%3C*\" \n  -  table\
+      \ _time host status clientip user uri \n  -  `splunk_xss_in_monitoring_console_filter`"
+  level: critical
+tags:
+- T1189
+- Drive-by Compromise
+- Initial Access
+references: .nan
+notes: Experimental detection (not supported by splunk)

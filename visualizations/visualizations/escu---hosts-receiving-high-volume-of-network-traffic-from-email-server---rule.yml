@@ -1,0 +1,36 @@
+title: ESCU - Hosts receiving high volume of network traffic from email server - Rule
+description: This search looks for an increase of data transfers from your email server
+  to your clients. This could be indicative of a malicious actor collecting data using
+  your email server.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` sum(All_Traffic.bytes_in)\
+      \ as bytes_in from datamodel=Network_Traffic where All_Traffic.dest_category=email_server\
+      \ by All_Traffic.src_ip _time span=1d \n  -  `drop_dm_object_name(\"All_Traffic\"\
+      )` \n  -  eventstats avg(bytes_in) as avg_bytes_in stdev(bytes_in) as stdev_bytes_in\
+      \ \n  -  eventstats count as num_data_samples avg(eval(if(_time < relative_time(now(),\
+      \ \"@d\"), bytes_in, null))) as per_source_avg_bytes_in stdev(eval(if(_time\
+      \ < relative_time(now(), \"@d\"), bytes_in, null))) as per_source_stdev_bytes_in\
+      \ by src_ip \n  -  eval minimum_data_samples = 4, deviation_threshold = 3 \n\
+      \  -  where num_data_samples >= minimum_data_samples AND bytes_in > (avg_bytes_in\
+      \ + (deviation_threshold * stdev_bytes_in)) AND bytes_in > (per_source_avg_bytes_in\
+      \ + (deviation_threshold * per_source_stdev_bytes_in)) AND _time >= relative_time(now(),\
+      \ \"@d\") \n  -  eval num_standard_deviations_away_from_server_average = round(abs(bytes_in\
+      \ - avg_bytes_in) / stdev_bytes_in, 2), num_standard_deviations_away_from_client_average\
+      \ = round(abs(bytes_in - per_source_avg_bytes_in) / per_source_stdev_bytes_in,\
+      \ 2) \n  -  table src_ip, _time, bytes_in, avg_bytes_in, per_source_avg_bytes_in,\
+      \ num_standard_deviations_away_from_server_average, num_standard_deviations_away_from_client_average\
+      \ \n  -  `hosts_receiving_high_volume_of_network_traffic_from_email_server_filter`"
+  level: critical
+tags:
+- "T1114.002\nT1114"
+- 'Email Collection: Remote Email Collection'
+- 'Email Collection: Remote Email Collection'
+references: Requires assets and identity
+notes: .nan

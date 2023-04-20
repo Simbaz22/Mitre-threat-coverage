@@ -1,0 +1,23 @@
+title: DS_Traffic to rare server on DHCP ports
+description: Rare host on DHCP ports may be indicative of a malicious entity attempting
+  to communicate to a impersonate a DHCP server and eventually diverting traffic to
+  malicious domains.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats count from datamodel=\"Network_Traffic\".\"All_Traffic\"\
+      \ where All_Traffic.action=allowed AND All_Traffic.dest_ip!=10.* AND All_Traffic.dest_ip!=192.*\
+      \ AND (All_Traffic.dest_port=67 OR All_Traffic.app=dhcp) by All_Traffic.dest_ip,\
+      \ _time\n  -  count<10 \n  -  `drop_dm_object_name(All_Traffic)`"
+  level: critical
+tags:
+- T1557.003
+- 'Adversary-in-the-Middle: DHCP Spoofing'
+- Collection, Credential Access
+references: .nan
+notes: .nan

@@ -1,0 +1,27 @@
+title: ESCU - Github Commit Changes In Master - Rule
+description: This search is to detect a pushed or commit to master or main branch.
+  This is to avoid unwanted modification to master without a review to the changes.
+  Ideally in terms of devsecops the changes made in a branch and do a PR for review.
+  of course in some cases admin of the project may did a changes directly to master
+  branch
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`github` branches{}.name = main OR branches{}.name = master \n  -   stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by commit.commit.author.email\
+      \ commit.author.login commit.commit.message repository.pushed_at commit.commit.committer.date\
+      \ repository.full_name \n  -  rename commit.author.login as user, repository.full_name\
+      \ as repository \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `github_commit_changes_in_master_filter`"
+  level: critical
+tags:
+- T1199
+- Trusted Relationship
+- Initial Access
+references: .nan
+notes: .nan

@@ -1,0 +1,27 @@
+title: ESCU - Windows Rasautou DLL Execution - Rule
+description: The following analytic identifies the Windows Windows Remote Auto Dialer,
+  rasautou.exe executing an arbitrary DLL. This technique is used to execute arbitrary
+  shellcode or DLLs via the rasautou.exe LOLBin capability. During triage, review
+  parent and child process behavior including file and image loads.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=rasautou.exe\
+      \ Processes.process=\"* -d *\"AND Processes.process=\"* -p *\" by Processes.dest\
+      \ Processes.user Processes.parent_process_name Processes.process_name Processes.process\
+      \ Processes.process_id Processes.parent_process_id Processes.original_file_name\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `windows_rasautou_dll_execution_filter`"
+  level: critical
+tags:
+- "T1055.001\nT1218\nT1055"
+- 'Process Injection: Dynamic-link Library Injection'
+- 'Process Injection: Dynamic-link Library Injection'
+references: Increase Windows logging to include command line data
+notes: .nan

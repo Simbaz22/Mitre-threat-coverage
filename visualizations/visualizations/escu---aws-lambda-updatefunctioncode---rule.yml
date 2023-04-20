@@ -1,0 +1,26 @@
+title: ESCU - AWS Lambda UpdateFunctionCode - Rule
+description: This analytic is designed to detect IAM users attempting to update/modify
+  AWS lambda code via the AWS CLI to gain persistence, futher access into your AWS
+  environment and to facilitate planting backdoors. In this instance, an attacker
+  may upload malicious code/binary to a lambda function which will be executed automatically
+  when the funnction is triggered.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventSource=lambda.amazonaws.com eventName=UpdateFunctionCode*\
+      \  errorCode = success  user_type=IAMUser \n  -  stats  count min(_time) as\
+      \ firstTime max(_time) as lastTime  values(requestParameters.functionName) as\
+      \ function_updated by src_ip user_arn user_agent user_type eventName aws_account_id\
+      \ \n  - `aws_lambda_updatefunctioncode_filter`"
+  level: critical
+tags:
+- T1204
+- User Execution
+- Execution
+references: .nan
+notes: .nan

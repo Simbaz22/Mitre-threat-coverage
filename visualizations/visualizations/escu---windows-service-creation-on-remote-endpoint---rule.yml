@@ -1,0 +1,28 @@
+title: ESCU - Windows Service Creation on Remote Endpoint - Rule
+description: This analytic looks for the execution of `sc.exe` with command-line arguments
+  utilized to create a Windows Service on a remote endpoint. Red Teams and adversaries
+  alike may abuse the Service Control Manager for lateral movement and remote code
+  execution.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where (Processes.process_name=sc.exe\
+      \ OR Processes.original_file_name=sc.exe) (Processes.process=*\\\\\\\\* AND\
+      \ Processes.process=*create* AND Processes.process=*binpath*) by Processes.dest\
+      \ Processes.user Processes.parent_process_name Processes.process_name Processes.process\
+      \ Processes.process_id Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `windows_service_creation_on_remote_endpoint_filter`"
+  level: critical
+tags:
+- "T1543\nT1543.003"
+- Create or Modify System Process
+- Create or Modify System Process
+references: Increase Windows logging to include command line data
+notes: .nan

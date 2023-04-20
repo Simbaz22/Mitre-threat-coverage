@@ -1,0 +1,29 @@
+title: ESCU - Linux Doas Conf File Creation - Rule
+description: This analytic is to detect the creation of doas.conf file in linux host
+  platform. This configuration file can be use by doas utility tool to allow or permit
+  standard users to perform tasks as root, the same way sudo does. This tool is developed
+  as a minimalistic alternative to sudo application. This tool can be abused advesaries,
+  attacker or malware to gain elevated privileges to the targeted or compromised host.
+  On the other hand this can also be executed by administrator for a certain task
+  that needs admin rights. In this case filter is needed.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Filesystem where Filesystem.file_path\
+      \ IN (\"*/etc/doas.conf\") by Filesystem.dest Filesystem.file_create_time Filesystem.file_name\
+      \ Filesystem.process_guid Filesystem.file_path \n  -  `drop_dm_object_name(Filesystem)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `linux_doas_conf_file_creation_filter`"
+  level: critical
+tags:
+- T1548.003
+- 'Abuse Elevation Control Mechanism: Sudo and Sudo Caching'
+- Defense Evasion, Privilege Escalation
+references: Increase Linux logging to include file creation, deletion and modification
+notes: .nan

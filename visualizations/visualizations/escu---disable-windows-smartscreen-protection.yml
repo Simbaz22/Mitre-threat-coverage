@@ -1,0 +1,36 @@
+title: ESCU - Disable Windows SmartScreen Protection
+description: The following search identifies a modification of registry to disable
+  the smartscreen protection of windows machine. This is windows feature provide an
+  early warning system against website that might engage in phishing attack or malware
+  distribution. This modification are seen in RAT malware to cover their tracks upon
+  downloading other of its component or other payload.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Registry\
+      \ where Registry.registry_path= \"*HKLM\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\
+      \\CurrentVersion\\\\Explorer\\\\SmartScreenEnabled\"  Registry.registry_value_data=\
+      \ \"Off\" by _time span=1h Registry.dest Registry.user Registry.registry_path\
+      \ Registry.registry_value_name Registry.registry_value_data Registry.process_guid\
+      \ \n  -  `drop_dm_object_name(Registry)` \n  - rename process_guid as proc_guid\
+      \ \n  - join proc_guid, _time [\n  -  tstats `security_content_summariesonly`\
+      \ count FROM datamodel=Endpoint.Processes by _time span=1h Processes.process_id\
+      \ Processes.process_name Processes.process Processes.dest Processes.parent_process_name\
+      \ Processes.parent_process Processes.process_guid \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  - rename process_guid as proc_guid \n  -  fields _time dest user parent_process_name\
+      \ parent_process process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data] \n  -  table _time dest user parent_process_name parent_process\
+      \ process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data \n  -  `disable_windows_smartscreen_protection_filter`"
+  level: critical
+tags:
+- T1562.001
+- 'Impair Defenses: Disable or Modify Tools'
+- Defense Evasion
+references: Increase Windows logging to include Registry events
+notes: .nan

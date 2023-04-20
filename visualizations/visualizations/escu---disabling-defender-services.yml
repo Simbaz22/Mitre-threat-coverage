@@ -1,0 +1,37 @@
+title: ESCU - Disabling Defender Services
+description: This particular behavior is typically executed when an adversaries or
+  malware gains access to an endpoint and beings to perform execution and to evade
+  detections. Usually, a batch (.bat) will be executed and multiple registry and scheduled
+  task modifications will occur. During triage, review parallel processes and identify
+  any further file modifications. Endpoint should be isolated.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Registry\
+      \ where Registry.registry_path = \"*\\\\System\\\\CurrentControlSet\\\\Services\\\
+      \\*\" AND (Registry.registry_path IN(\"*WdBoot*\", \"*WdFilter*\", \"*WdNisDrv*\"\
+      , \"*WdNisSvc*\",\"*WinDefend*\", \"*SecurityHealthService*\")) AND Registry.registry_value_name\
+      \ = Start Registry.registry_value_data = 0x00000004 by _time span=1h Registry.dest\
+      \ Registry.user Registry.registry_path Registry.registry_value_name Registry.registry_value_data\
+      \ Registry.process_guid \n  -  `drop_dm_object_name(Registry)` \n  - rename\
+      \ process_guid as proc_guid \n  - join proc_guid, _time [\n  -  tstats `security_content_summariesonly`\
+      \ count FROM datamodel=Endpoint.Processes by _time span=1h Processes.process_id\
+      \ Processes.process_name Processes.process Processes.dest Processes.parent_process_name\
+      \ Processes.parent_process Processes.process_guid \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  - rename process_guid as proc_guid \n  -  fields _time dest user parent_process_name\
+      \ parent_process process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data] \n  -  table _time dest user parent_process_name parent_process\
+      \ process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data \n  -  `disabling_defender_services_filter`"
+  level: critical
+tags:
+- T1562.001
+- 'Impair Defenses: Disable or Modify Tools'
+- Defense Evasion
+references: Increase Windows logging to include Registry events
+notes: .nan

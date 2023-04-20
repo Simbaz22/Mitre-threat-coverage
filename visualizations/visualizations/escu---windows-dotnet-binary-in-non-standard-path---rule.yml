@@ -1,0 +1,34 @@
+title: ESCU - Windows DotNet Binary in Non Standard Path - Rule
+description: The following analytic identifies native .net binaries within the Windows
+  operating system that may be abused by adversaries by moving it to a new directory.
+  The analytic identifies the .net binary by using a lookup and compares the process
+  name and original file name (internal name). The analytic utilizes a lookup with
+  the is_net_windows_file macro to identify the binary process name and original file
+  name. if one or the other matches an alert will be generated. Adversaries abuse
+  these binaries as they are native to windows and native DotNet. Note that not all
+  SDK (post install of Windows) are captured in the lookup.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Processes where NOT (Processes.process_path\
+      \ IN (\"*\\\\Windows\\\\ADWS\\\\*\",\"*\\\\Windows\\\\SysWOW64*\", \"*\\\\Windows\\\
+      \\system32*\", \"*\\\\Windows\\\\NetworkController\\\\*\", \"*\\\\Windows\\\\\
+      SystemApps\\\\*\", \"*\\\\WinSxS\\\\*\", \"*\\\\Windows\\\\Microsoft.NET\\\\\
+      *\")) by Processes.dest Processes.user Processes.parent_process Processes.process_name\
+      \ Processes.process Processes.original_file_name Processes.process_path Processes.process_id\
+      \ Processes.parent_process_id \n  -  `drop_dm_object_name(\"Processes\")` \n\
+      \  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `is_net_windows_file` \n  -  `windows_dotnet_binary_in_non_standard_path_filter`"
+  level: critical
+tags:
+- "T1036\nT1036.003\nT1218\nT1218.004"
+- Masquerading
+- Masquerading
+references: .nan
+notes: .nan

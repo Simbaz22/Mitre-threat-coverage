@@ -1,0 +1,19 @@
+title: DS_Scheduled Task modification
+description: This rule detects a modification to a scheduled task.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "index=winlog EventCode=4702 AND user!=\"*$\"  \n\n  -  table Task_Name\
+      \ action user dest signature"
+  level: critical
+tags:
+- T1053.005
+- 'Scheduled Task/Job: Scheduled Task'
+- Execution, Persistence, Privilege Escalation
+references: .nan
+notes: .nan

@@ -1,0 +1,24 @@
+title: ESCU - Domain Group Discovery with Adsisearcher - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the `[Adsisearcher]` type accelerator being used to query Active Directory
+  for domain groups. Red Teams and adversaries may leverage `[Adsisearcher]` to enumerate
+  domain groups for situational awareness and Active Directory Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (Message = \"*[adsisearcher]*\" AND Message\
+      \ = \"*(objectcategory=group)*\" AND Message = \"*findAll()*\") \n  -  stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by EventCode Message\
+      \ ComputerName User \n  -  `security_content_ctime(firstTime)` \n  -  `domain_group_discovery_with_adsisearcher_filter`"
+  level: critical
+tags:
+- T1069.002
+- 'Permission Groups Discovery: Domain Groups'
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

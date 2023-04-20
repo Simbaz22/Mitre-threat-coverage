@@ -1,0 +1,31 @@
+title: ESCU - Office Spawning Control - Rule
+description: The following detection identifies control.exe spawning from an office
+  product. This detection identifies any Windows Office Product spawning `control.exe`.
+  In malicious instances, the command-line of `control.exe` will contain a file path
+  to a .cpl or .inf, related to CVE-2021-40444. In this instance, we narrow our detection
+  down to the Office suite as a parent process. During triage, review all file modifications.
+  Capture and analyze any artifacts on disk. review parallel and child processes to
+  identify further suspicious behavior
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.parent_process_name\
+      \ IN (\"winword.exe\",\"excel.exe\",\"powerpnt.exe\",\"mspub.exe\",\"visio.exe\"\
+      ,\"wordpad.exe\",\"wordview.exe\") Processes.process_name=control.exe by Processes.dest\
+      \ Processes.user Processes.parent_process Processes.process_name Processes.process\
+      \ Processes.process_id Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\n\
+      \  -  `office_spawning_control_filter`"
+  level: critical
+tags:
+- "T1566\nT1566.001"
+- Phishing
+- Phishing
+references: .nan
+notes: .nan

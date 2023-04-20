@@ -1,0 +1,30 @@
+title: ESCU - Windows InstallUtil in Non Standard Path - Rule
+description: The following analytic identifies the Windows binary InstallUtil.exe
+  running from a non-standard location. The analytic utilizes a macro for InstallUtil
+  and identifies both the process_name and original_file_name.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Processes where `process_installutil`\
+      \ NOT (Processes.process_path IN (\"*\\\\Windows\\\\ADWS\\\\*\",\"*\\\\Windows\\\
+      \\SysWOW64*\", \"*\\\\Windows\\\\system32*\", \"*\\\\Windows\\\\NetworkController\\\
+      \\*\", \"*\\\\Windows\\\\SystemApps\\\\*\", \"*\\\\WinSxS\\\\*\", \"*\\\\Windows\\\
+      \\Microsoft.NET\\\\*\")) by Processes.dest Processes.user Processes.parent_process\
+      \ Processes.process_name Processes.process Processes.original_file_name Processes.process_id\
+      \ Processes.parent_process_id Processes.process_hash \n  -  `drop_dm_object_name(\"\
+      Processes\")` \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `windows_installutil_in_non_standard_path_filter`"
+  level: critical
+tags:
+- T1036.003
+- 'Masquerading: Rename System Utilities'
+- Defense Evasion
+references: "Increase windows logging to include file creation, deletion and modification\n\
+  Requires Sysmon data"
+notes: .nan

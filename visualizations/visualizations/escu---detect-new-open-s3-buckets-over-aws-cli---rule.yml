@@ -1,0 +1,30 @@
+title: ESCU - Detect New Open S3 Buckets over AWS CLI - Rule
+description: This search looks for AWS CloudTrail events where a user has created
+  an open/public S3 bucket over the aws cli.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventSource=\"s3.amazonaws.com\" (userAgent=\"[aws-cli*\"\
+      \ OR userAgent=aws-cli* ) eventName=PutBucketAcl OR requestParameters.accessControlList.x-amz-grant-read-acp\
+      \ IN (\"*AuthenticatedUsers\",\"*AllUsers\") OR requestParameters.accessControlList.x-amz-grant-write\
+      \ IN (\"*AuthenticatedUsers\",\"*AllUsers\") OR requestParameters.accessControlList.x-amz-grant-write-acp\
+      \ IN (\"*AuthenticatedUsers\",\"*AllUsers\") OR requestParameters.accessControlList.x-amz-grant-full-control\
+      \ IN (\"*AuthenticatedUsers\",\"*AllUsers\") \n  -  rename requestParameters.bucketName\
+      \ AS bucketName \n  -  fillnull \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by userIdentity.userName userIdentity.principalId userAgent bucketName\
+      \ requestParameters.accessControlList.x-amz-grant-read requestParameters.accessControlList.x-amz-grant-read-acp\
+      \ requestParameters.accessControlList.x-amz-grant-write requestParameters.accessControlList.x-amz-grant-write-acp\
+      \ requestParameters.accessControlList.x-amz-grant-full-control \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `detect_new_open_s3_buckets_over_aws_cli_filter`"
+  level: critical
+tags:
+- T1530
+- Data from Cloud Storage
+- Collection
+references: .nan
+notes: .nan

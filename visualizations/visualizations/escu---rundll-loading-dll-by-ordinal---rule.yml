@@ -1,0 +1,29 @@
+title: ESCU - RunDLL Loading DLL By Ordinal - Rule
+description: The following analytic identifies rundll32.exe loading an export function
+  by ordinal value. Adversaries may abuse rundll32.exe to proxy execution of malicious
+  code. Using rundll32.exe, vice executing directly, may avoid triggering security
+  tools that may not monitor execution of the rundll32.exe process because of allowlists
+  or false positives from normal operations. Utilizing ordinal values makes it a bit
+  more complicated for analysts to understand the behavior until the DLL is reviewed.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(Processes.process)\
+      \ as process min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes\
+      \ where `process_rundll32` by Processes.dest Processes.user Processes.parent_process_name\
+      \ Processes.process_name Processes.original_file_name Processes.process Processes.process_id\
+      \ Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)` \n  -\
+      \  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  where match(process,\"rundll32.+\\#\\d+\") \n  -  `rundll_loading_dll_by_ordinal_filter`"
+  level: critical
+tags:
+- T1218.011
+- 'System Binary Proxy Execution: Rundll32'
+- Defense Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

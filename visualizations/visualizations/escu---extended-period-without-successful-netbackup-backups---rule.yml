@@ -1,0 +1,26 @@
+title: ESCU - Extended Period Without Successful Netbackup Backups - Rule
+description: "WARNING, this detection has been marked deprecated by the Splunk Threat\
+  \ Research team, this means that it will no longer be maintained or supported. If\
+  \ you have any questions feel free to email us at: research@splunk.com. This search\
+  \ returns a list of hosts that have not successfully completed a backup in over\
+  \ a week. Deprecated because it's a infrastructure monitoring."
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`netbackup` MESSAGE=\"Disk/Partition backup completed successfully.\"\
+      \ \n  -  stats latest(_time) as latestTime by COMPUTERNAME \n  -  `security_content_ctime(latestTime)`\
+      \ \n  -  rename COMPUTERNAME as dest \n  -  eval isOutlier=if(latestTime <=\
+      \ relative_time(now(), \"-7d@d\"), 1, 0) \n  -  isOutlier=1 \n  -  table latestTime,\
+      \ dest \n  -  `extended_period_without_successful_netbackup_backups_filter`"
+  level: critical
+tags:
+- T1490
+- Inhibit System Recovery
+- Impact
+references: .nan
+notes: Deprecated by Splunk

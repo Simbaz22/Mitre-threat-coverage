@@ -1,0 +1,23 @@
+title: ESCU - aws detect sts assume role abuse - Rule
+description: This search provides detection of suspicious use of sts:AssumeRole. These
+  tokens can be created on the go and used by attackers to move laterally and escalate
+  privileges.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` user_type=AssumedRole userIdentity.sessionContext.sessionIssuer.type=Role\
+      \ \n  -  table sourceIPAddress userIdentity.arn user_agent user_access_key status\
+      \ action requestParameters.roleName responseElements.role.roleName responseElements.role.createDate\
+      \ \n  -  `aws_detect_sts_assume_role_abuse_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: THIS IS A EXPERIMENTAL DETECTION

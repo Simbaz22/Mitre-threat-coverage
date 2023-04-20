@@ -1,0 +1,26 @@
+title: ESCU - AWS SetDefaultPolicyVersion - Rule
+description: This search looks for AWS CloudTrail events where a user has set a default
+  policy versions. Attackers have been know to use this technique for Privilege Escalation
+  in case the previous versions of the policy had permissions to access more resources
+  than the current version of the policy
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=SetDefaultPolicyVersion eventSource = iam.amazonaws.com\
+      \ \n  -  stats count min(_time) as firstTime max(_time) as lastTime values(requestParameters.policyArn)\
+      \ as policy_arn by src requestParameters.versionId eventName eventSource aws_account_id\
+      \ errorCode userAgent eventID awsRegion userIdentity.principalId user_arn \n\
+      \  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `aws_setdefaultpolicyversion_filter`"
+  level: critical
+tags:
+- T1078.004
+- 'Valid Accounts: Cloud Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: .nan

@@ -1,0 +1,26 @@
+title: ESCU - Kubernetes GCP detect sensitive object access - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  provides information on Kubernetes accounts accessing sensitve objects such as configmaps
+  or secrets'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Cloud\nGCP"
+detection:
+  condition:
+    sigma: "`google_gcp_pubsub_message` data.protoPayload.authorizationInfo{}.resource=configmaps\
+      \ OR secrets  \n  -  table data.protoPayload.requestMetadata.callerIp src_user\
+      \ data.resource.labels.cluster_name data.protoPayload.request.metadata.namespace\
+      \ data.labels.authorization.k8s.io/decision \n  -  dedup data.protoPayload.requestMetadata.callerIp\
+      \ src_user data.resource.labels.cluster_name \n  - `kubernetes_gcp_detect_sensitive_object_access_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: .nan
+notes: Rule Deprecated by Splunk

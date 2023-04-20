@@ -1,0 +1,31 @@
+title: ESCU - Detect PsExec With accepteula Flag - Rule
+description: This search looks for events where `PsExec.exe` is run with the `accepteula`
+  flag in the command line. PsExec is a built-in Windows utility that enables you
+  to execute processes on other systems. It is fully interactive for console applications.
+  This tool is widely used for launching interactive command prompts on remote systems.
+  Threat actors leverage this extensively for executing code on compromised systems.
+  If an attacker is running PsExec for the first time, they will be prompted to accept
+  the end-user license agreement (EULA), which can be passed as the argument `accepteula`
+  within the command line.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(Processes.process)\
+      \ as process min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes\
+      \ where `process_psexec` Processes.process=*accepteula* by Processes.dest Processes.user\
+      \ Processes.parent_process_name Processes.process_name Processes.process Processes.process_id\
+      \ Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)`\n  - \
+      \ `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `detect_psexec_with_accepteula_flag_filter`"
+  level: critical
+tags:
+- "T1021\nT1021.002"
+- Remote Services
+- Remote Services
+references: Increase Windows logging to include command line data
+notes: .nan

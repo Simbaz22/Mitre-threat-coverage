@@ -1,0 +1,25 @@
+title: ESCU - UAC Bypass MMC Load Unsigned Dll - Rule
+description: This search is to detect a suspicious loaded unsigned dll by MMC.exe
+  application. This technique is commonly seen in attacker that tries to bypassed
+  UAC feature or gain privilege escalation. This is done by modifying some CLSID registry
+  that will trigger the mmc.exe to load the dll path
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=7  ImageLoaded = \"*.dll\" Image = \"*\\\\mmc.exe\"\
+      \ Signed=false Company != \"Microsoft Corporation\" \n  -  stats count min(_time)\
+      \ as firstTime max(_time) as lastTime by Image ImageLoaded Signed ProcessId\
+      \ OriginalFileName Computer EventCode Company \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `uac_bypass_mmc_load_unsigned_dll_filter`"
+  level: critical
+tags:
+- T1548.002
+- 'Abuse Elevation Control Mechanism: Bypass User Account Control'
+- Defense Evasion, Privilege Escalation
+references: Requires Sysmon data
+notes: .nan

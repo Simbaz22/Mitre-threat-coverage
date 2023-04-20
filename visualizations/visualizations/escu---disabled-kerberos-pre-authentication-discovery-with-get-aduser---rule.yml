@@ -1,0 +1,28 @@
+title: ESCU - Disabled Kerberos Pre-Authentication Discovery With Get-ADUser - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the execution of the `Get-ADUser` commandlet with specific parameters.
+  `Get-ADUser` is part of the Active Directory PowerShell module used to manage Windows
+  Active Directory networks. As the name suggests, `Get-ADUser` is used to query for
+  domain users. With the appropiate parameters, Get-ADUser allows adversaries to discover
+  domain accounts with Kerberos Pre Authentication disabled.\ Red Teams and adversaries
+  alike use may abuse Get-ADUSer to enumerate these accounts and attempt to crack
+  their passwords offline.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (Message = \"*Get-ADUser*\" AND Message=\"\
+      *4194304*\") \n  -  stats count min(_time)  as firstTime max(_time) as lastTime\
+      \ by EventCode Message ComputerName User \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `disabled_kerberos_pre_authentication_discovery_with_get_aduser_filter`"
+  level: critical
+tags:
+- T1558.004
+- 'Steal or Forge Kerberos Tickets: AS-REP Roasting'
+- Credential Access
+references: Requires PowerShell logs
+notes: .nan

@@ -1,0 +1,31 @@
+title: ESCU - Detect AzureHound File Modifications - Rule
+description: The following analytic is similar to SharpHound file modifications, but
+  this instance covers the use of Invoke-AzureHound. AzureHound is the SharpHound
+  equivilent but for Azure. It's possible this may never be seen in an environment
+  as most attackers may execute this tool remotely. Once execution is complete, a
+  zip file with a similar name will drop `20210601090751-azurecollection.zip`. In
+  addition to the zip, multiple .json files will be written to disk, which are in
+  the zip.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Filesystem where Filesystem.file_name\
+      \ IN (\"*-azurecollection.zip\", \"*-azprivroleadminrights.json\", \"*-azglobaladminrights.json\"\
+      , \"*-azcloudappadmins.json\", \"*-azapplicationadmins.json\") by Filesystem.file_create_time\
+      \ Filesystem.process_id  Filesystem.file_name Filesystem.file_path Filesystem.dest\
+      \ \n  -  `drop_dm_object_name(Filesystem)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `detect_azurehound_file_modifications_filter`"
+  level: critical
+tags:
+- "T1087.002\nT1069.001\nT1482\nT1087.001\nT1087\nT1069.002\nT1069"
+- 'Account Discovery: Domain Account'
+- 'Account Discovery: Domain Account'
+references: "Increase Windows logging to include command line data\nIncrease Windows\
+  \ logging to include file modification data"
+notes: .nan

@@ -1,0 +1,32 @@
+title: ESCU - Detect GCP Storage access from a new IP - Rule
+description: This search looks at GCP Storage bucket-access logs and detects new or
+  previously unseen remote IP addresses that have successfully accessed a GCP Storage
+  bucket.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "`google_gcp_pubsub_message` \n  -  multikv \n  -  rename sc_status_ as\
+      \ status \n  -  rename cs_object_ as bucket_name \n  -  rename c_ip_ as remote_ip\
+      \ \n  -  rename cs_uri_ as request_uri \n  -  rename cs_method_ as operation\
+      \ \n  -  status=\"\\\"200\\\"\" \n  -  stats earliest(_time) as firstTime latest(_time)\
+      \ as lastTime by bucket_name remote_ip operation request_uri \n  -  table firstTime,\
+      \ lastTime, bucket_name, remote_ip, operation, request_uri \n  -  inputlookup\
+      \ append=t previously_seen_gcp_storage_access_from_remote_ip \n  -  stats min(firstTime)\
+      \ as firstTime, max(lastTime) as lastTime by bucket_name remote_ip operation\
+      \ request_uri \n  -  outputlookup previously_seen_gcp_storage_access_from_remote_ip\
+      \ \n  -  eval newIP=if(firstTime >= relative_time(now(),\"-70m@m\"), 1, 0) \n\
+      \  -  where newIP=1 \n  -  eval first_time=strftime(firstTime,\"%m/%d/%y %H:%M:%S\"\
+      ) \n  -  eval last_time=strftime(lastTime,\"%m/%d/%y %H:%M:%S\") \n  -  table\
+      \  first_time last_time bucket_name remote_ip operation request_uri \n  -  `detect_gcp_storage_access_from_a_new_ip_filter`"
+  level: critical
+tags:
+- T1530
+- Data from Cloud Storage
+- Collection
+references: .nan
+notes: Rule not applicable to this client

@@ -1,0 +1,32 @@
+title: ESCU - Dump LSASS via procdump Rename - Rule
+description: "WARNING, this detection has been marked deprecated by the Splunk Threat\
+  \ Research team, this means that it will no longer be maintained or supported. If\
+  \ you have any questions feel free to email us at: research@splunk.com. Detect a\
+  \ renamed instance of procdump.exe dumping the lsass process. This query looks for\
+  \ both -mm and -ma usage. -mm will produce a mini dump file and -ma will write a\
+  \ dump file with all process memory. Both are highly suspect and should be reviewed.\
+  \ Modify the query as needed.\nDuring triage, confirm this is procdump.exe executing.\
+  \ If it is the first time a Sysinternals utility has been ran, it is possible there\
+  \ will be a -accepteula on the command line. Review other endpoint data sources\
+  \ for cross process (injection) into lsass.exe."
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` OriginalFileName=procdump  process_name!=procdump*.exe  EventID=1\
+      \ (CommandLine=*-ma* OR CommandLine=*-mm*) CommandLine=*lsass* \n  -  rename\
+      \ Computer as dest \n  -   stats count min(_time) as firstTime max(_time) as\
+      \ lastTime by dest, parent_process_name, process_name, OriginalFileName, CommandLine\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `dump_lsass_via_procdump_rename_filter`"
+  level: critical
+tags:
+- T1003.001
+- 'OS Credential Dumping: LSASS Memory'
+- Credential Access
+references: Requires Sysmon data
+notes: .nan

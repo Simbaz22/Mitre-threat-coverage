@@ -1,0 +1,30 @@
+title: ESCU - GCP Detect accounts with high risk roles by project - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  provides detection of accounts with high risk roles by projects. Compromised accounts
+  with high risk roles can move laterally or even scalate privileges at different
+  projects depending on organization schema.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: GCP
+detection:
+  condition:
+    sigma: "`google_gcp_pubsub_message` data.protoPayload.request.policy.bindings{}.role=roles/owner\
+      \ OR roles/editor OR roles/iam.serviceAccountUser OR roles/iam.serviceAccountAdmin\
+      \ OR roles/iam.serviceAccountTokenCreator OR roles/dataflow.developer OR roles/dataflow.admin\
+      \ OR roles/composer.admin OR roles/dataproc.admin OR roles/dataproc.editor \n\
+      \  -  table data.resource.type data.protoPayload.authenticationInfo.principalEmail\
+      \ data.protoPayload.authorizationInfo{}.permission data.protoPayload.authorizationInfo{}.resource\
+      \ data.protoPayload.response.bindings{}.role data.protoPayload.response.bindings{}.members{}\
+      \ \n  -  `gcp_detect_accounts_with_high_risk_roles_by_project_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: Deprecated

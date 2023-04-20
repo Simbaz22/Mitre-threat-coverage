@@ -1,0 +1,35 @@
+title: ESCU - EC2 Instance Started With Previously Unseen AMI - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  looks for EC2 instances being created with previously unseen AMIs.  This search
+  is deprecated and have been translated to use the latest Change Datamodel.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: AWS
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=RunInstances [`cloudtrail` eventName=RunInstances\
+      \ errorCode=success \n  -  stats earliest(_time) as firstTime latest(_time)\
+      \ as lastTime by requestParameters.instancesSet.items{}.imageId \n  -  rename\
+      \ requestParameters.instancesSet.items{}.imageId as amiID \n  -  inputlookup\
+      \ append=t previously_seen_ec2_amis.csv \n  -  stats min(firstTime) as firstTime\
+      \ max(lastTime) as lastTime by amiID \n  -  outputlookup previously_seen_ec2_amis.csv\
+      \ \n  -  eval newAMI=if(firstTime >= relative_time(now(), \"-70m@m\"), 1, 0)\
+      \ \n  -  `security_content_ctime(firstTime)`\n  - `security_content_ctime(lastTime)`\
+      \ \n  -  where newAMI=1 \n  -  rename amiID as requestParameters.instancesSet.items{}.imageId\
+      \ \n  -  table requestParameters.instancesSet.items{}.imageId] \n  -  rename\
+      \ requestParameters.instanceType as instanceType, responseElements.instancesSet.items{}.instanceId\
+      \ as dest, userIdentity.arn as arn, requestParameters.instancesSet.items{}.imageId\
+      \ as amiID \n  -  table firstTime, lastTime, arn, amiID, dest, instanceType\
+      \ \n  -  `ec2_instance_started_with_previously_unseen_ami_filter`"
+  level: critical
+tags:
+- T1078.004
+- 'Valid Accounts: Cloud Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: Deprecated by Splunk

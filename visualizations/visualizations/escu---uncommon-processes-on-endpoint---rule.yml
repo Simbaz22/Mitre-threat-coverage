@@ -1,0 +1,25 @@
+title: ESCU - Uncommon Processes On Endpoint - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  looks for applications on the endpoint that you have marked as uncommon.'
+status: Expired
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes by Processes.dest\
+      \ Processes.user Processes.process Processes.process_name \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `uncommon_processes` \n  - `uncommon_processes_on_endpoint_filter`"
+  level: critical
+tags:
+- T1204.002
+- 'User Execution: Malicious File'
+- Execution
+references: Increase Windows logging to include command line data
+notes: .nan

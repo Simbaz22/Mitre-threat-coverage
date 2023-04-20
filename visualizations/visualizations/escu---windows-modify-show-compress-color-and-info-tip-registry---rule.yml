@@ -1,0 +1,39 @@
+title: ESCU - Windows Modify Show Compress Color And Info Tip Registry - Rule
+description: This analytic is to look for suspicious registry modification related
+  to file compression color and information tips. This IOC was seen in hermetic wiper
+  where it has a thread that will create this registry entry to change the color of
+  compressed or encrypted files in NTFS file system as well as the pop up information
+  tips. This is a good indicator that a process tries to modified one of the registry
+  GlobalFolderOptions related to file compression attribution in terms of color in
+  NTFS file system.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Registry\
+      \ where Registry.registry_path = \"*\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\
+      \\Explorer\\\\Advanced*\" AND Registry.registry_value_name  IN(\"ShowCompColor\"\
+      , \"ShowInfoTip\") by _time span=1h Registry.dest Registry.user Registry.registry_path\
+      \ Registry.registry_value_name Registry.registry_value_data Registry.process_guid\
+      \ \n  -  `drop_dm_object_name(Registry)` \n  - rename process_guid as proc_guid\
+      \ \n  - join proc_guid, _time [\n  -  tstats `security_content_summariesonly`\
+      \ count FROM datamodel=Endpoint.Processes by _time span=1h Processes.process_id\
+      \ Processes.process_name Processes.process Processes.dest Processes.parent_process_name\
+      \ Processes.parent_process Processes.process_guid \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  - rename process_guid as proc_guid \n  -  fields _time dest user parent_process_name\
+      \ parent_process process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data] \n  -  table _time dest user parent_process_name parent_process\
+      \ process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data \n  -  `windows_modify_show_compress_color_and_info_tip_registry_filter`"
+  level: critical
+tags:
+- T1112
+- Modify Registry
+- Defense Evasion
+references: "Increase Windows logging to include Registry events\nIncrease Windows\
+  \ logging to include command line data"
+notes: .nan

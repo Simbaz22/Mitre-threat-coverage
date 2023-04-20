@@ -1,0 +1,28 @@
+title: ESCU - Cloud Compute Instance Created In Previously Unused Region - Rule
+description: This search looks at cloud-infrastructure events where an instance is
+  created in any region within the last hour and then compares it to a lookup file
+  of previously seen regions where instances have been created.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "\n  -  tstats earliest(_time) as firstTime latest(_time) as lastTime values(All_Changes.object_id)\
+      \ as dest, count from datamodel=Change where All_Changes.action=created by All_Changes.vendor_region,\
+      \ All_Changes.user \n  -  `drop_dm_object_name(\"All_Changes\")` \n  -  lookup\
+      \ previously_seen_cloud_regions vendor_region as vendor_region OUTPUTNEW firstTimeSeen,\
+      \ enough_data \n  -  eventstats max(enough_data) as enough_data \n  -  where\
+      \ enough_data=1 \n  -  eval firstTimeSeenRegion=min(firstTimeSeen) \n  -  where\
+      \ isnull(firstTimeSeenRegion) OR firstTimeSeenRegion > relative_time(now(),\
+      \ \"-24h@h\") \n  -  table firstTime, user, dest, count , vendor_region \n \
+      \ -  `security_content_ctime(firstTime)` \n  -  `cloud_compute_instance_created_in_previously_unused_region_filter`"
+  level: critical
+tags:
+- T1535
+- Unused/Unsupported Cloud Regions
+- Defense Evasion
+references: .nan
+notes: THIS IS A EXPERIMENTAL DETECTION

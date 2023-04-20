@@ -1,0 +1,21 @@
+title: Rare file hashes for high severity endpoint alerts
+description: Rare file hash for high severity endpoint alerts would indicate a version
+  of the file that has never been seen in an organization and would most likely be
+  malicious.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: EDR
+detection:
+  condition:
+    sigma: MISSING SPLUNK LOGIC
+  level: critical
+tags:
+- T1587
+- Develop Capabilities
+- Resource Development
+references: Requires EDR data feed
+notes: "Securonix Logic:\nCategorySeverity = High or 3 or DeviceSeverity = High\n\
+  AND\nfilehash is not null"

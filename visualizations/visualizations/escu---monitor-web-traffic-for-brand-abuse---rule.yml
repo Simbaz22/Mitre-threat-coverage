@@ -1,0 +1,22 @@
+title: ESCU - Monitor Web Traffic For Brand Abuse - Rule
+description: This search looks for Web requests to faux domains similar to the one
+  that you want to have monitored for abuse.
+status: .nan
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(Web.url) as urls\
+      \ min(_time) as firstTime from datamodel=Web by Web.src \n  -  `drop_dm_object_name(\"\
+      Web\")` \n  -  `security_content_ctime(firstTime)` \n  -  `brand_abuse_web`\
+      \ \n  -  `monitor_web_traffic_for_brand_abuse_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: Requires a lookup list for brand monitoring
+notes: .nan

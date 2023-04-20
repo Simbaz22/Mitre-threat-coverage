@@ -1,0 +1,28 @@
+title: ESCU - Execution of File with Multiple Extensions - Rule
+description: This search looks for processes launched from files that have double
+  extensions in the file name. This is typically done to obscure the "real" file extension
+  and make it appear as though the file being accessed is a data file, as opposed
+  to executable content.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process\
+      \ = *.doc.exe OR Processes.process = *.htm.exe OR Processes.process = *.html.exe\
+      \ OR Processes.process = *.txt.exe OR Processes.process = *.pdf.exe OR Processes.process\
+      \ = *.doc.exe by Processes.dest Processes.user Processes.process Processes.parent_process\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `execution_of_file_with_multiple_extensions_filter`"
+  level: critical
+tags:
+- T1036.003
+- 'Masquerading: Rename System Utilities'
+- Defense Evasion
+references: .nan
+notes: Logic is correct; however, rule is unlikely to trigger on Domain Controller.
+  Can still be active.

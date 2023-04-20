@@ -1,0 +1,27 @@
+title: ESCU - Excessive File Deletion In WinDefender Folder
+description: This analytic will identify excessive file deletion events in the Windows
+  Defender folder. This technique was seen in the WhisperGate malware campaign in
+  which adversaries abused Nirsofts advancedrun.exe to gain administrative privilege
+  to then execute PowerShell commands to delete files within the Windows Defender
+  application folder. This behavior is a good indicator the offending process is trying
+  to corrupt a Windows Defender installation.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=23 TargetFilename = \"*\\\\ProgramData\\\\Microsoft\\\
+      \\Windows Defender*\" \n  -  stats values(TargetFilename) as deleted_files min(_time)\
+      \ as firstTime max(_time) as lastTime count by user EventCode Image ProcessID\
+      \ Computer \n  - where count >=50 \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `excessive_file_deletion_in_windefender_folder_filter`"
+  level: critical
+tags:
+- T1485
+- Data Destruction
+- Impact
+references: Increase Windows logging to include file modification data
+notes: .nan

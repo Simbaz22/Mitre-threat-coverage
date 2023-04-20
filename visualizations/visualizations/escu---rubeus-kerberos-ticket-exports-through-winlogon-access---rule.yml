@@ -1,0 +1,35 @@
+title: ESCU - Rubeus Kerberos Ticket Exports Through Winlogon Access - Rule
+description: The following analytic looks for a process accessing the winlogon.exe
+  system process. The Splunk Threat Research team identified this behavior when using
+  the Rubeus tool to monitor for and export kerberos tickets from memory. Before being
+  able to export tickets. Rubeus will try to escalate privileges to SYSTEM by obtaining
+  a handle to winlogon.exe before trying to monitor for kerberos tickets. Exporting
+  tickets from memory is typically the first step for pass the ticket attacks. Red
+  teams and adversaries alike may use the pass the ticket technique using stolen Kerberos
+  tickets to move laterally within an environment, bypassing normal system access
+  controls. Defenders should be aware that adversaries may customize the source code
+  of Rubeus to potentially bypass this analytic.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=10 TargetImage=C:\\\\Windows\\\\system32\\\\winlogon.exe\
+      \ (GrantedAccess=0x1f3fff) (SourceImage!=C:\\\\Windows\\\\system32\\\\svchost.exe\
+      \ AND SourceImage!=C:\\\\Windows\\\\system32\\\\lsass.exe AND SourceImage!=C:\\\
+      \\Windows\\\\system32\\\\LogonUI.exe AND SourceImage!=C:\\\\Windows\\\\system32\\\
+      \\smss.exe AND SourceImage!=C:\\\\Windows\\\\system32\\\\wbem\\\\wmiprvse.exe)\
+      \ \n  -  stats count min(_time) as firstTime max(_time) as lastTime by Computer,\
+      \ SourceImage, SourceProcessId, TargetImage, TargetProcessId, EventCode, GrantedAccess\
+      \ \n  -  rename Computer as dest \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `rubeus_kerberos_ticket_exports_through_winlogon_access_filter`"
+  level: critical
+tags:
+- "T1550\nT1550.003"
+- Use Alternate Authentication Material
+- Use Alternate Authentication Material
+references: Requires Sysmon data
+notes: .nan

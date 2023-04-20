@@ -1,0 +1,31 @@
+title: ESCU - Suspicious Reg exe Process - Rule
+description: This search looks for reg.exe being launched from a command prompt not
+  started by the user. When a user launches cmd.exe, the parent process is usually
+  explorer.exe. This search filters out those instances.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Processes where Processes.parent_process_name\
+      \ != explorer.exe Processes.process_name =cmd.exe by Processes.user Processes.process_name\
+      \ Processes.parent_process_name Processes.dest Processes.process_id Processes.parent_process_id\
+      \ \n  -  `drop_dm_object_name(\"Processes\")` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  [\n  -  tstats `security_content_summariesonly`\
+      \ count FROM datamodel=Endpoint.Processes where Processes.parent_process_name=cmd.exe\
+      \ Processes.process_name= reg.exe by Processes.parent_process_id Processes.dest\
+      \ Processes.process_name \n  -  `drop_dm_object_name(\"Processes\")` \n  - \
+      \ `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  rename parent_process_id as process_id \n  - dedup process_id\n  -\
+      \  table process_id dest] \n  -  `suspicious_reg_exe_process_filter`"
+  level: critical
+tags:
+- T1112
+- Modify Registry
+- Defense Evasion
+references: .nan
+notes: .nan

@@ -1,0 +1,29 @@
+title: ESCU - Detect Outbound LDAP Traffic - Rule
+description: Malicious actors often abuse misconfigured LDAP servers or applications
+  that use the LDAP servers in organizations. Outbound LDAP traffic should not be
+  allowed outbound through your perimeter firewall.  This search will help determine
+  if you have any LDAP connections to IP addresses outside of private (RFC1918) address
+  space.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats earliest(_time) as earliest_time latest(_time) as latest_time\
+      \ values(All_Traffic.dest_ip) as dest_ip from datamodel=Network_Traffic.All_Traffic\
+      \ where All_Traffic.dest_port = 389 OR All_Traffic.dest_port = 636 AND NOT (All_Traffic.dest_ip\
+      \ = 10.0.0.0/8 OR All_Traffic.dest_ip=192.168.0.0/16 OR All_Traffic.dest_ip\
+      \ = 172.16.0.0/12 OR All_Traffic.dest_ip = 199.198.128.0/20) by All_Traffic.src_ip\
+      \ All_Traffic.dest_ip \n  - `drop_dm_object_name(\"All_Traffic\")` \n  -  where\
+      \ src_ip != dest_ip \n  -  `security_content_ctime(latest_time)`  \n  -  `security_content_ctime(earliest_time)`\
+      \ \n  -  `detect_outbound_ldap_traffic_filter`"
+  level: critical
+tags:
+- "T1190\nT1059"
+- Exploit Public-Facing Application
+- Exploit Public-Facing Application
+references: .nan
+notes: .nan

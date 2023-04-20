@@ -1,0 +1,26 @@
+title: ESCU - Detect attackers scanning for vulnerable JBoss servers - Rule
+description: This search looks for specific GET or HEAD requests to web servers that
+  are indicative of reconnaissance attempts to identify vulnerable JBoss servers.
+  JexBoss is described as the exploit tool of choice for this malicious activity.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Network
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Web where (Web.http_method=\"GET\" OR\
+      \ Web.http_method=\"HEAD\") AND (Web.url=\"*/web-console/ServerInfo.jsp*\" OR\
+      \ Web.url=\"*web-console*\" OR Web.url=\"*jmx-console*\" OR Web.url = \"*invoker*\"\
+      ) by Web.http_method, Web.url, Web.src, Web.dest \n  -  `drop_dm_object_name(\"\
+      Web\")` \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `detect_attackers_scanning_for_vulnerable_jboss_servers_filter`"
+  level: critical
+tags:
+- T1082
+- System Information Discovery
+- Discovery
+references: .nan
+notes: Experimental detection (not supported by splunk)

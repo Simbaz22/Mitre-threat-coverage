@@ -1,0 +1,24 @@
+title: ESCU - Kubernetes Azure pod scan fingerprint - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  provides information of unauthenticated requests via source IP user agent, request
+  URI and response status data against Kubernetes cluster pod in Azure'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Azure\nCloud"
+detection:
+  condition:
+    sigma: "`kubernetes_azure` category=kube-audit \n  -  spath input=properties.log\
+      \ \n  -  responseStatus.code=401 \n  -  table  sourceIPs{} userAgent verb requestURI\
+      \ responseStatus.reason properties.pod \n  - `kubernetes_azure_pod_scan_fingerprint_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: .nan
+notes: Rule Deprecated by Splunk

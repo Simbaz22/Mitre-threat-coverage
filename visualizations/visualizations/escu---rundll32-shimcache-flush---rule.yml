@@ -1,0 +1,28 @@
+title: ESCU - Rundll32 Shimcache Flush - Rule
+description: This analytic is to detect a suspicious rundll32 commandline to clear
+  shim cache. This technique is a anti-forensic technique to clear the cache taht
+  are one important artifacts in terms of digital forensic during attacks or incident.
+  This TTP is a good indicator that someone tries to evade some tools and clear foothold
+  on the machine.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where  `process_rundll32`\
+      \ AND Processes.process = \"*apphelp.dll,ShimFlushCache*\" by Processes.dest\
+      \ Processes.user Processes.parent_process_name Processes.process_name Processes.process\
+      \ Processes.process_id Processes.parent_process_id Processes.original_file_name\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `rundll32_shimcache_flush_filter`"
+  level: critical
+tags:
+- T1112
+- Modify Registry
+- Defense Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

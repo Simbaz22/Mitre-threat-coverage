@@ -1,0 +1,26 @@
+title: ESCU - Mshta spawning Rundll32 OR Regsvr32 Process - Rule
+description: This search is to detect a suspicious mshta.exe process that spawn rundll32
+  or regsvr32 child process. This technique was seen in several malware nowadays like
+  trickbot to load its initial .dll stage loader to execute and download the the actual
+  trickbot payload.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.parent_process_name\
+      \ = \"mshta.exe\"  `process_rundll32` OR `process_regsvr32` by Processes.parent_process\
+      \ Processes.process_name Processes.process Processes.process_id Processes.user\
+      \ Processes.dest \n  -  `drop_dm_object_name(\"Processes\")` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  - `security_content_ctime(lastTime)` \n  -  `mshta_spawning_rundll32_or_regsvr32_process_filter`"
+  level: critical
+tags:
+- "T1218\nT1218.005"
+- System Binary Proxy Execution
+- System Binary Proxy Execution
+references: .nan
+notes: .nan

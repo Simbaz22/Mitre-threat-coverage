@@ -1,0 +1,30 @@
+title: ESCU - Suspicious Driver Loaded Path - Rule
+description: This analytic will detect suspicious driver loaded paths. This technique
+  is commonly used by malicious software like coin miners (xmrig) to register its
+  malicious driver from notable directories where executable or drivers do not commonly
+  exist. During triage, validate this driver is for legitimate business use. Review
+  the metadata and certificate information. Unsigned drivers from non-standard paths
+  is not normal, but occurs. In addition, review driver loads into `ntoskrnl.exe`
+  for possible other drivers of interest. Long tail analyze drivers by path (outside
+  of default, and in default) for further review.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=6 ImageLoaded = \"*.sys\" NOT (ImageLoaded IN(\"*\\\
+      \\WINDOWS\\\\inf\",\"*\\\\WINDOWS\\\\System32\\\\drivers\\\\*\", \"*\\\\WINDOWS\\\
+      \\System32\\\\DriverStore\\\\FileRepository\\\\*\")) \n  -   stats  min(_time)\
+      \ as firstTime max(_time) as lastTime count by Computer ImageLoaded Hashes IMPHASH\
+      \ Signature Signed \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `suspicious_driver_loaded_path_filter`"
+  level: critical
+tags:
+- T1543.003
+- 'Create or Modify System Process: Windows Service'
+- Persistence, Privilege Escalation
+references: Requires Sysmon data
+notes: .nan

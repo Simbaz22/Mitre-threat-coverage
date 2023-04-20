@@ -1,0 +1,27 @@
+title: ESCU - Spectre and Meltdown Vulnerable Systems - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. The search
+  is used to detect systems that are still vulnerable to the Spectre and Meltdown
+  vulnerabilities.'
+status: Expired
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Vulnerabilities where Vulnerabilities.cve\
+      \ =\"CVE-2017-5753\" OR Vulnerabilities.cve =\"CVE-2017-5715\" OR Vulnerabilities.cve\
+      \ =\"CVE-2017-5754\" by Vulnerabilities.dest \n  -  `drop_dm_object_name(Vulnerabilities)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `spectre_and_meltdown_vulnerable_systems_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: .nan
+notes: Deprecated by Splunk

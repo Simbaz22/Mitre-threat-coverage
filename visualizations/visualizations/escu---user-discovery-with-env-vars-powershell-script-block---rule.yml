@@ -1,0 +1,26 @@
+title: ESCU - User Discovery With Env Vars PowerShell Script Block - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the use of PowerShell environment variables to identify the current
+  logged user. Red Teams and adversaries may leverage this method to identify the
+  logged user on a compromised endpoint for situational awareness and Active Directory
+  Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (ScriptBlockText = \"*$env:UserName*\" OR\
+      \ ScriptBlockText = \"*[System.Environment]::UserName*\") \n  -  stats count\
+      \ min(_time) as firstTime max(_time) as lastTime by EventCode ScriptBlockText\
+      \ Computer user_id \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `user_discovery_with_env_vars_powershell_script_block_filter`"
+  level: critical
+tags:
+- T1033
+- System Owner/User Discovery
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

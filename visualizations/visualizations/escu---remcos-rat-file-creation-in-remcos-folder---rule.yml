@@ -1,0 +1,26 @@
+title: ESCU - Remcos RAT File Creation in Remcos Folder - Rule
+description: This search is to detect file creation in remcos folder in appdata which
+  is the keylog and clipboard logs that will be send to its c2 server. This is really
+  a good TTP indicator that there is a remcos rat in the system that do keylogging,
+  clipboard grabbing and audio recording.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  - tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Filesystem where Filesystem.file_name\
+      \ IN (\"*.dat\") Filesystem.file_path = \"*\\\\remcos\\\\*\" by _time Filesystem.file_name\
+      \ Filesystem.file_path Filesystem.dest Filesystem.file_create_time \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `remcos_rat_file_creation_in_remcos_folder_filter`"
+  level: critical
+tags:
+- T1113
+- Screen Capture
+- Collection
+references: Increase Windows logging to include command line data
+notes: .nan

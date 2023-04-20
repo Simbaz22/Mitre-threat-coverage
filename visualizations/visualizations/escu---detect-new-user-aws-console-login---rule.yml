@@ -1,0 +1,32 @@
+title: ESCU - Detect new user AWS Console Login - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  looks for AWS CloudTrail events wherein a console login event by a user was recorded
+  within the last hour, then compares the event to a lookup file of previously seen
+  users (by ARN values) who have logged into the console. The alert is fired if the
+  user has logged into the console for the first time within the last hour. Deprecated
+  now this search is updated to use the Authentication datamodel.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: AWS
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=ConsoleLogin \n  -  rename userIdentity.arn as\
+      \ user \n  -  stats earliest(_time) as firstTime latest(_time) as lastTime by\
+      \ user \n  -  inputlookup append=t previously_seen_users_console_logins_cloudtrail\
+      \  \n  -  stats min(firstTime) as firstTime max(lastTime) as lastTime by user\
+      \ \n  -  eval userStatus=if(firstTime >= relative_time(now(), \"-70m@m\"), \"\
+      First Time Logging into AWS Console\",\"Previously Seen User\") \n  -  `security_content_ctime(firstTime)`\n\
+      \  - `security_content_ctime(lastTime)`\n  -  where userStatus =\"First Time\
+      \ Logging into AWS Console\"  \n  -  `detect_new_user_aws_console_login_filter`"
+  level: critical
+tags:
+- T1078.004
+- 'Valid Accounts: Cloud Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: Deprecated by splunk

@@ -1,0 +1,24 @@
+title: ESCU - O365 Suspicious User Email Forwarding - Rule
+description: This search detects when multiple user configured a forwarding rule to
+  the same destination.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: O365
+detection:
+  condition:
+    sigma: "`o365_management_activity` Operation=Set-Mailbox \n  -  spath input=Parameters\
+      \ \n  -  rename Identity AS src_user \n  -  ForwardingSmtpAddress=* \n  -  stats\
+      \ dc(src_user) AS count_src_user earliest(_time) as firstTime latest(_time)\
+      \ as lastTime values(src_user) AS src_user values(user) AS user by ForwardingSmtpAddress\
+      \ \n  -  where count_src_user > 1 \n  - `security_content_ctime(firstTime)`\
+      \ \n  - `security_content_ctime(lastTime)` \n  - `o365_suspicious_user_email_forwarding_filter`"
+  level: critical
+tags:
+- "T1114.003\nT1114"
+- 'Email Collection: Email Forwarding Rule'
+- 'Email Collection: Email Forwarding Rule'
+references: Requires O365 data feed
+notes: .nan

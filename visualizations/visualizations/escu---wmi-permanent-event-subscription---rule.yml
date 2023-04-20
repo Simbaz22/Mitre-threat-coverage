@@ -1,0 +1,33 @@
+title: ESCU - WMI Permanent Event Subscription - Rule
+description: "This analytic looks for the creation of WMI permanent event subscriptions.\
+  \ The following analytic identifies the use of WMI Event Subscription to establish\
+  \ persistence or perform privilege escalation. WMI can be used to install event\
+  \ filters, providers, consumers, and bindings that execute code when a defined event\
+  \ occurs. WMI subscription execution is proxied by the WMI Provider Host process\
+  \ (WmiPrvSe.exe) and thus may result in elevated SYSTEM privileges. This analytic\
+  \ is restricted by commonly added process execution and a path. If the volume is\
+  \ low enough, remove the values and flag on any new subscriptions.\nAll event subscriptions\
+  \ have three components \\\n\n    Filter - WQL Query for the events we want. EventID\
+  \ = 19 \\\n    Consumer - An action to take upon triggering the filter. EventID\
+  \ = 20 \\\n    Binding - Registers a filter to a consumer. EventID = 21\n    Monitor\
+  \ for the creation of new WMI EventFilter, EventConsumer, and FilterToConsumerBinding.\
+  \ It may be pertinent to review all 3 to identify the flow of execution. In addition,\
+  \ EventCode 4104 may assist with any other PowerShell script usage that registered\
+  \ the subscription."
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=21 \n\n  -  rename host as dest \n\n  -  table _time,\
+      \ dest, user, Operation, EventType, Query, Consumer, Filter \n\n  -  `wmi_permanent_event_subscription___sysmon_filter`"
+  level: critical
+tags:
+- T1546.003
+- 'Event Triggered Execution: Windows Management Instrumentation Event Subscription'
+- Persistence, Privilege Escalation
+references: Requires Sysmon data
+notes: .nan

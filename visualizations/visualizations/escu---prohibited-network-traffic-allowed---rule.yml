@@ -1,0 +1,27 @@
+title: ESCU - Prohibited Network Traffic Allowed - Rule
+description: This search looks for network traffic defined by port and transport layer
+  protocol in the Enterprise Security lookup table "lookup_interesting_ports", that
+  is marked as prohibited, and has an associated 'allow' action in the Network_Traffic
+  data model. This could be indicative of a misconfigured network device.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Network
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Network_Traffic where All_Traffic.action\
+      \ = allowed by All_Traffic.src_ip All_Traffic.dest_ip All_Traffic.dest_port\
+      \ All_Traffic.action \n  -  lookup update=true interesting_ports_lookup dest_port\
+      \ as All_Traffic.dest_port OUTPUT app is_prohibited note transport \n  -  is_prohibited=true\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `drop_dm_object_name(\"All_Traffic\")` \n  -  `prohibited_network_traffic_allowed_filter`"
+  level: critical
+tags:
+- T1048
+- Exfiltration Over Alternative Protocol
+- Exfiltration
+references: Requires lookup table updated by client
+notes: .nan

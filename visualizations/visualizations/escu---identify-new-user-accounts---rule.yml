@@ -1,0 +1,26 @@
+title: ESCU - Identify New User Accounts - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This detection
+  search will help profile user accounts in your environment by identifying newly
+  created accounts that have been added to your network in the past week.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  from datamodel Identity_Management.All_Identities  \n  -  eval\
+      \ empStatus=case((now()-startDate)<604800, \"Accounts created in last week\"\
+      ) \n  -  empStatus=\"Accounts created in last week\"\n  -  `security_content_ctime(endDate)`\
+      \ \n  -  `security_content_ctime(startDate)`\n  -  table identity empStatus\
+      \ endDate startDate \n  -  `identify_new_user_accounts_filter`"
+  level: critical
+tags:
+- T1078.002
+- 'Valid Accounts: Domain Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: Rule deprecated by Splunk

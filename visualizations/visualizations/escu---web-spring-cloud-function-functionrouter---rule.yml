@@ -1,0 +1,28 @@
+title: ESCU - Web Spring Cloud Function FunctionRouter - Rule
+description: The following analytic identifies activity related to the web application
+  Spring Cloud Function that was recently idenfied as vulnerable. This is CVE-2022-22963.
+  Multiple proof of concept code was released. The URI that is hit includes `functionrouter`.
+  The specifics of the exploit include a status of 500. In this query we did not include
+  it, but for filtering you can add Web.status=500. The exploit data itself (based
+  on all the POCs) is located in the form_data field. This field will include all
+  class.modules being called.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Web
+detection:
+  condition:
+    sigma: "\n  -  tstats count from datamodel=Web where Web.http_method IN (\"POST\"\
+      ) Web.url=\"*/functionRouter*\" by Web.http_user_agent Web.http_method, Web.url,Web.url_length\
+      \ Web.src, Web.dest Web.status sourcetype \n  -  `drop_dm_object_name(\"Web\"\
+      )` \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `web_spring_cloud_function_functionrouter_filter`"
+  level: critical
+tags:
+- T1190
+- Exploit Public-Facing Application
+- Initial Access
+references: .nan
+notes: .nan

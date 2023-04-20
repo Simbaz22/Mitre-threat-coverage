@@ -1,0 +1,25 @@
+title: ESCU - Suspicious writes to System Volume Information - Rule
+description: "WARNING, this detection has been marked deprecated by the Splunk Threat\
+  \ Research team, this means that it will no longer be maintained or supported. If\
+  \ you have any questions feel free to email us at: research@splunk.com. This search\
+  \ detects writes to the 'System Volume Information' folder by something other than\
+  \ the System process."
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "(`sysmon` OR tag=process) EventCode=11 process_id!=4 file_path=*System\\\
+      \ Volume\\ Information* \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by dest, Image, file_path \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `suspicious_writes_to_system_volume_information_filter`"
+  level: critical
+tags:
+- T1036
+- Masquerading
+- Defense Evasion
+references: Requires Sysmon data
+notes: .nan

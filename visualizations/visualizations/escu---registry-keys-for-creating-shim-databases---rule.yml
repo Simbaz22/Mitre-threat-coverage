@@ -1,0 +1,33 @@
+title: ESCU - Registry Keys for Creating SHIM Databases - Rule
+description: This search looks for registry activity associated with application compatibility
+  shims, which can be leveraged by attackers for various nefarious purposes.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Registry\
+      \ where Registry.registry_path=*CurrentVersion\\\\AppCompatFlags\\\\Custom*\
+      \ OR Registry.registry_path=*CurrentVersion\\\\AppCompatFlags\\\\InstalledSDB*\
+      \ by _time span=1h Registry.dest Registry.user Registry.registry_path Registry.registry_value_name\
+      \ Registry.registry_value_data Registry.process_guid \n  -  `drop_dm_object_name(Registry)`\
+      \ \n  - rename process_guid as proc_guid \n  - join proc_guid, _time [\n  -\
+      \  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ by _time span=1h Processes.process_id Processes.process_name Processes.process\
+      \ Processes.dest Processes.parent_process_name Processes.parent_process Processes.process_guid\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  - rename process_guid as proc_guid\
+      \ \n  -  fields _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data]\
+      \ \n  -  table _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data\
+      \ \n  -  `registry_keys_for_creating_shim_databases_filter`"
+  level: critical
+tags:
+- "T1546.011\nT1546"
+- 'Event Triggered Execution: Application Shimming'
+- 'Event Triggered Execution: Application Shimming'
+references: Increase Windows logging to include Registry events
+notes: .nan

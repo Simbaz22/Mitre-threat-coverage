@@ -1,0 +1,27 @@
+title: ESCU - Recursive Delete of Directory In Batch CMD - Rule
+description: This search is to detect a suspicious commandline designed to delete
+  files or directory recursive using batch command. This technique was seen in ransomware
+  (reddot) where it it tries to delete the files in recycle bin to impaire user from
+  recovering deleted files.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where `process_cmd`\
+      \ Processes.process=*/c*  Processes.process=* rd * Processes.process=\"*/s*\"\
+      \ Processes.process=\"*/q*\" by Processes.user Processes.process_name Processes.parent_process_name\
+      \ Processes.parent_process Processes.process Processes.process_id Processes.dest\
+      \ \n  - `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `recursive_delete_of_directory_in_batch_cmd_filter`"
+  level: critical
+tags:
+- T1070.004
+- 'Indicator Removal: File Deletion'
+- Defense Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

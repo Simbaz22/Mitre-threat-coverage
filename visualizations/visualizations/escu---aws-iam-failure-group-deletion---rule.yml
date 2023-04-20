@@ -1,0 +1,27 @@
+title: ESCU - AWS IAM Failure Group Deletion - Rule
+description: This detection identifies failure attempts to delete groups. We want
+  to identify when a group is attempting to be deleted, but either access is denied,
+  there is a conflict or there is no group. This is indicative of administrators performing
+  an action, but also could be suspicious behavior occurring. Review parallel IAM
+  events - recently added users, new groups and so forth.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventSource=iam.amazonaws.com eventName=DeleteGroup errorCode\
+      \ IN (NoSuchEntityException,DeleteConflictException, AccessDenied) (userAgent!=*.amazonaws.com)\
+      \ \n  -  stats count min(_time) as firstTime max(_time) as lastTime values(requestParameters.groupName)\
+      \ as group_name by src eventName eventSource aws_account_id errorCode errorMessage\
+      \ userAgent eventID awsRegion userIdentity.principalId user_arn \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `aws_iam_failure_group_deletion_filter`"
+  level: critical
+tags:
+- T1098
+- Account Manipulation
+- Persistence
+references: Requires errorMessage field in AWS logs
+notes: .nan

@@ -1,0 +1,21 @@
+title: ESCU - Create Remote Thread into LSASS - Rule
+description: Detect remote thread creation into LSASS consistent with credential dumping.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventID=8 TargetImage=*lsass.exe \n  -  stats count min(_time)\
+      \ as firstTime max(_time) as lastTime by Computer, EventCode, TargetImage, TargetProcessId\
+      \ \n  -  rename Computer as dest \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `create_remote_thread_into_lsass_filter`"
+  level: critical
+tags:
+- T1003.001
+- 'OS Credential Dumping: LSASS Memory'
+- Credential Access
+references: Requires Sysmon data
+notes: .nan

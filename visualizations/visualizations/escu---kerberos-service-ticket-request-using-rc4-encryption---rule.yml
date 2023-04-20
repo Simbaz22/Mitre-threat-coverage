@@ -1,0 +1,33 @@
+title: ESCU - Kerberos Service Ticket Request Using RC4 Encryption - Rule
+description: The following analytic leverages Kerberos Event 4769, A Kerberos service
+  ticket was requested, to identify a potential Kerberos Service Ticket request related
+  to a Golden Ticket attack. Adversaries who have obtained the Krbtgt account NTLM
+  password hash may forge a Kerberos Granting Ticket (TGT) to obtain unrestricted
+  access to an Active Directory environment. Armed with a Golden Ticket, attackers
+  can request service tickets to move laterally and execute code on remote systems.
+  Looking for Kerberos Service Ticket requests using the legacy RC4 encryption mechanism
+  could represent the second stage of a Golden Ticket attack. RC4 usage should be
+  rare on a modern network since Windows Vista & Windows Sever 2008 and newer support
+  AES Kerberos encryption.\ Defenders should note that if an attacker does not leverage
+  the NTLM password hash but rather the AES key to create a golden ticket, this detection
+  may be bypassed.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4769 Service_Name=\"*$\" (Ticket_Options=0x40810000\
+      \ OR Ticket_Options=0x40800000 OR Ticket_Options=0x40810010) Ticket_Encryption_Type=0x17\
+      \ \n  -  stats count min(_time) as firstTime max(_time) as lastTime by dest,\
+      \ service, service_id, Ticket_Encryption_Type, Ticket_Options \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `kerberos_service_ticket_request_using_rc4_encryption_filter`"
+  level: critical
+tags:
+- "T1558\nT1558.001"
+- Steal or Forge Kerberos Tickets
+- Steal or Forge Kerberos Tickets
+references: .nan
+notes: Too many false positives.

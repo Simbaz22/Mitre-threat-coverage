@@ -1,0 +1,30 @@
+title: DS_Restricted Group Change
+description: These restricted group change events may be indicative of a possible
+  backdoor access attempts.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "index=winlog EventCode IN (4728,4729,4737,4755,4761,4762,4764,4727,4756,4757,4759,4760)\
+      \ AND NOT Subject_Account_Name IN (\"adladmin\", \"GlobeDAdmin\", \"SVC_Exchange_Admin\"\
+      , \"kiadmin\", \"Svc_pushms\", \"nabadmin\", \"LPAdmin\", \"LVSMON\", \"LVS-PPAdmin\"\
+      , \"LVS-MLAdmin\", \"LVS-TKAdmin\", \"LVS-CMAdmin\", \"LVS-MMAdmin\", \"LVS-TSAdmin\"\
+      , \"LVS-DTAdmin\", \"LVS-PZAdmin\", \"LVS-RLAdmin\", \"LVS-EVAdmin\", \"LVS-FVAdmin\"\
+      , \"LVS-MBAdmin\", \"LVS-CSMadmin\", \"lvs-jbadmin\", \"lvs-asadmin\", \"LVS-Mlong\"\
+      , \"lvs-dkadmin\", \"lvs-mradmin\", \"LVSauto\", \"lvs-jjoadmin\", \"jpadmin\"\
+      , \"lvs-Mmahadmin\", \"LVS-gcadmin\", \"LVS-SAAdmin\", \"LVS-JOADMIN\", \"lvs-waadmin\"\
+      , \"secadmin\", \"ALongAdmin\", \"twadmin\", \"LVS-ARAdmin\", \"seadmin\",\"\
+      rchadmin\",\"eoadmin\",\"vhadmin\",\"msadmin\",\"*$\")\n\n  -  table EventCode\
+      \ name action dest Subject_Account_Name Group_Name Member_Account_Name object_category\
+      \ result"
+  level: critical
+tags:
+- T1484.001
+- 'Domain Policy Modification: Group Policy Modification'
+- Defense Evasion, Privilege Escalation
+references: .nan
+notes: .nan

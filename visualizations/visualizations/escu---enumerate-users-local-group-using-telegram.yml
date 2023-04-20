@@ -1,0 +1,25 @@
+title: ESCU - Enumerate Users Local Group Using Telegram
+description: This analytic will detect a suspicious Telegram process enumerating all
+  network users in a local group. This technique was seen in a Monero infected honeypot
+  to mapped all the users on the compromised system. EventCode 4798 is generated when
+  a process enumerates a user's security-enabled local groups on a computer or device.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4798  Process_Name = \"*telegram.exe\"\
+      \ \n  -  stats count min(_time) as firstTime max(_time) as lastTime by ComputerName\
+      \ EventCode Process_Name  Process_ID Account_Name Account_Domain Logon_ID Security_ID\
+      \ Message \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `enumerate_users_local_group_using_telegram_filter`"
+  level: critical
+tags:
+- T1087
+- Account Discovery
+- Discovery
+references: .nan
+notes: .nan

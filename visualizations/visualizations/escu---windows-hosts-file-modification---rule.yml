@@ -1,0 +1,26 @@
+title: ESCU - Windows hosts file modification - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. The search
+  looks for modifications to the hosts file on all Windows endpoints across your environment.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Filesystem by Filesystem.file_name\
+      \ Filesystem.file_path Filesystem.dest \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  Filesystem.file_name=hosts\
+      \ AND Filesystem.file_path=*Windows\\\\System32\\\\* \n  -  `drop_dm_object_name(Filesystem)`\
+      \ \n  -  `windows_hosts_file_modification_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: Increase windows logging to include file creation, deletion and modification
+notes: Deprecated by Splunk

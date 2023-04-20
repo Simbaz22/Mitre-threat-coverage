@@ -1,0 +1,38 @@
+title: ESCU - Active Setup Registry Autostart
+description: This analytic is to detect a suspicious modification of the active setup
+  registry for persistence and privilege escalation. This technique was seen in several
+  malware (poisonIvy), adware and APT to gain persistence to the compromised machine
+  upon boot up. This TTP is a good indicator to further check the process id that
+  do the modification since modification of this registry is not commonly done. check
+  the legitimacy of the file and process involve in this rules to check if it is a
+  valid setup installer that creating or modifying this registry.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Registry\
+      \ where Registry.registry_value_name= \"StubPath\" Registry.registry_path =\
+      \ \"*\\\\SOFTWARE\\\\Microsoft\\\\Active Setup\\\\Installed Components*\" by\
+      \ _time span=1h Registry.dest Registry.user Registry.registry_path Registry.registry_value_name\
+      \ Registry.registry_value_data Registry.process_guid \n  -  `drop_dm_object_name(Registry)`\
+      \ \n  - rename process_guid as proc_guid \n  - join proc_guid, _time [\n  -\
+      \  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ by _time span=1h Processes.process_id Processes.process_name Processes.process\
+      \ Processes.dest Processes.parent_process_name Processes.parent_process Processes.process_guid\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  - rename process_guid as proc_guid\
+      \ \n  -  fields _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data]\
+      \ \n  -  table _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data\
+      \ \n  -  `active_setup_registry_autostart_filter`"
+  level: critical
+tags:
+- T1547.014
+- 'Boot or Logon Autostart Execution: Active Setup'
+- Persistence, Privilege Escalation
+references: Increase Windows logging to include Registry events
+notes: .nan

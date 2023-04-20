@@ -1,0 +1,38 @@
+title: ESCU - Log4Shell JNDI Payload Injection Attempt - Rule
+description: CVE-2021-44228 Log4Shell payloads can be injected via various methods,
+  but on of the most common vectors injection is via Web calls. Many of the vulnerable
+  java web applications that are using log4j have a web component to them are specially
+  targets of this injection, specifically projects like Apache Struts, Flink, Druid,
+  and Solr. The exploit is triggered by a LDAP lookup function in the log4j package,
+  its invocation is similar to `${jndi:ldap://PAYLOAD_INJECTED}`, when executed against
+  vulnerable web applications the invocation can be seen in various part of web logs.
+  Specifically it has been successfully exploited via headers like X-Forwarded-For,
+  User-Agent, Referer, and X-Api-Version. In this detection we first limit the scope
+  of our search to the Web Datamodel and use the `| from datamodel` function to benefit
+  from schema accelerated searching capabilities, mainly because the second part of
+  the detection is pretty heavy, it runs a regex across all _raw events that looks
+  for `${jndi:ldap://` pattern across all potential web fields available to the raw
+  data, like http headers for example. If you see results for this detection, it means
+  that there was a attempt at a injection, which could be a reconnaissance activity
+  or a valid expliotation attempt, but this does not exactly mean that the host was
+  indeed successfully exploited.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  from datamodel Web.Web \n  -  regex _raw=\"[jJnNdDiI]{4}(\\:\n\
+      \  - \\%3A\n  - \\/\n  - \\%2F)\\w+(\\:\\/\\/\n  - \\%3A\\%2F\\%2F)(\\$\\{.*?\\\
+      }(\\.)?)?\" \n  -  fillnull \n  -  stats count by action, category, dest, dest_port,\
+      \ http_content_type, http_method, http_referrer, http_user_agent, site, src,\
+      \ url, url_domain, user \n  -  `log4shell_jndi_payload_injection_attempt_filter`"
+  level: critical
+tags:
+- T1190
+- Exploit Public-Facing Application
+- Initial Access
+references: .nan
+notes: Activity already covered by network rules.

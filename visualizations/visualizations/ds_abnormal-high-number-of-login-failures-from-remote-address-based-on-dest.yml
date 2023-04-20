@@ -1,0 +1,28 @@
+title: DS_Abnormal High Number of Login Failures from Remote Address Based on Dest
+description: This rule identifies an abnormal number of login failures to a destination
+  from a remote IP address based on a standard deviation of 3. Drill down search will
+  provide additional context events.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Linux\nWindows"
+detection:
+  condition:
+    sigma: "\n  -  from datamodel:\"Authentication\".\"Failed_Authentication\"\n\n\
+      \  -  src!=10.* AND src!=192.* AND src!=unknown AND src!=\"::ffff:10.*\" AND\
+      \ src!=GMTOSCCM2 AND dest!=\"GMHQDC1.globeandmail.net\" AND dest!=\"GMHQDC2.globeandmail.net\"\
+      \ AND dest!=\"GMQ9DC01.globeandmail.net\"\n\n  -  bucket span=30m _time\n\n\
+      \  -  stats dc(dest) as unique_dest values(dest) as tried_destinations by _time,\
+      \ src\n\n  -  eventstats avg(unique_dest) as dest_avg, stdev(unique_dest) as\
+      \ dest_std\n\n  -  eval upperBound=(dest_avg+dest_std*3)\n\n  -  eval isOutlier=if(unique_dest\
+      \ > upperBound, \"TRUE\", \"FALSE\")\n\n  -  isOutlier = \"TRUE\" AND unique_dest\
+      \ > 2"
+  level: critical
+tags:
+- T1586
+- Compromise Accounts
+- Resource Development
+references: .nan
+notes: .nan

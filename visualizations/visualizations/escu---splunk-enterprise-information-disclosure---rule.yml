@@ -1,0 +1,27 @@
+title: ESCU - Splunk Enterprise Information Disclosure - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  allows you to look for evidence of exploitation for CVE-2018-11409, a Splunk Enterprise
+  Information Disclosure Bug.'
+status: Expired
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Splunk Internal Logs
+detection:
+  condition:
+    sigma: "index=_internal sourcetype=splunkd_ui_access server-info \n  -  clientip!=127.0.0.1\
+      \ uri_path=\"*raw/services/server/info/server-info\" \n  -  rename clientip\
+      \ as src_ip, splunk_server as dest \n  -  stats earliest(_time) as firstTime,\
+      \ latest(_time) as lastTime, values(uri) as uri, values(useragent) as http_user_agent,\
+      \ values(user) as user by src_ip, dest \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `splunk_enterprise_information_disclosure_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: .nan
+notes: Deprecated by Splunk

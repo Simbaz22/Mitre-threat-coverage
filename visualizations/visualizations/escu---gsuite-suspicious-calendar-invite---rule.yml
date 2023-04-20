@@ -1,0 +1,23 @@
+title: ESCU - Gsuite suspicious calendar invite - Rule
+description: This search can help the detection of compromised accounts or internal
+  users sending suspcious calendar invites via GSuite calendar. These invites may
+  contain malicious links or attachments.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "`gsuite_calendar` \n  - bin span=5m _time \n  - rename parameters.* as\
+      \ * \n  - target_calendar_id!=null email=\"*yourdomain.com\"\n  -  stats  count\
+      \ values(target_calendar_id) values(event_title) values(event_guest) by email\
+      \ _time \n  -  where count >100\n  -  `gsuite_suspicious_calendar_invite_filter`"
+  level: critical
+tags:
+- T1566
+- Phishing
+- Initial Access
+references: .nan
+notes: Rule not applicable to this client

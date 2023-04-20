@@ -1,0 +1,25 @@
+title: ESCU - GetDomainGroup with PowerShell Script Block - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the execution of the `Get-DomainGroup` commandlet. `Get-DomainGroup`
+  is part of PowerView, a PowerShell tool used to perform enumeration on Windows domains.
+  As the name suggests, `Get-DomainGroup` is used to query domain groups. Red Teams
+  and adversaries may leverage this function to enumerate domain groups for situational
+  awareness and Active Directory Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (Message = \"*Get-DomainGroup*\") \n  -  stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by EventCode Message\
+      \ ComputerName User \n  -  `security_content_ctime(firstTime)` \n  -  `getdomaingroup_with_powershell_script_block_filter`"
+  level: critical
+tags:
+- T1069.002
+- 'Permission Groups Discovery: Domain Groups'
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

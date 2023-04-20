@@ -1,0 +1,22 @@
+title: ESCU - Access LSASS Memory for Dump Creation - Rule
+description: Detect memory dumping of the LSASS process.
+status: "Inactive\nMissing Data Source"
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=10 TargetImage=*lsass.exe CallTrace=*dbgcore.dll* OR\
+      \ CallTrace=*dbghelp.dll* \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by Computer, TargetImage, TargetProcessId, SourceImage, SourceProcessId\
+      \ \n  -  rename Computer as dest \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `access_lsass_memory_for_dump_creation_filter`"
+  level: critical
+tags:
+- T1003.001
+- 'OS Credential Dumping: LSASS Memory'
+- Credential Access
+references: Requires Sysmon data
+notes: Requires sysmon

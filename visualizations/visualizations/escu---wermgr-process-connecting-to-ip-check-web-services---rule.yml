@@ -1,0 +1,31 @@
+title: ESCU - Wermgr Process Connecting To IP Check Web Services - Rule
+description: this search is designed to detect suspicious wermgr.exe process that
+  tries to connect to known IP web services. This technique is know for trickbot and
+  other trojan spy malware to recon the infected machine and look for its ip address
+  without so much finger print on the commandline process. Since wermgr.exe is designed
+  for error handling process of windows it is really suspicious that this process
+  is trying to connect to this IP web services cause that maybe cause of some malicious
+  code injection.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode =22 process_name = wermgr.exe QueryName IN (\"*wtfismyip.com\"\
+      , \"*checkip.amazonaws.com\", \"*ipecho.net\", \"*ipinfo.io\", \"*api.ipify.org\"\
+      , \"*icanhazip.com\", \"*ip.anysrc.com\",\"*api.ip.sb\", \"ident.me\", \"www.myexternalip.com\"\
+      , \"*zen.spamhaus.org\", \"*cbl.abuseat.org\", \"*b.barracudacentral.org\",\"\
+      *dnsbl-1.uceprotect.net\", \"*spam.dnsbl.sorbs.net\") \n  -   stats  min(_time)\
+      \ as firstTime max(_time) as lastTime count by  process_path process_name process_id\
+      \ QueryName QueryStatus QueryResults Computer EventCode \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `wermgr_process_connecting_to_ip_check_web_services_filter`"
+  level: critical
+tags:
+- T1590.005
+- 'Gather Victim Network Information: IP Addresses'
+- Reconnaissance
+references: Requires Sysmon data
+notes: .nan

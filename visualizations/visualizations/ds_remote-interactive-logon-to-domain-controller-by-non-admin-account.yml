@@ -1,0 +1,28 @@
+title: DS_Remote interactive logon to domain controller by non-admin account
+description: Detects a remote interactive logon to a domain controller by a non-admin
+  account
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "index=winlog AND Logon_Type=10 AND (EventCode=4624 OR EventCode=528) AND\
+      \ NOT user IN (\"adladmin\", \"GlobeDAdmin\", \"SVC_Exchange_Admin\", \"kiadmin\"\
+      , \"Svc_pushms\", \"nabadmin\", \"LPAdmin\", \"LVSMON\", \"LVS-PPAdmin\", \"\
+      LVS-MLAdmin\", \"LVS-TKAdmin\", \"LVS-CMAdmin\", \"LVS-MMAdmin\", \"LVS-TSAdmin\"\
+      , \"LVS-DTAdmin\", \"LVS-PZAdmin\", \"LVS-RLAdmin\", \"LVS-EVAdmin\", \"LVS-FVAdmin\"\
+      , \"LVS-MBAdmin\", \"LVS-CSMadmin\", \"lvs-jbadmin\", \"lvs-asadmin\", \"LVS-Mlong\"\
+      , \"lvs-dkadmin\", \"lvs-mradmin\", \"LVSauto\", \"lvs-jjoadmin\", \"jpadmin\"\
+      , \"lvs-Mmahadmin\", \"LVS-gcadmin\", \"LVS-SAAdmin\", \"LVS-JOADMIN\", \"lvs-waadmin\"\
+      , \"secadmin\", \"ALongAdmin\", \"twadmin\", \"LVS-ARAdmin\", \"seadmin\") \n\
+      \  -  table user Logon_Type EventCode action dest"
+  level: critical
+tags:
+- T1078.002
+- 'Valid Accounts: Domain Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: .nan

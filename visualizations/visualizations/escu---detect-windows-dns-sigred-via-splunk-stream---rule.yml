@@ -1,0 +1,21 @@
+title: ESCU - Detect Windows DNS SIGRed via Splunk Stream - Rule
+description: This search detects SIGRed via Splunk Stream.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "`stream_dns` \n  -  spath \"query_type{}\" \n  -  \"query_type{}\" IN\
+      \ (SIG,KEY) \n  -  spath protocol_stack \n  -  protocol_stack=\"ip:tcp:dns\"\
+      \ \n  -  append [`stream_tcp` bytes_out>65000] \n  -  `detect_windows_dns_sigred_via_splunk_stream_filter`\
+      \ \n  -  stats count by flow_id \n  -  where count>1 \n  -  fields - count"
+  level: critical
+tags:
+- T1203
+- Exploitation for Client Execution
+- Execution
+references: Requires DNS Data
+notes: .nan

@@ -1,0 +1,34 @@
+title: ESCU - Windows Registry Modification for Safe Mode Persistence - Rule
+description: The following analytic identifies a modification or registry add to the
+  safeboot registry as an autostart mechanism. This technique is utilized by adversaries
+  to persist a driver or service into Safe Mode. Two keys are monitored in this analytic,  Minimal
+  and Network. adding values to Minimal will load into Safe Mode and by adding into
+  Network it will provide the service or drive the ability to perform network connections
+  in Safe Mode.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Registry\
+      \ where Registry.registry_path IN (\"*SYSTEM\\\\CurrentControlSet\\\\Control\\\
+      \\SafeBoot\\\\Minimal\\\\*\",\"*SYSTEM\\\\CurrentControlSet\\\\Control\\\\SafeBoot\\\
+      \\Network\\\\*\") by _time span=1h Registry.dest Registry.user Registry.registry_path\
+      \ Registry.registry_value_name Registry.process_guid Registry.registry_key_name\
+      \ Registry.registry_value_data \n  -  `drop_dm_object_name(Registry)` \n  -\
+      \  join process_guid _time [\n  -  tstats `security_content_summariesonly` count\
+      \ FROM datamodel=Endpoint.Processes by _time span=1h Processes.process_id Processes.process_name\
+      \ Processes.process Processes.dest Processes.process_guid \n  -  `drop_dm_object_name(Processes)`]\
+      \ \n  -  table _time dest user process_name process process_guid registry_path\
+      \ registry_value_name registry_value_data registry_key_name \n  -  `windows_registry_modification_for_safe_mode_persistence_filter`"
+  level: critical
+tags:
+- "T1547.001\nT1547"
+- 'Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder'
+- 'Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder'
+references: "Increase Windows logging to include Registry events\nIncrease Windows\
+  \ logging to include command line data"
+notes: .nan

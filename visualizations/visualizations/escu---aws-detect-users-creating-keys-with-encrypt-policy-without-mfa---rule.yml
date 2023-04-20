@@ -1,0 +1,30 @@
+title: ESCU - AWS Detect Users creating keys with encrypt policy without MFA - Rule
+description: This search provides detection of KMS keys where action kms:Encrypt is
+  accessible for everyone (also outside of your organization). This is an indicator
+  that your account is compromised and the attacker uses the encryption key to compromise
+  another company.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=CreateKey OR eventName=PutKeyPolicy \n  -  spath\
+      \ input=requestParameters.policy output=key_policy_statements path=Statement{}\
+      \ \n  -  mvexpand key_policy_statements \n  -  spath input=key_policy_statements\
+      \ output=key_policy_action_1 path=Action \n  -  spath input=key_policy_statements\
+      \ output=key_policy_action_2 path=Action{} \n  -  eval key_policy_action=mvappend(key_policy_action_1,\
+      \ key_policy_action_2) \n  -  spath input=key_policy_statements output=key_policy_principal\
+      \ path=Principal.AWS \n  -  key_policy_action=\"kms:Encrypt\" AND key_policy_principal=\"\
+      *\" \n  -  stats count min(_time) as firstTime max(_time) as lastTime by eventName\
+      \ eventSource eventID awsRegion userIdentity.principalId \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  - `aws_detect_users_creating_keys_with_encrypt_policy_without_mfa_filter`"
+  level: critical
+tags:
+- T1486
+- Data Encrypted for Impact
+- Impact
+references: .nan
+notes: .nan

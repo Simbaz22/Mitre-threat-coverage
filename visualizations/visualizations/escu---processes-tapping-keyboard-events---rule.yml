@@ -1,0 +1,24 @@
+title: ESCU - Processes Tapping Keyboard Events - Rule
+description: This search looks for processes in an MacOS system that is tapping keyboard
+  events in MacOS, and essentially monitoring all keystrokes made by a user. This
+  is a common technique used by RATs to log keystrokes from a victim, although it
+  can also be used by legitimate processes like Siri to react on human input
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: MacOS
+detection:
+  condition:
+    sigma: "\n  -  from datamodel Alerts.Alerts \n  -  app=osquery:results name=pack_osx-attacks_Keyboard_Event_Taps\
+      \ \n  -  rename columns.cmdline as cmd, columns.name as process_name, columns.pid\
+      \ as process_id\n  -  dedup host,process_name \n  -  table host,process_name,\
+      \ cmd, process_id \n  -  `processes_tapping_keyboard_events_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: Requires MacOS logs
+notes: .nan

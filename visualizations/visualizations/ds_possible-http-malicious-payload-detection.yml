@@ -1,0 +1,21 @@
+title: DS_Possible HTTP Malicious Payload Detection
+description: Palo Alto firewall events that possibly identify HTTP Malicious Payloads.
+  Code execution is observed and evaluated by the firewall as malicious.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "index=firewall signature=\"Possible HTTP Malicious Payload Detection\"\
+      \ \n\n  -  table src_ip src_port src_zone dest_ip dest_port dest_zone user action\
+      \ app signature category file_name url url_domain rule"
+  level: critical
+tags:
+- T1204
+- User Execution
+- Execution
+references: .nan
+notes: .nan

@@ -1,0 +1,27 @@
+title: ESCU - Uninstall App Using MsiExec - Rule
+description: This search is to detect a suspicious un-installation of application
+  using msiexec. This technique was seen in conti leak tool and script where it tries
+  to uninstall AV product using this commandline. This commandline to uninstall product
+  is not a common practice in enterprise network.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=msiexec.exe\
+      \ Processes.process= \"* /qn *\" Processes.process= \"*/X*\" Processes.process=\
+      \ \"*REBOOT=*\" by Processes.dest Processes.user Processes.parent_process Processes.process_name\
+      \ Processes.process Processes.process_id Processes.parent_process_id \n  - \
+      \ `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `uninstall_app_using_msiexec_filter`"
+  level: critical
+tags:
+- T1218.007
+- 'System Binary Proxy Execution: Msiexec'
+- Defense Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

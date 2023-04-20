@@ -1,0 +1,43 @@
+title: ESCU - Windows Disable Windows Group Policy Features Through Registry - Rule
+description: This analytic is to detect a suspicious registry modification to disable
+  windows features. These techniques are seen in several ransomware malware to impair
+  the compromised host to make it hard for analyst to mitigate or response from the
+  attack. Disabling these known features make the analysis and forensic response more
+  hard. Disabling these feature is not so common but can still be implemented by the
+  administrator for security purposes. In this scenario filters for users that are
+  allowed doing this is needed.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Registry\
+      \ where Registry.registry_path= \"*\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\\
+      CurrentVersion\\\\Policies\\\\Explorer\\\\*\" OR Registry.registry_path= \"\
+      *\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System\\\
+      \\*\" Registry.registry_value_name IN (\"NoDesktop\", \"NoFind\", \"NoControlPanel\"\
+      , \"NoFileMenu\", \"NoSetTaskbar\", \"NoTrayContextMenu\", \"TaskbarLockAll\"\
+      , \"NoThemesTab\",\"NoPropertiesMyDocuments\",\"NoVisualStyleChoice\",\"NoColorChoice\"\
+      ,\"NoPropertiesMyDocuments\") Registry.registry_value_data = \"0x00000001\"\
+      \ by _time span=1h Registry.dest Registry.user Registry.registry_path Registry.registry_value_name\
+      \ Registry.registry_value_data Registry.process_guid \n  -  `drop_dm_object_name(Registry)`\
+      \ \n  - rename process_guid as proc_guid \n  - join proc_guid, _time [\n  -\
+      \  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ by _time span=1h Processes.process_id Processes.process_name Processes.process\
+      \ Processes.dest Processes.parent_process_name Processes.parent_process Processes.process_guid\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  - rename process_guid as proc_guid\
+      \ \n  -  fields _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data]\
+      \ \n  -  table _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data\
+      \ \n  -  `windows_disable_windows_group_policy_features_through_registry_filter`"
+  level: critical
+tags:
+- T1112
+- Modify Registry
+- Defense Evasion
+references: Increase Windows logging to include Registry events
+notes: .nan

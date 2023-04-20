@@ -1,0 +1,30 @@
+title: ESCU - Powershell Fileless Script Contains Base64 Encoded Content - Rule
+description: "The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)\
+  \ to identify suspicious PowerShell execution. Script Block Logging captures the\
+  \ command sent to PowerShell, the full command to be executed. Upon enabling, logs\
+  \ will output to Windows event logs. Dependent upon volume, enable on critical endpoints\
+  \ or all. \nThis analytic identifies `FromBase64String` within the script block.\
+  \ A typical malicious instance will include additional code. \nCommand example -\
+  \ `[Byte[]]$var_code = [System.Convert]::FromBase64String(38uqIyMjQ6rG....` \nDuring\
+  \ triage, review parallel processes using an EDR product or 4688 events. It will\
+  \ be important to understand the timeline of events around this activity. Review\
+  \ the entire logged PowerShell script block."
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: PowerShell
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 Message=*frombase64string* \n  -  stats count\
+      \ min(_time) as firstTime max(_time) as lastTime by OpCode ComputerName User\
+      \ EventCode Message \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `powershell_fileless_script_contains_base64_encoded_content_filter`"
+  level: critical
+tags:
+- "T1059\nT1027\nT1059.001"
+- Command and Scripting Interpreter
+- Command and Scripting Interpreter
+references: .nan
+notes: .nan

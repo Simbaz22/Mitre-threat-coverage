@@ -1,0 +1,29 @@
+title: ESCU - Office Document Spawned Child Process To Download - Rule
+description: This search is to detect potential malicious office document executing
+  lolbin child process to download payload or other malware. Since most of the attacker
+  abused the capability of office document to execute living on land application to
+  blend it to the normal noise in the infected machine to cover its track.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.parent_process_name\
+      \ IN (\"winword.exe\",\"excel.exe\",\"powerpnt.exe\",\"mspub.exe\",\"visio.exe\"\
+      ) Processes.process IN (\"*http:*\",\"*https:*\") NOT (Processes.original_file_name\
+      \ IN(\"firefox.exe\", \"chrome.exe\",\"iexplore.exe\",\"msedge.exe\"))  by Processes.dest\
+      \ Processes.user Processes.parent_process_name Processes.process_name Processes.process\
+      \ Processes.process_id Processes.parent_process_id Processes.original_file_name\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `office_document_spawned_child_process_to_download_filter`"
+  level: critical
+tags:
+- "T1566\nT1566.001"
+- Phishing
+- Phishing
+references: Increase Windows logging to include command line data
+notes: .nan

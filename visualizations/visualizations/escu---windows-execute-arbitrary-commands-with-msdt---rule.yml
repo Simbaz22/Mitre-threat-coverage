@@ -1,0 +1,29 @@
+title: ESCU - Windows Execute Arbitrary Commands with MSDT - Rule
+description: The following analytic identifies a recently disclosed arbitraty command
+  execution using Windows msdt.exe - a Diagnostics Troubleshooting Wizard. The sample
+  identified will use the ms-msdt:/ protocol handler to load msdt.exe to retrieve
+  a remote payload. During triage, review file modifications for html. Identify parallel
+  process execution that may be related, including an Office Product.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=msdt.exe\
+      \ Processes.process=\"*ms-msdt:/id*\" Processes.process=\"*IT_BrowseForFile=*\"\
+      \ Processes.process=\"*IT_RebrowseForFile=*\" by Processes.dest Processes.user\
+      \ Processes.parent_process_name Processes.process_name Processes.process Processes.process_id\
+      \ Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)` \n  -\
+      \  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `windows_execute_arbitrary_commands_with_msdt_filter`"
+  level: critical
+tags:
+- T1202
+- Indirect Command Execution
+- Defense Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

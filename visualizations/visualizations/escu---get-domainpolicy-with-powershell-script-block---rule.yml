@@ -1,0 +1,24 @@
+title: ESCU - Get DomainPolicy with Powershell Script Block - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the execution of the `Get DomainPolicy` commandlet used to obtain the
+  password policy in a Windows domain. Red Teams and adversaries alike may use PowerShell
+  to enumerate domain policies for situational awareness and Active Directory Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 Message =\"*Get-DomainPolicy*\" \n  -  stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by EventCode Message\
+      \ ComputerName User \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `get_domainpolicy_with_powershell_script_block_filter`"
+  level: critical
+tags:
+- T1201
+- Password Policy Discovery
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

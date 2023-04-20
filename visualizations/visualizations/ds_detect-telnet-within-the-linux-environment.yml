@@ -1,0 +1,19 @@
+title: DS_Detect Telnet Within the Linux Environment
+description: This rule will detect the use of telnet within the Linux environment.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "index=linux (app=\"telnet\" OR eventtype=\"telnet*\" OR process=\"telnet\"\
+      )\n\n  -  table name process user app action dest eventtype"
+  level: critical
+tags:
+- T1205
+- Traffic Signaling
+- Command and Control, Defense Evasion, Persistence
+references: .nan
+notes: .nan

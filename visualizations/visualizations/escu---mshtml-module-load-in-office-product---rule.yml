@@ -1,0 +1,29 @@
+title: ESCU - MSHTML Module Load in Office Product - Rule
+description: The following detection identifies the module load of mshtml.dll into
+  an Office product. This behavior has been related to CVE-2021-40444, whereas the
+  malicious document will load ActiveX, which activates the MSHTML component. The
+  vulnerability resides in the MSHTML component. During triage, identify parallel
+  processes and capture any file modifications for analysis.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventID=7 process_name IN (\"winword.exe\",\"excel.exe\",\"powerpnt.exe\"\
+      ,\"mspub.exe\",\"visio.exe\",\"wordpad.exe\",\"wordview.exe\") ImageLoaded IN\
+      \ (\"*\\\\mshtml.dll\", \"*\\\\Microsoft.mshtml.dll\",\"*\\\\IE.Interop.MSHTML.dll\"\
+      ,\"*\\\\MshtmlDac.dll\",\"*\\\\MshtmlDed.dll\",\"*\\\\MshtmlDer.dll\") \n  -\
+      \  stats count min(_time) as firstTime max(_time) as lastTime by Computer, process_name,\
+      \ ImageLoaded, OriginalFileName, process_id \n  -  rename Computer as dest \n\
+      \  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `mshtml_module_load_in_office_product_filter`"
+  level: critical
+tags:
+- T1566.001
+- 'Phishing: Spearphishing Attachment'
+- Initial Access
+references: Requires Sysmon data
+notes: .nan

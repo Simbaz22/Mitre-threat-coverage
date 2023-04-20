@@ -1,0 +1,31 @@
+title: ESCU - Print Spooler Failed to Load a Plug-in - Rule
+description: "The following analytic identifies driver load errors utilizing the Windows\
+  \ PrintService Admin logs. This was identified during our testing of CVE-2021-34527\
+  \ previously (CVE-2021-1675) or PrintNightmare. \nWithin the proof of concept code,\
+  \ the following error will occur - \"The print spooler failed to load a plug-in\
+  \ module C:\\Windows\\system32\\spool\\DRIVERS\\x64\\3\\meterpreter.dll, error code\
+  \ 0x45A. See the event user data for context information.\" \nThe analytic is based\
+  \ on file path and failure to load the plug-in. \nDuring triage, isolate the endpoint\
+  \ and review for source of exploitation. Capture any additional file modification\
+  \ events."
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`printservice` ((ErrorCode=\"0x45A\" (EventCode=\"808\" OR EventCode=\"\
+      4909\")) OR (\"The print spooler failed to load a plug-in module\" OR \"\\\\\
+      drivers\\\\x64\\\\\")) \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by OpCode EventCode ComputerName Message \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `print_spooler_failed_to_load_a_plug_in_filter`"
+  level: critical
+tags:
+- T1547.012
+- 'Boot or Logon Autostart Execution: Print Processors'
+- Persistence, Privilege Escalation
+references: Increase Windows logging to include PrintService Admin and Operational
+  logs
+notes: .nan

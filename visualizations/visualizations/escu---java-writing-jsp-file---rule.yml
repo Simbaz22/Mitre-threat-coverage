@@ -1,0 +1,30 @@
+title: ESCU - Java Writing JSP File - Rule
+description: The following analytic identifies the process java writing a .jsp to
+  disk. This is potentially indicative of a web shell being written to disk.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ where Processes.process_name IN (\"java\",\"java.exe\", \"javaw.exe\") by\
+      \ _time Processes.process_id Processes.process_name Processes.dest Processes.process_guid\
+      \ Processes.user \n  -  `drop_dm_object_name(Processes)` \n  -  join process_guid\
+      \ [\n  -  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Filesystem\
+      \ where Filesystem.file_name=\"*.jsp*\" by _time Filesystem.dest Filesystem.file_create_time\
+      \ Filesystem.file_name Filesystem.file_path Filesystem.process_guid Filesystem.user\
+      \ \n  -  `drop_dm_object_name(Filesystem)` \n  -  fields _time process_guid\
+      \ file_path file_name file_create_time user dest process_name] \n  -  stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by dest process_name\
+      \ process_guid file_name file_path file_create_time user \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `java_writing_jsp_file_filter`"
+  level: critical
+tags:
+- T1190
+- Exploit Public-Facing Application
+- Initial Access
+references: Increase Windows logging to include file modification data
+notes: .nan

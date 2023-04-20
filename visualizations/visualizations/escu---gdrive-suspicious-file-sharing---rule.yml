@@ -1,0 +1,24 @@
+title: ESCU - Gdrive suspicious file sharing - Rule
+description: This search can help the detection of compromised accounts or internal
+  users sharing potentially malicious/classified documents with users outside your
+  organization via GSuite file sharing .
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: GCP
+detection:
+  condition:
+    sigma: "`gsuite_drive` name=change_user_access \n  -  rename parameters.* as *\
+      \ \n  -  email = \"*@yourdomain.com\" target_user != \"*@yourdomain.com\" \n\
+      \  -  stats count values(owner) as owner values(target_user) as target values(doc_type)\
+      \ as doc_type values(doc_title) as doc_title dc(target_user) as distinct_target\
+      \ by src_ip email \n  -  where distinct_target > 50 \n  -  `gdrive_suspicious_file_sharing_filter`"
+  level: critical
+tags:
+- T1566
+- Phishing
+- Initial Access
+references: .nan
+notes: Experimental detection (not supported by splunk)

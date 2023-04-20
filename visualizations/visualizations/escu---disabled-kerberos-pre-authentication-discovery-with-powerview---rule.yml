@@ -1,0 +1,28 @@
+title: ESCU - Disabled Kerberos Pre-Authentication Discovery With PowerView - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the execution of the `Get-DomainUser` commandlet with specific parameters.
+  `Get-DomainUser` is part of PowerView, a PowerShell tool used to perform enumeration
+  on Windows Active Directory networks. As the name suggests, `Get-DomainUser` is
+  used to identify domain users and combining it with `-PreauthNotRequired` allows
+  adversaries to discover domain accounts with Kerberos Pre Authentication disabled.\
+  Red Teams and adversaries alike use may leverage PowerView to enumerate these accounts
+  and attempt to crack their passwords offline.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (Message = \"*Get-DomainUser*\" AND Message=\"\
+      *PreauthNotRequired*\") \n  -  stats count min(_time)  as firstTime max(_time)\
+      \ as lastTime by EventCode Message ComputerName User \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `disabled_kerberos_pre_authentication_discovery_with_powerview_filter`"
+  level: critical
+tags:
+- T1558.004
+- 'Steal or Forge Kerberos Tickets: AS-REP Roasting'
+- Credential Access
+references: Requires PowerShell logs
+notes: .nan

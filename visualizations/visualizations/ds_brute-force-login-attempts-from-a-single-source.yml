@@ -1,0 +1,28 @@
+title: DS_Brute Force Login Attempts from a Single Source
+description: This rule triggers on correlated events when it detects brute force login
+  ( 5 Events in 10 Min Interval) attempts on local system(s) from a single source
+  IP address.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Linux\nWindows"
+detection:
+  condition:
+    sigma: "\n  -  tstats count min(_time) as firstTime max(_time) as lastTime from\
+      \ datamodel=Authentication where Authentication.action=failure AND Authentication.src!=unknown\
+      \ AND Authentication.dest!=GMHQDC1.globeandmail.net AND Authentication.dest!=GMHQDC2.globeandmail.net\
+      \ AND Authentication.dest!=GMQ9DC01.globeandmail.net AND Authentication.dest!=GMQ9DC02.globeandmail.net\
+      \ AND (Authentication.src!=GMHQADFS1 AND Authentication.dest!=GMHQADFS1.globeandmail.net)\
+      \ AND (Authentication.src!=GMQ9ADFS1 AND Authentication.src!=GMQ9ADFS1.globeandmail.net)\
+      \ by Authentication.src Authentication.dest\n\n  -  count > 4\n\n  -  `security_content_ctime(firstTime)`\
+      \ \n\n  -  `security_content_ctime(lastTime)`\n\n  -  `drop_dm_object_name(Authentication)`\n\
+      \n  -  table src dest count firstTime lastTime"
+  level: critical
+tags:
+- T1110
+- Brute Force
+- Credential Access
+references: .nan
+notes: .nan

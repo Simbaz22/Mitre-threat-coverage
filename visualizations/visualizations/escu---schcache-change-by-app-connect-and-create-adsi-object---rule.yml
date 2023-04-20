@@ -1,0 +1,31 @@
+title: ESCU - SchCache Change By App Connect And Create ADSI Object - Rule
+description: This analytic is to detect an application try to connect and create ADSI
+  Object to do LDAP query. Every time an application connects to the directory and
+  attempts to create an ADSI object, the Active Directory Schema is checked for changes.
+  If it has changed since the last connection, the schema is downloaded and stored
+  in a cache on the local computer either in %LOCALAPPDATA%\Microsoft\Windows\SchCache
+  or %systemroot%\SchCache. We found this a good anomaly use case to detect suspicious
+  application like blackmatter ransomware that use ADS object api to execute ldap
+  query. having a good list of ldap or normal AD query tool used within the network
+  is a good start to reduce the noise.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=11  TargetFilename = \"*\\\\Windows\\\\SchCache\\\\\
+      *\" TargetFilename = \"*.sch*\" NOT (Image IN (\"*\\\\Windows\\\\system32\\\\\
+      mmc.exe\")) \n  - stats count min(_time) as firstTime max(_time) as lastTime\
+      \ by Image TargetFilename EventCode process_id  process_name Computer \n  -\
+      \  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `schcache_change_by_app_connect_and_create_adsi_object_filter`"
+  level: critical
+tags:
+- T1087.002
+- 'Account Discovery: Domain Account'
+- Discovery
+references: Requires Sysmon data
+notes: .nan

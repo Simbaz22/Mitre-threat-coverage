@@ -1,0 +1,23 @@
+title: ESCU - Detect Windows DNS SIGRed via Zeek - Rule
+description: This search detects SIGRed via Zeek DNS and Zeek Conn data.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Network_Resolution\
+      \ where DNS.query_type IN (SIG,KEY) by DNS.flow_id \n  -  rename DNS.flow_id\
+      \ as flow_id \n  -  append [\n  -  tstats  `security_content_summariesonly`\
+      \ count from datamodel=Network_Traffic where All_Traffic.bytes_in>65000 by All_Traffic.flow_id\
+      \ \n  -  rename All_Traffic.flow_id as flow_id] \n  -  `detect_windows_dns_sigred_via_zeek_filter`\
+      \ \n  -  stats count by flow_id \n  -  where count>1 \n  -  fields - count"
+  level: critical
+tags:
+- T1203
+- Exploitation for Client Execution
+- Execution
+references: Requires DNS Data
+notes: .nan

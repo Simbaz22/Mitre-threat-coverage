@@ -1,0 +1,29 @@
+title: ESCU - Windows Remote Assistance Spawning Process - Rule
+description: The following analytic identifies the use of Microsoft Remote Assistance,
+  msra.exe, spawning PowerShell.exe or cmd.exe as a child process. Msra.exe by default
+  has no command-line arguments and typically spawns itself. It will generate a network
+  connection to the remote system that is connected. This behavior is indicative of
+  another process injected into msra.exe. Review the parent process or cross process
+  events to identify source.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.parent_process_name=msra.exe\
+      \ `windows_shells` by Processes.dest Processes.user Processes.parent_process_name\
+      \ Processes.process_name Processes.original_file_name Processes.process Processes.process_id\
+      \ Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)` \n  -\
+      \  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `windows_remote_assistance_spawning_process_filter`"
+  level: critical
+tags:
+- T1055
+- Process Injection
+- Defense Evasion, Privilege Escalation
+references: .nan
+notes: .nan

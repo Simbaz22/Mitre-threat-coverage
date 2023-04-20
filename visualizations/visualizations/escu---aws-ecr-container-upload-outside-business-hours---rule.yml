@@ -1,0 +1,27 @@
+title: ESCU - AWS ECR Container Upload Outside Business Hours - Rule
+description: This search looks for AWS CloudTrail events from AWS Elastic Container
+  Service (ECR). A upload of a new container is normally done during business hours.
+  When done outside business hours, we want to take a look into it.
+status: "Inactive\nNon-malicious"
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventSource=ecr.amazonaws.com eventName=PutImage date_hour>=20\
+      \ OR date_hour<8 NOT (date_wday=saturday OR date_wday=sunday) \n  -  rename\
+      \ requestParameters.* as * \n  -  rename repositoryName AS image \n  -  eval\
+      \ phase=\"release\" \n  -  eval severity=\"medium\" \n  -  stats min(_time)\
+      \ as firstTime max(_time) as lastTime by awsRegion, eventName, eventSource,\
+      \ user, userName, src_ip, imageTag, registryId, image, phase, severity \n  -\
+      \  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `aws_ecr_container_upload_outside_business_hours_filter`"
+  level: critical
+tags:
+- "T1204.003\nT1204"
+- 'User Execution: Malicious Image'
+- 'User Execution: Malicious Image'
+references: .nan
+notes: .nan

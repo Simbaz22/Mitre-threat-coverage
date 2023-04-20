@@ -1,0 +1,25 @@
+title: ESCU - Windows Get-AdComputer Unconstrained Delegation Discovery - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the Get-ADComputer commandlet used with specific parameters to discover
+  Windows endpoints with Kerberos Unconstrained Delegation. Red Teams and adversaries
+  alike may leverage use this technique for situational awareness and Active Directory
+  Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "PowerShell\nWindows"
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (Message = \"*Get-ADComputer*\" AND Message\
+      \ = \"*TrustedForDelegation*\") \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by EventCode Message ComputerName User \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `windows_get_adcomputer_unconstrained_delegation_discovery_filter`"
+  level: critical
+tags:
+- T1018
+- Remote System Discovery
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

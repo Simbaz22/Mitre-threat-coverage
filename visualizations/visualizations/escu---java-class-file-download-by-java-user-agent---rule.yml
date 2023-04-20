@@ -1,0 +1,25 @@
+title: ESCU - Java Class File download by Java User Agent - Rule
+description: The following analytic identifies a Java user agent performing a GET
+  request for a .class file from the remote site. This is potentially indicative of
+  exploitation of the Java application and may be related to current event CVE-2021-44228
+  (Log4Shell).
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats count from datamodel=Web where Web.http_user_agent=\"*Java*\"\
+      \ Web.http_method=\"GET\" Web.url=\"*.class*\" by Web.http_user_agent Web.http_method,\
+      \ Web.url,Web.url_length Web.src, Web.dest \n  -  `drop_dm_object_name(\"Web\"\
+      )` \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `java_class_file_download_by_java_user_agent_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: .nan
+notes: .nan

@@ -1,0 +1,40 @@
+title: ESCU - Linux Deletion of SSL Certificate - Rule
+description: This analytic is to detect a deletion of ssl certificate in a linux machine.
+  attacker may delete or modify ssl certificate to impair some security features or
+  act as defense evasion in compromised linux machine. This Anomaly can be also a
+  good indicator of a malware trying to wipe or delete several files in a compromised
+  host as part of its destructive payload like what acidrain malware does in linux
+  or router machines. This detection can be a good pivot to check what process and
+  user tries to delete this type of files which is not so common and need further
+  investigation.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Filesystem where Filesystem.action=deleted\
+      \ Filesystem.file_path = \"/etc/ssl/certs/*\" Filesystem.file_path IN (\"*.pem\"\
+      , \"*.crt\") by _time span=1h Filesystem.file_name Filesystem.file_path Filesystem.dest\
+      \ Filesystem.process_guid Filesystem.action \n  -  `drop_dm_object_name(Filesystem)`\
+      \ \n  - rename process_guid as proc_guid \n  - join proc_guid, _time [ \n  -\
+      \  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ where Processes.parent_process_name != unknown by _time span=1h Processes.process_id\
+      \ Processes.process_name Processes.process Processes.dest Processes.parent_process_name\
+      \ Processes.parent_process Processes.process_path Processes.process_guid \n\
+      \  -  `drop_dm_object_name(Processes)` \n  - rename process_guid as proc_guid\
+      \ \n  -  fields _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data\
+      \ registry_key_name action] \n  -  table  process_name process proc_guid file_name\
+      \ file_path action _time parent_process_name parent_process  process_path dest\
+      \ user \n  -  `linux_deletion_of_ssl_certificate_filter`"
+  level: critical
+tags:
+- "T1485\nT1070.004\nT1070"
+- Data Destruction
+- Data Destruction
+references: Increase Linux logging to include file creation, deletion and modification
+notes: .nan

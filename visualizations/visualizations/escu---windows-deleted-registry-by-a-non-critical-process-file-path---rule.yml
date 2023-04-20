@@ -1,0 +1,40 @@
+title: ESCU - Windows Deleted Registry By A Non Critical Process File Path - Rule
+description: This analytic is to detect deletion of registry with suspicious process
+  file path. This technique was seen in Double Zero wiper malware where it will delete
+  all the subkey in HKLM, HKCU and HKU registry hive as part of its destructive payload
+  to the targeted hosts. This anomaly detections can catch possible malware or advesaries
+  deleting registry as part of defense evasion or even payload impact but can also
+  catch for third party application updates or installation. In this scenario false
+  positive filter is needed.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Registry\
+      \ where Registry.action=deleted by _time span=1h Registry.dest Registry.user\
+      \ Registry.registry_path Registry.registry_value_name Registry.registry_key_name\
+      \ Registry.process_guid Registry.registry_value_data Registry.action \n  - \
+      \ `drop_dm_object_name(Registry)` \n  - rename process_guid as proc_guid \n\
+      \  - join proc_guid, _time [\n  -  tstats `security_content_summariesonly` count\
+      \ FROM datamodel=Endpoint.Processes where NOT (Processes.process_path IN (\"\
+      *\\\\windows\\\\*\", \"*\\\\program files*\")) by _time span=1h Processes.process_id\
+      \ Processes.process_name Processes.process Processes.dest Processes.parent_process_name\
+      \ Processes.parent_process Processes.process_path Processes.process_guid \n\
+      \  -  `drop_dm_object_name(Processes)` \n  - rename process_guid as proc_guid\
+      \ \n  -  fields _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data\
+      \ registry_key_name action] \n  -  table _time parent_process_name parent_process\
+      \ process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data registry_key_name action dest user \n  -  `windows_deleted_registry_by_a_non_critical_process_file_path_filter`"
+  level: critical
+tags:
+- T1112
+- Modify Registry
+- Defense Evasion
+references: "Increase Windows logging to include Registry events\nRequires Sysmon\
+  \ data"
+notes: .nan

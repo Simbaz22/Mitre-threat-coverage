@@ -1,0 +1,29 @@
+title: ESCU - Gsuite Drive Share In External Email - Rule
+description: This search is to detect suspicious google drive or google docs files
+  shared outside or externally. This behavior might be a good hunting query to monitor
+  exfitration of data made by an attacker or insider to a targetted machine.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "`gsuite_drive` NOT (email IN(\"\", \"null\")) \n  -  rex field=parameters.owner\
+      \ \"[^@]+@(?<src_domain>[^@]+)\" \n  -  rex field=email \"[^@]+@(?<dest_domain>[^@]+)\"\
+      \ \n  -  where src_domain = \"internal_test_email.com\" and not dest_domain\
+      \ = \"internal_test_email.com\" \n  -  eval phase=\"plan\" \n  -  eval severity=\"\
+      low\" \n  -  stats values(parameters.doc_title) as doc_title, values(parameters.doc_type)\
+      \ as doc_types, values(email) as dst_email_list, values(parameters.visibility)\
+      \ as visibility, values(parameters.doc_id) as doc_id, count min(_time) as firstTime\
+      \ max(_time) as lastTime by parameters.owner ip_address phase severity  \n \
+      \ -  rename parameters.owner as user ip_address as src_ip \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `gsuite_drive_share_in_external_email_filter`"
+  level: critical
+tags:
+- "T1567.002\nT1567"
+- 'Exfiltration Over Web Service: Exfiltration to Cloud Storage'
+- 'Exfiltration Over Web Service: Exfiltration to Cloud Storage'
+references: .nan
+notes: Rule not applicable to this client

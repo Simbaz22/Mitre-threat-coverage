@@ -1,0 +1,26 @@
+title: ESCU - Kubernetes Azure detect RBAC authorization by account - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  provides information on Kubernetes RBAC authorizations by accounts, this search
+  can be modified by adding rare or top to see both extremes of RBAC by accounts occurrences'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Azure\nCloud"
+detection:
+  condition:
+    sigma: "`kubernetes_azure` category=kube-audit \n  -  spath input=properties.log\
+      \ \n  -  annotations.authorization.k8s.io/reason=* \n  -  table sourceIPs{}\
+      \ user.username userAgent annotations.authorization.k8s.io/reason \n  - stats\
+      \ count by user.username annotations.authorization.k8s.io/reason \n  -  rare\
+      \ user.username annotations.authorization.k8s.io/reason \n  - `kubernetes_azure_detect_rbac_authorization_by_account_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: .nan
+notes: Rule Deprecated by Splunk

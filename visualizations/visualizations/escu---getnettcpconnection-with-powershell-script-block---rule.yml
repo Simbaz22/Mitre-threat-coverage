@@ -1,0 +1,25 @@
+title: ESCU - GetNetTcpconnection with PowerShell Script Block - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the execution of the `Get-NetTcpconnection ` commandlet. This commandlet
+  is used to return a listing of network connections on a compromised system. Red
+  Teams and adversaries alike may use this commandlet for situational awareness and
+  Active Directory Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (Message = \"*Get-NetTcpconnection*\") \n\
+      \  -  stats count min(_time) as firstTime max(_time) as lastTime by EventCode\
+      \ Message ComputerName User \n  -  `security_content_ctime(firstTime)` \n  -\
+      \  `getnettcpconnection_with_powershell_script_block_filter`"
+  level: critical
+tags:
+- T1049
+- System Network Connections Discovery
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

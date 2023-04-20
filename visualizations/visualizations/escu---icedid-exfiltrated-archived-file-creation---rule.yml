@@ -1,0 +1,24 @@
+title: ESCU - IcedID Exfiltrated Archived File Creation - Rule
+description: This search is to detect a suspicious file creation namely passff.tar
+  and cookie.tar. This files are possible archived of stolen browser information like
+  history and cookies in a compromised machine with IcedID.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode= 11  (TargetFilename = \"*\\\\passff.tar\" OR TargetFilename\
+      \ = \"*\\\\cookie.tar\") \n  - stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by TargetFilename EventCode process_id  process_name Computer\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `icedid_exfiltrated_archived_file_creation_filter`"
+  level: critical
+tags:
+- "T1560.001\nT1560"
+- 'Archive Collected Data: Archive via Utility'
+- 'Archive Collected Data: Archive via Utility'
+references: Requires Sysmon data
+notes: .nan

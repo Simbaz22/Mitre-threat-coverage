@@ -1,0 +1,26 @@
+title: ESCU - Windows Schtasks Create Run As System - Rule
+description: The following analytic identifies Schtasks.exe creating a new task to
+  start and run as an elevated user - SYSTEM. This is commonly used by adversaries
+  to spawn a process in an elevated state.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where `process_schtasks`\
+      \ Processes.process=\"*/create *\" AND Processes.process=\"*/ru *\" AND Processes.process=\"\
+      *system*\" by Processes.dest Processes.user Processes.parent_process_name Processes.process_name\
+      \ Processes.original_file_name Processes.process Processes.process_id Processes.parent_process_id\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `windows_schtasks_create_run_as_system_filter`"
+  level: critical
+tags:
+- "T1053.005\nT1053"
+- 'Scheduled Task/Job: Scheduled Task'
+- 'Scheduled Task/Job: Scheduled Task'
+references: Increase Windows logging to include command line data
+notes: .nan

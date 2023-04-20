@@ -1,0 +1,32 @@
+title: ESCU - Process Creating LNK file in Suspicious Location - Rule
+description: This search looks for a process launching an `*.lnk` file under `C:\User*`
+  or `*\Local\Temp\*`. This is common behavior used by various spear phishing tools.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Filesystem where Filesystem.file_name=\"\
+      *.lnk\" AND (Filesystem.file_path=\"C:\\\\User\\\\*\" OR Filesystem.file_path=\"\
+      *\\\\Temp\\\\*\") by _time span=1h Filesystem.process_guid Filesystem.file_name\
+      \ Filesystem.file_path Filesystem.file_hash Filesystem.user \n  -  `drop_dm_object_name(Filesystem)`\
+      \ \n  -  rename process_guid as lnk_guid \n  -  join lnk_guid, _time [\n  -\
+      \  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ where Processes.process_name=* by _time span=1h Processes.parent_process_guid\
+      \ Processes.process_id Processes.process_name Processes.dest Processes.process_path\
+      \ Processes.process \n  -  `drop_dm_object_name(Processes)` \n  -  rename parent_process_guid\
+      \ as lnk_guid \n  -  fields _time lnk_guid process_id dest process_name process_path\
+      \ process] \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  table firstTime, lastTime, lnk_guid, process_id, user, dest, file_name,\
+      \ file_path, process_name, process, process_path, file_hash \n  -  `process_creating_lnk_file_in_suspicious_location_filter`"
+  level: critical
+tags:
+- T1566.002
+- 'Phishing: Spearphishing Link'
+- Initial Access
+references: Increase Windows logging to include command line data
+notes: .nan

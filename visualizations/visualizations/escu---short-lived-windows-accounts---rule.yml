@@ -1,0 +1,26 @@
+title: ESCU - Short Lived Windows Accounts - Rule
+description: This search detects accounts that were created and deleted in a short
+  time period.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(All_Changes.result_id)\
+      \ as result_id count min(_time) as firstTime max(_time) as lastTime from datamodel=Change\
+      \ where All_Changes.result_id=4720 OR All_Changes.result_id=4726 by _time span=4h\
+      \ All_Changes.user All_Changes.dest \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `drop_dm_object_name(\"\
+      All_Changes\")` \n  -  result_id = 4720 result_id=4726 \n  -  transaction user\
+      \ connected=false maxspan=240m \n  -  table firstTime lastTime count user dest\
+      \ result_id \n  -  `short_lived_windows_accounts_filter`"
+  level: critical
+tags:
+- T1136
+- Create Account
+- Persistence
+references: .nan
+notes: .nan

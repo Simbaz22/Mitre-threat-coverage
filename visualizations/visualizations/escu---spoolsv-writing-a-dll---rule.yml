@@ -1,0 +1,33 @@
+title: ESCU - Spoolsv Writing a DLL - Rule
+description: The following analytic identifies a `.dll` being written by `spoolsv.exe`.
+  This was identified during our testing of CVE-2021-34527 previously (CVE-2021-1675)
+  or PrintNightmare. Typically, this is not normal behavior for `spoolsv.exe` to write
+  a `.dll`. Current POC code used will write the suspicious DLL to disk within a path
+  of `\spool\drivers\x64\`. During triage, isolate the endpoint and review for source
+  of exploitation. Capture any additional file modification events.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ where Processes.process_name=spoolsv.exe by _time Processes.process_id Processes.process_name\
+      \ Processes.dest \n  -  `drop_dm_object_name(Processes)` \n  -  join process_guid,\
+      \ _time [\n  -  tstats `security_content_summariesonly` count min(_time) as\
+      \ firstTime max(_time) as lastTime FROM datamodel=Endpoint.Filesystem where\
+      \ Filesystem.file_path=\"*\\\\spool\\\\drivers\\\\x64\\\\*\" Filesystem.file_name=\"\
+      *.dll\" by _time Filesystem.dest Filesystem.file_create_time Filesystem.file_name\
+      \ Filesystem.file_path \n  -  `drop_dm_object_name(Filesystem)` \n  -  fields\
+      \ _time dest file_create_time file_name file_path process_name process_path\
+      \ process] \n  -  dedup file_create_time \n  -  table dest file_create_time,\
+      \ file_name, file_path, process_name \n  -  `spoolsv_writing_a_dll_filter`"
+  level: critical
+tags:
+- T1547.012
+- 'Boot or Logon Autostart Execution: Print Processors'
+- Persistence, Privilege Escalation
+references: Increase Windows logging to include command line data
+notes: .nan

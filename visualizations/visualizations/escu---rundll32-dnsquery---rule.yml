@@ -1,0 +1,25 @@
+title: ESCU - Rundll32 DNSQuery - Rule
+description: This search is to detect a suspicious rundll32.exe process having a http
+  connection and do a dns query in some web domain. This technique was seen in IcedID
+  malware where the rundll32 that execute its payload will contact amazon.com to check
+  internet connect and to communicate to its C&C server to download config and other
+  file component.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=22 process_name=\"rundll32.exe\" \n  -  stats count\
+      \ min(_time) as firstTime max(_time) as lastTime by Image QueryName QueryStatus\
+      \ ProcessId  Computer \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `rundll32_dnsquery_filter`"
+  level: critical
+tags:
+- T1218.011
+- 'System Binary Proxy Execution: Rundll32'
+- Defense Evasion
+references: Requires Sysmon data
+notes: .nan

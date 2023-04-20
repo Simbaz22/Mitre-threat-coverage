@@ -1,0 +1,26 @@
+title: ESCU - gcp detect oauth token abuse - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  provides detection of possible GCP Oauth token abuse. GCP Oauth token without time
+  limit can be exfiltrated and reused for keeping access sessions alive without further
+  control of authentication, allowing attackers to access and move laterally.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Cloud\nGCP"
+detection:
+  condition:
+    sigma: "`google_gcp_pubsub_message` type.googleapis.com/google.cloud.audit.AuditLog\
+      \ \n  - table protoPayload.@type protoPayload.status.details{}.@type protoPayload.status.details{}.violations{}.callerIp\
+      \ protoPayload.status.details{}.violations{}.type protoPayload.status.message\
+      \ \n  -  `gcp_detect_oauth_token_abuse_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: Deprecated by Splunk

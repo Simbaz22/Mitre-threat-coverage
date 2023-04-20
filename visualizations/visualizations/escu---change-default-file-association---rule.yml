@@ -1,0 +1,29 @@
+title: ESCU - Change Default File Association - Rule
+description: This analytic is developed to detect suspicious registry modification
+  to change the default file association of windows to malicious payload. This techninique
+  was seen in some APT where it modify the default process to run file association,
+  like .txt to notepad.exe. Instead notepad.exe it will point to a Script or other
+  payload that will load malicious command to the compromised host.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count  min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Registry where Registry.registry_path\
+      \ =\"*\\\\shell\\\\open\\\\command\\\\*\" Registry.registry_path = \"*HKCR\\\
+      \\*\" by Registry.dest  Registry.user Registry.registry_path Registry.registry_key_name\
+      \ Registry.registry_value_name \n  -  `security_content_ctime(lastTime)` \n\
+      \  -  `security_content_ctime(firstTime)` \n  -  `drop_dm_object_name(Registry)`\
+      \ \n  -  `change_default_file_association_filter`"
+  level: critical
+tags:
+- "T1546.001\nT1546"
+- 'Event Triggered Execution: Change Default File Association'
+- 'Event Triggered Execution: Change Default File Association'
+references: "Increase Windows logging to include Registry events\nIncrease Windows\
+  \ logging to include command line data"
+notes: .nan

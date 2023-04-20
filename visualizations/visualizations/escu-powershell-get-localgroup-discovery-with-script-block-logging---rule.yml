@@ -1,0 +1,24 @@
+title: ESCU-Powershell Get LocalGroup Discovery with Script Block Logging - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify suspicious PowerShell execution. Script Block Logging captures the command
+  sent to PowerShell, the full command to be executed. Upon enabling, logs will output
+  to Windows event logs. Dependent upon volume, enable on critical endpoints or all.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 ScriptBlockText = *system.management.automation.amsi*\
+      \ \n  -  stats count min(_time) as firstTime max(_time) as lastTime by EventCode\
+      \ ScriptBlockText Computer user_id \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `unloading_amsi_via_reflection_filter`"
+  level: critical
+tags:
+- T1069.001
+- 'Permission Groups Discovery: Local Groups'
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

@@ -1,0 +1,28 @@
+title: ESCU - Detect Regasm with no Command Line Arguments - Rule
+description: The following analytic identifies regasm.exe with no command line arguments.
+  This particular behavior occurs when another process injects into regasm.exe, no
+  command line arguments will be present. During investigation, identify any network
+  connections and parallel processes. Identify any suspicious module loads related
+  to credential dumping or file writes. Regasm.exe are natively found in `C:\Windows\Microsoft.NET\Framework\v*\regasm|regsvcs.exe`
+  and `C:\Windows\Microsoft.NET\Framework64\v*\regasm|regsvcs.exe`.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ where `process_regasm` by _time span=1h  Processes.process_id Processes.process_name\
+      \ Processes.dest Processes.process_path Processes.process Processes.parent_process_name\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  regex process=\"(?i)(regasm\\\
+      .exe.{0,4}$)\" \n  -  `detect_regasm_with_no_command_line_arguments_filter`"
+  level: critical
+tags:
+- "T1218\nT1218.009"
+- System Binary Proxy Execution
+- System Binary Proxy Execution
+references: Increase Windows logging to include command line data
+notes: .nan

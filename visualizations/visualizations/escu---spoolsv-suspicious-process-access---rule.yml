@@ -1,0 +1,27 @@
+title: ESCU - Spoolsv Suspicious Process Access - Rule
+description: This analytic identifies a suspicious behavior related to PrintNightmare,
+  or CVE-2021-34527 previously (CVE-2021-1675),  to gain privilege escalation on the
+  vulnerable machine. This exploit attacks a critical Windows Print Spooler Vulnerability
+  to elevate privilege. This detection is to look for suspicious process access made
+  by the spoolsv.exe that may related to the attack.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=10 SourceImage = \"*\\\\spoolsv.exe\" CallTrace = \"\
+      *\\\\Windows\\\\system32\\\\spool\\\\DRIVERS\\\\x64\\\\*\" TargetImage IN (\"\
+      *\\\\rundll32.exe\", \"*\\\\spoolsv.exe\") GrantedAccess = 0x1fffff \n  -  stats\
+      \  count min(_time) as firstTime max(_time) as lastTime by Computer SourceImage\
+      \ TargetImage GrantedAccess CallTrace  EventCode ProcessID\n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `spoolsv_suspicious_process_access_filter`"
+  level: critical
+tags:
+- T1068
+- Exploitation for Privilege Escalation
+- Privilege Escalation
+references: Requires Sysmon data
+notes: .nan

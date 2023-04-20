@@ -1,0 +1,25 @@
+title: ESCU - Powershell Using memory As Backing Store - Rule
+description: The following analytic identifies suspicious PowerShell script execution
+  via EventCode 4104 that is using memory stream as new object backstore. The malicious
+  PowerShell script will contain stream flate data and will be decompressed in memory
+  to run or drop the actual payload. During triage, review parallel processes within
+  the same timeframe. Review the full script block to identify other related artifacts.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: PowerShell
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 ScriptBlockText = *New-Object* ScriptBlockText\
+      \ = *IO.MemoryStream* \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by EventCode ScriptBlockText Computer user_id \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `powershell_using_memory_as_backing_store_filter`"
+  level: critical
+tags:
+- "T1059.001\nT1059"
+- 'Command and Scripting Interpreter: PowerShell'
+- 'Command and Scripting Interpreter: PowerShell'
+references: .nan
+notes: .nan

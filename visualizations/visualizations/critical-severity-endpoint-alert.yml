@@ -1,0 +1,18 @@
+title: Critical Severity Endpoint Alert
+description: Detects Critical Severity activity observed by EDR
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: EDR
+detection:
+  condition:
+    sigma: MISSING SPLUNK LOGIC
+  level: critical
+tags:
+- T0859
+- '#INVALID VALUE'
+- '#INVALID VALUE'
+references: Requires EDR data feed
+notes: "Securonix Logic:\nDeviceSeverity = Critical\nAND\nAccountName !contain $"

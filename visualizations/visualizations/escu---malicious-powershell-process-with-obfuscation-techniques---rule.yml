@@ -1,0 +1,27 @@
+title: ESCU - Malicious PowerShell Process With Obfuscation Techniques - Rule
+description: This search looks for PowerShell processes launched with arguments that
+  have characters indicative of obfuscation on the command-line.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(Processes.process)\
+      \ as process values(Processes.parent_process) as parent_process min(_time) as\
+      \ firstTime max(_time) as lastTime from datamodel=Endpoint.Processes where `process_powershell`\
+      \ by Processes.user Processes.process_name Processes.original_file_name Processes.parent_process_name\
+      \ Processes.dest Processes.process \n  -  `drop_dm_object_name(Processes)` \n\
+      \  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\n\
+      \  -  eval num_obfuscation = (mvcount(split(process,\"`\"))-1) + (mvcount(split(process,\
+      \ \"^\"))-1) + (mvcount(split(process, \"'\"))-1) \n  -  `malicious_powershell_process_with_obfuscation_techniques_filter`\
+      \ \n  -  num_obfuscation > 10"
+  level: critical
+tags:
+- T1569.002
+- 'System Services: Service Execution'
+- Execution
+references: Increase Windows logging to include command line data and powershell logs
+notes: .nan

@@ -1,0 +1,27 @@
+title: ESCU - Excessive DNS Failures - Rule
+description: This search identifies DNS query failures by counting the number of DNS
+  responses that do not indicate success, and trigger on more than 50 occurrences.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Network
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(\"DNS.query\"\
+      ) as queries from datamodel=Network_Resolution where nodename=DNS \"DNS.reply_code\"\
+      !=\"No Error\" \"DNS.reply_code\"!=\"NoError\" DNS.reply_code!=\"unknown\" NOT\
+      \ \"DNS.query\"=\"*.arpa\" \"DNS.query\"=\"*.*\" by \"DNS.src\",\"DNS.query\"\
+      \n  -  `drop_dm_object_name(\"DNS\")`\n  -  lookup cim_corporate_web_domain_lookup\
+      \ domain as query OUTPUT domain\n  -  where isnull(domain)\n  -  lookup update=true\
+      \ alexa_lookup_by_str domain as query OUTPUT rank\n  -  where isnull(rank)\n\
+      \  -  stats sum(count) as count mode(queries) as queries by src\n  -  `get_asset(src)`\n\
+      \  -  where count>50 \n  -  `excessive_dns_failures_filter`"
+  level: critical
+tags:
+- T1071.004
+- 'Application Layer Protocol: DNS'
+- Command and Control
+references: .nan
+notes: Experimental detection (not supported by splunk)

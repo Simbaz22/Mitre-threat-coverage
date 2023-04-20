@@ -1,0 +1,28 @@
+title: ESCU - Processes launching netsh - Rule
+description: This search looks for processes launching netsh.exe. Netsh is a command-line
+  scripting utility that allows you to, either locally or remotely, display or modify
+  the network configuration of a computer that is currently running. Netsh can be
+  used as a persistence proxy technique to execute a helper DLL when netsh.exe is
+  executed. In this search, we are looking for processes spawned by netsh.exe and
+  executing commands via the command line.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(Processes.process)\
+      \ AS Processes.process min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes\
+      \ where `process_netsh` by Processes.parent_process_name Processes.parent_process\
+      \ Processes.original_file_name Processes.process_name Processes.user Processes.dest\
+      \ \n  - `drop_dm_object_name(\"Processes\")` \n  - `security_content_ctime(firstTime)`\
+      \ \n  - `security_content_ctime(lastTime)` \n  - `processes_launching_netsh_filter`"
+  level: critical
+tags:
+- T1562.004
+- 'Impair Defenses: Disable or Modify System Firewall'
+- Defense Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

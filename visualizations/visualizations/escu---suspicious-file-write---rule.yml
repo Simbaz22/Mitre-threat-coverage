@@ -1,0 +1,26 @@
+title: ESCU - Suspicious File Write - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. The search
+  looks for files created with names that have been linked to malicious activity.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(Filesystem.action)\
+      \ as action values(Filesystem.file_path) as file_path min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Filesystem by Filesystem.file_name\
+      \ Filesystem.dest \n  -  `security_content_ctime(lastTime)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `drop_dm_object_name(Filesystem)` \n  -  `suspicious_writes` \n  -\
+      \  `suspicious_file_write_filter`"
+  level: critical
+tags:
+- T1036
+- Masquerading
+- Defense Evasion
+references: .nan
+notes: Deprecated

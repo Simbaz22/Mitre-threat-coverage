@@ -1,0 +1,25 @@
+title: ESCU - AWS EKS Kubernetes cluster sensitive object access - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  provides information on Kubernetes accounts accessing sensitve objects such as configmaps
+  or secrets'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`aws_cloudwatchlogs_eks` objectRef.resource=secrets OR configmaps sourceIPs{}!=::1\
+      \ sourceIPs{}!=127.0.0.1  \n  - table sourceIPs{} user.username user.groups{}\
+      \ objectRef.resource objectRef.namespace objectRef.name annotations.authorization.k8s.io/reason\
+      \ \n  - dedup user.username user.groups{} \n  - `aws_eks_kubernetes_cluster_sensitive_object_access_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: .nan
+notes: Deprecated by Splunk

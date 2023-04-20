@@ -1,0 +1,25 @@
+title: ESCU - AWS SAML Access by Provider User and Principal - Rule
+description: This search provides specific SAML access from specific Service Provider,
+  user and targeted principal at AWS. This search provides specific information to
+  detect abnormal access or potential credential hijack or forgery, specially in federated
+  environments using SAML protocol inside the perimeter or cloud provider.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=Assumerolewithsaml \n  -  stats count min(_time)\
+      \ as firstTime max(_time) as lastTime by requestParameters.principalArn requestParameters.roleArn\
+      \ requestParameters.roleSessionName recipientAccountId responseElements.issuer\
+      \ sourceIPAddress userAgent \n  -  `security_content_ctime(firstTime)`\n  -\
+      \  `security_content_ctime(lastTime)` \n  - `aws_saml_access_by_provider_user_and_principal_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: Too many False Positives

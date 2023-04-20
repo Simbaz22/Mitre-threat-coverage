@@ -1,0 +1,26 @@
+title: ESCU - Linux pkexec Privilege Escalation - Rule
+description: The following analytic identifies `pkexec` spawning with no command-line
+  arguments. A vulnerability in Polkit's pkexec component identified as CVE-2021-4034
+  (PwnKit) which is present in the default configuration of all major Linux distributions
+  and can be exploited to gain full root privileges on the system.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ where Processes.process_name=pkexec by _time Processes.dest Processes.process_id\
+      \ Processes.parent_process_name Processes.process_name Processes.process Processes.process_path\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  regex process=\"(^.{1}$)\"\
+      \ \n  -  `linux_pkexec_privilege_escalation_filter`"
+  level: critical
+tags:
+- T1055.001
+- 'Process Injection: Dynamic-link Library Injection'
+- Defense Evasion, Privilege Escalation
+references: Increase Linux logging to include command line data
+notes: .nan

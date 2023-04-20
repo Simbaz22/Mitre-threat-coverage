@@ -1,0 +1,24 @@
+title: ESCU - UAC Bypass With Colorui COM Object - Rule
+description: This search is to detect a possible uac bypass using the colorui.dll
+  COM Object. this technique was seen in so many malware and ransomware like lockbit
+  where it make use of the colorui.dll COM CLSID to bypass UAC.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=7 ImageLoaded=\"*\\\\colorui.dll\" process_name !=\
+      \ \"colorcpl.exe\" NOT(Image IN(\"*\\\\windows\\\\*\", \"*\\\\program files*\"\
+      )) \n  -  stats count min(_time) as firstTime max(_time) as lastTime by Image\
+      \ ImageLoaded process_name Computer EventCode Signed ProcessId \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `uac_bypass_with_colorui_com_object_filter`"
+  level: critical
+tags:
+- T1218.003
+- 'System Binary Proxy Execution: CMSTP'
+- Defense Evasion
+references: Requires Sysmon data
+notes: .nan

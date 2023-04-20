@@ -1,0 +1,28 @@
+title: ESCU - Detect Unauthorized Assets by MAC address - Rule
+description: By populating the organization's assets within the assets_by_str.csv,
+  we will be able to detect unauthorized devices that are trying to connect with the
+  organization's network by inspecting DHCP request packets, which are issued by devices
+  when they attempt to obtain an IP address from the DHCP server. The MAC address
+  associated with the source of the DHCP request is checked against the list of known
+  devices, and reports on those that are not found.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Network_Sessions\
+      \ where nodename=All_Sessions.DHCP All_Sessions.signature=DHCPREQUEST by All_Sessions.src_ip\
+      \ All_Sessions.dest_mac \n  -  dedup All_Sessions.dest_mac\n  -  `drop_dm_object_name(\"\
+      Network_Sessions\")`\n  - `drop_dm_object_name(\"All_Sessions\")` \n  -  NOT\
+      \ [\n  -  inputlookup asset_lookup_by_str \n  - rename mac as dest_mac \n  -\
+      \  fields + dest_mac] \n  -  `detect_unauthorized_assets_by_mac_address_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: Requires DHCP Data
+notes: .nan

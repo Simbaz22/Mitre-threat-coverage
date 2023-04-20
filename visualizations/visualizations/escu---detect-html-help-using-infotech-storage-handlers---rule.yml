@@ -1,0 +1,36 @@
+title: ESCU - Detect HTML Help Using InfoTech Storage Handlers - Rule
+description: The following analytic identifies hh.exe (HTML Help) execution of a Compiled
+  HTML Help (CHM) file using InfoTech Storage Handlers. This particular technique
+  will load Windows script code from a compiled help file, using InfoTech Storage
+  Handlers. itss.dll will load upon execution. Three InfoTech Storage handlers are
+  supported - ms-its, its, mk:@MSITStore. ITSS may be used to launch a specific html/htm
+  file from within a CHM file. CHM files may contain nearly any file type embedded.
+  Upon a successful execution, the following script engines may be used for execution
+  - JScript, VBScript, VBScript.Encode, JScript.Encode, JScript.Compact. Analyst may
+  identify vbscript.dll or jscript.dll loading into hh.exe upon execution. The "htm"
+  and "html" file extensions were the only extensions observed to be supported for
+  the execution of Shortcut commands or WSH script code. During investigation, identify
+  script content origination. hh.exe is natively found in C:\Windows\system32 and
+  C:\Windows\syswow64.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where `process_hh`\
+      \ Processes.process IN (\"*its:*\", \"*mk:@MSITStore:*\") by Processes.dest\
+      \ Processes.user Processes.parent_process Processes.process_name Processes.process\
+      \ Processes.process_id Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `detect_html_help_using_infotech_storage_handlers_filter`"
+  level: critical
+tags:
+- "T1218\nT1218.001"
+- System Binary Proxy Execution
+- System Binary Proxy Execution
+references: Increase Windows logging to include command line data
+notes: .nan

@@ -1,0 +1,27 @@
+title: DS_Possible Rorschach Ransomware
+description: "This rule detects notepad.exe spawning abnormal child processes that\
+  \ have been identified with the Rorschach Ransomware.\nhttps://research.checkpoint.com/2023/rorschach-a-new-sophisticated-and-fast-ransomware/"
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.parent_process_name=notepad.exe\
+      \ AND (Processes.process_name=wbadmin.exe OR Processes.process_name=wevutil.exe\
+      \ OR Processes.process_name=vssadmin.exe OR Processes.process_name=net.exe OR\
+      \ Processes.process_name=wmic.exe OR Processes.process_name=netsh.exe OR Processes.process_name=bcedit.exe)\
+      \ by Processes.dest Processes.user Processes.parent_process Processes.process_name\
+      \ Processes.process Processes.process_id Processes.parent_process_id \n\n  -\
+      \  `drop_dm_object_name(Processes)` \n\n  -  `security_content_ctime(firstTime)`\
+      \ \n\n  -  `security_content_ctime(lastTime)`"
+  level: critical
+tags:
+- T1562
+- Impair Defenses
+- Defense Evasion
+references: .nan
+notes: .nan

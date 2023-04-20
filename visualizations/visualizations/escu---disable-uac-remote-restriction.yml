@@ -1,0 +1,37 @@
+title: ESCU - Disable UAC Remote Restriction
+description: This analytic is to detect a suspicious modification of registry to disable
+  UAC remote restriction. This technique was well documented in Microsoft page where
+  attacker may modify this registry value to bypassed UAC feature of windows host.
+  This is a good indicator that some tries to bypassed UAC to suspicious process or
+  gain privilege escalation.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count  min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Registry where Registry.registry_path=\"\
+      *\\\\CurrentVersion\\\\Policies\\\\System*\" Registry.registry_value_name=\"\
+      LocalAccountTokenFilterPolicy\" Registry.registry_value_data=\"0x00000001\"\
+      \ by _time span=1h Registry.dest Registry.user Registry.registry_path Registry.registry_value_name\
+      \ Registry.registry_value_data Registry.process_guid \n  -  `drop_dm_object_name(Registry)`\
+      \ \n  - rename process_guid as proc_guid \n  - join proc_guid, _time [\n  -\
+      \  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ by _time span=1h Processes.process_id Processes.process_name Processes.process\
+      \ Processes.dest Processes.parent_process_name Processes.parent_process Processes.process_guid\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  - rename process_guid as proc_guid\
+      \ \n  -  fields _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data]\
+      \ \n  -  table _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data\
+      \ \n  -  `disable_uac_remote_restriction_filter`"
+  level: critical
+tags:
+- T1548.002
+- 'Abuse Elevation Control Mechanism: Bypass User Account Control'
+- Defense Evasion, Privilege Escalation
+references: Increase Windows logging to include Registry events
+notes: .nan

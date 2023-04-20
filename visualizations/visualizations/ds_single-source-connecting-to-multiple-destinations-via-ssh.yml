@@ -1,0 +1,23 @@
+title: DS_Single Source Connecting to Multiple Destinations via SSH
+description: This rule detects a single source connecting to at least 5 destination
+  hosts within a duration of one hour via ssh. The drill-down search will provide
+  destination hostname and user.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Linux\nWindows"
+detection:
+  condition:
+    sigma: "\n  -  tstats distinct_count(Authentication.dest) as distinct_count values(Authentication.dest)\
+      \ as dest from datamodel=Authentication where Authentication.app=\"ssh\" AND\
+      \ Authentication.action=\"success\" by Authentication.src\n\n  -  where distinct_count\
+      \ > 4\n\n  -  rename Authentication.src as src\n\n  -  table src dest"
+  level: critical
+tags:
+- T1021.004
+- 'Remote Services: SSH'
+- Lateral Movement
+references: .nan
+notes: .nan

@@ -1,0 +1,35 @@
+title: ESCU - Gsuite Suspicious Shared File Name - Rule
+description: This search is to detect a shared file in google drive with suspicious
+  file name that are commonly used by spear phishing campaign. This technique is very
+  popular to lure the user by running a malicious document or click a malicious link
+  within the shared file that will redirected to malicious website. This detection
+  can also catch some normal email communication between organization and its external
+  customer.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "`gsuite_drive` parameters.owner_is_team_drive=false \"parameters.doc_title\"\
+      \ IN (\"*dhl*\", \"* ups *\", \"*delivery*\", \"*parcel*\", \"*label*\", \"\
+      *invoice*\", \"*postal*\", \"*fedex*\", \"* usps *\", \"* express *\", \"*shipment*\"\
+      , \"*Banking/Tax*\",\"*shipment*\", \"*new order*\") parameters.doc_type IN\
+      \ (\"document\",\"pdf\", \"msexcel\", \"msword\", \"spreadsheet\", \"presentation\"\
+      ) \n  -  rex field=parameters.owner \"[^@]+@(?<source_domain>[^@]+)\" \n  -\
+      \  rex field=parameters.target_user \"[^@]+@(?<dest_domain>[^@]+)\" \n  -  where\
+      \ not source_domain=\"internal_test_email.com\" and dest_domain=\"internal_test_email.com\"\
+      \ \n  -  eval phase=\"plan\" \n  -  eval severity=\"low\" \n  -  stats count\
+      \ min(_time) as firstTime max(_time) as lastTime by email parameters.owner parameters.target_user\
+      \ parameters.doc_title parameters.doc_type phase severity \n  -  rename parameters.target_user\
+      \ AS user \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `gsuite_suspicious_shared_file_name_filter`"
+  level: critical
+tags:
+- "T1566.001\nT1566"
+- 'Phishing: Spearphishing Attachment'
+- 'Phishing: Spearphishing Attachment'
+references: .nan
+notes: Rule not applicable to this client

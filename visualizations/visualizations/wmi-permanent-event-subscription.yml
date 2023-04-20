@@ -1,0 +1,25 @@
+title: WMI Permanent Event Subscription
+description: This detection has been marked experimental by the Splunk Threat Research
+  team. This means we have not been able to test, simulate, or build datasets for
+  this detection. Use at your own risk. This analytic is NOT supported.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wmi` EventCode=5861 Binding \n\n  -  rex field=Message \"Consumer =\\\
+      s+(?<consumer>[^;\n\n  - ^$]+)\" \n\n  -  consumer!=\"NTEventLogEventConsumer=\\\
+      \"SCM Event Log Consumer\\\"\" \n\n  -  stats count min(_time) as firstTime\
+      \ max(_time) as lastTime by ComputerName, consumer, Message \n\n  -  `security_content_ctime(firstTime)`\n\
+      \n  -  `security_content_ctime(lastTime)` \n\n  -  rename ComputerName as dest\
+      \ \n\n  -  `wmi_permanent_event_subscription_filter`"
+  level: critical
+tags:
+- T1047
+- Windows Management Instrumentation
+- Execution
+references: .nan
+notes: Experimental detection (not supported by splunk)

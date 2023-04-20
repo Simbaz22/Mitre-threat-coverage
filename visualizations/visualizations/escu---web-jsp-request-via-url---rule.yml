@@ -1,0 +1,26 @@
+title: ESCU - Web JSP Request via URL - Rule
+description: The following analytic identifies the common URL requests used by a recent
+  CVE - CVE-2022-22965, or Spring4Shell, to access a webshell on the remote webserver.
+  The filename and cmd are arbitrary in this exploitation. Java will write a JSP to
+  disk and a process will spawn from Java based on the cmd passed. This is indicative
+  of typical web shell activity.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Web
+detection:
+  condition:
+    sigma: "\n  -  tstats count from datamodel=Web where Web.http_method IN (\"GET\"\
+      ) Web.url IN (\"*.jsp?cmd=*\",\"*j&cmd=*\") by Web.http_user_agent Web.http_method,\
+      \ Web.url,Web.url_length Web.src, Web.dest sourcetype \n  -  `drop_dm_object_name(\"\
+      Web\")` \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `web_jsp_request_via_url_filter`"
+  level: critical
+tags:
+- T1505.003
+- 'Server Software Component: Web Shell'
+- Persistence
+references: .nan
+notes: .nan

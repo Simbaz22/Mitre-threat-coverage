@@ -1,0 +1,30 @@
+title: ESCU - Anomalous usage of 7zip
+description: The following detection identifies a 7z.exe spawned from `Rundll32.exe`
+  or `Dllhost.exe`. It is assumed that the adversary has brought in `7z.exe` and `7z.dll`.
+  It has been observed where an adversary will rename `7z.exe`. Additional coverage
+  may be required to identify the behavior of renamed instances of `7z.exe`. During
+  triage, identify the source of injection into `Rundll32.exe` or `Dllhost.exe`. Capture
+  any files written to disk and analyze as needed. Review parallel processes for additional
+  behaviors. Typically, archiving files will result in exfiltration.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.parent_process_name\
+      \ IN (\"rundll32.exe\", \"dllhost.exe\") Processes.process_name=*7z* by Processes.dest\
+      \ Processes.user Processes.parent_process Processes.process_name Processes.process\
+      \ Processes.process_id Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\n\
+      \  -  `anomalous_usage_of_7zip_filter`"
+  level: critical
+tags:
+- T1560.001
+- 'Archive Collected Data: Archive via Utility'
+- Collection
+references: .nan
+notes: .nan

@@ -1,0 +1,33 @@
+title: ESCU - EC2 Instance Started With Previously Unseen Instance Type - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  looks for EC2 instances being created with previously unseen instance types.  This
+  search is deprecated and have been translated to use the latest Change Datamodel.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: AWS
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=RunInstances [`cloudtrail` eventName=RunInstances\
+      \ errorCode=success \n  -  fillnull value=\"m1.small\" requestParameters.instanceType\
+      \ \n  -  stats earliest(_time) as earliest latest(_time) as latest by requestParameters.instanceType\
+      \ \n  -  rename requestParameters.instanceType as instanceType \n  -  inputlookup\
+      \ append=t previously_seen_ec2_instance_types.csv \n  -  stats min(earliest)\
+      \ as earliest max(latest) as latest by instanceType \n  -  outputlookup previously_seen_ec2_instance_types.csv\
+      \ \n  -  eval newType=if(earliest >= relative_time(now(), \"-70m@m\"), 1, 0)\
+      \ \n  -  `security_content_ctime(earliest)` \n  -  `security_content_ctime(latest)`\
+      \ \n  -  where newType=1 \n  -  rename instanceType as requestParameters.instanceType\
+      \ \n  -  table requestParameters.instanceType] \n  -  spath output=user userIdentity.arn\
+      \ \n  -  rename requestParameters.instanceType as instanceType, responseElements.instancesSet.items{}.instanceId\
+      \ as dest \n  -  table _time, user, dest, instanceType \n  -  `ec2_instance_started_with_previously_unseen_instance_type_filter`"
+  level: critical
+tags:
+- T1078.004
+- 'Valid Accounts: Cloud Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: Deprecated by Splunk

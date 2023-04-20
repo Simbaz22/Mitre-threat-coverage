@@ -1,0 +1,30 @@
+title: ESCU - Linux System Network Discovery - Rule
+description: This analytic is to look for possible enumeration of local network configuration.
+  This technique is commonly used as part of recon of adversaries or threat actor
+  to know some network information for its next or further attack. This anomaly detections
+  may capture normal event made by administrator during auditing or testing network
+  connection of specific host or network to network.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(Processes.process_name)\
+      \ as process_name_list values(Processes.process) as process_list values(Processes.process_id)\
+      \ as process_id_list values(Processes.parent_process_id) as parent_process_id_list\
+      \ values(Processes.process_guid) as process_guid_list dc(Processes.process_name)\
+      \ as process_name_count from datamodel=Endpoint.Processes where Processes.process_name\
+      \ IN (\"arp\", \"ifconfig\", \"ip\", \"netstat\", \"firewall-cmd\", \"ufw\"\
+      , \"iptables\", \"ss\", \"route\") by _time span=30m Processes.dest Processes.user\
+      \ \n  -  where process_name_count >=4 \n  -  `drop_dm_object_name(Processes)`\n\
+      \  -  `linux_system_network_discovery_filter`"
+  level: critical
+tags:
+- T1016
+- System Network Configuration Discovery
+- Discovery
+references: Increase Linux logging to include command line data
+notes: .nan

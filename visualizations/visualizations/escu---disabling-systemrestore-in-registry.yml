@@ -1,0 +1,40 @@
+title: ESCU - Disabling SystemRestore In Registry
+description: The following search identifies the modification of registry related
+  in disabling the system restore of a machine. This event or behavior are seen in
+  some RAT malware to make the restore of the infected machine  difficult and keep
+  their infection on the box.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Registry\
+      \ where Registry.registry_path= \"*\\\\SOFTWARE\\\\Microsoft\\\\Windows NT\\\
+      \\CurrentVersion\\\\SystemRestore\\\\DisableSR\" OR Registry.registry_path=\
+      \ \"*\\\\SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\SystemRestore\\\
+      \\DisableConfig\" OR Registry.registry_path= \"*\\\\SOFTWARE\\\\Policies\\\\\
+      Microsoft\\\\Windows NT\\\\SystemRestore\\\\DisableSR\" OR Registry.registry_path=\
+      \ \"*\\\\SOFTWARE\\\\Policies\\\\Microsoft\\\\Windows NT\\\\SystemRestore\\\\\
+      DisableConfig\" Registry.registry_value_data = \"0x00000001\" by _time span=1h\
+      \ Registry.dest Registry.user Registry.registry_path Registry.registry_value_name\
+      \ Registry.registry_key_name Registry.process_guid Registry.registry_value_data\
+      \ \n  -  `drop_dm_object_name(Registry)` \n  - rename process_guid as proc_guid\
+      \ \n  - join proc_guid, _time [\n  -  tstats `security_content_summariesonly`\
+      \ count FROM datamodel=Endpoint.Processes by _time span=1h Processes.process_id\
+      \ Processes.process_name Processes.process Processes.dest Processes.parent_process_name\
+      \ Processes.parent_process Processes.process_guid \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  - rename process_guid as proc_guid \n  -  fields _time dest user parent_process_name\
+      \ parent_process process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data registry_key_name] \n  -  table _time dest user parent_process_name\
+      \ parent_process process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data registry_key_name \n  -  `disabling_systemrestore_in_registry_filter`"
+  level: critical
+tags:
+- T1490
+- Inhibit System Recovery
+- Impact
+references: Increase Windows logging to include Registry events
+notes: .nan

@@ -1,0 +1,28 @@
+title: ESCU - Exchange PowerShell Abuse via SSRF - Rule
+description: "This analytic identifies suspicious behavior related to ProxyShell against\
+  \ on-premise Microsoft Exchange servers. \nModification of this analytic is requried\
+  \ to ensure fields are mapped accordingly. \nA suspicious event will have `PowerShell`,\
+  \ the method `POST` and `autodiscover.json`. This is indicative of accessing PowerShell\
+  \ on the back end of Exchange with SSRF. \nAn event will look similar to `POST /autodiscover/autodiscover.json\
+  \ a=dsxvu@fnsso.flq/powershell/?X-Rps-CAT=VgEAVAdXaW5kb3d...` (abbreviated) \nReview\
+  \ the source attempting to perform this activity against your environment. In addition,\
+  \ review PowerShell logs and access recently granted to Exchange roles."
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  `exchange` c_uri=\"*//autodiscover.json*\" cs_uri_query=\"*PowerShell*\"\
+      \ cs_method=\"POST\" \n  -  stats count min(_time) as firstTime max(_time) as\
+      \ lastTime by dest, cs_uri_query, cs_method, c_uri \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `exchange_powershell_abuse_via_ssrf_filter`"
+  level: critical
+tags:
+- T1190
+- Exploit Public-Facing Application
+- Initial Access
+references: .nan
+notes: Experimental detection (not supported by splunk)

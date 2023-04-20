@@ -1,0 +1,24 @@
+title: ESCU - Windows Security Account Manager Stopped - Rule
+description: The search looks for a Windows Security Account Manager (SAM) was stopped
+  via command-line. This is consistent with Ryuk infections across a fleet of endpoints.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Processes WHERE (\"Processes.process_name\"\
+      =\"net*.exe\" \"Processes.process\"=\"*stop \\\"samss\\\"*\") BY \"Processes.dest\"\
+      , \"Processes.user\", \"Processes.process\" \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `windows_security_account_manager_stopped_filter`"
+  level: critical
+tags:
+- T1489
+- Service Stop
+- Impact
+references: Increase Windows logging to include command line data
+notes: .nan

@@ -1,0 +1,26 @@
+title: ESCU - DNS Query Length Outliers - MLTK - Rule
+description: This search allows you to identify DNS requests that are unusually large
+  for the record type being requested in your environment.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Firewall\nNetwork"
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as start_time\
+      \ max(_time) as end_time values(DNS.src) as src values(DNS.dest) as dest from\
+      \ datamodel=Network_Resolution by DNS.query DNS.record_type \n  -  DNS.record_type=*\
+      \ \n  -  `drop_dm_object_name(DNS)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  eval query_length = len(query)\
+      \ \n  -  apply dns_query_pdfmodel threshold=0.01 \n  -  rename \"IsOutlier(query_length)\"\
+      \ as isOutlier \n  -  isOutlier > 0 \n  -  sort -query_length \n  -  table start_time\
+      \ end_time query record_type count src dest query_length \n  -  `dns_query_length_outliers___mltk_filter`"
+  level: critical
+tags:
+- T1071.004
+- 'Application Layer Protocol: DNS'
+- Command and Control
+references: Requires Splunk MLTK
+notes: THIS IS A EXPERIMENTAL DETECTION - Machine Learning Toolkit (MLTK) required

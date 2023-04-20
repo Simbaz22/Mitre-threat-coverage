@@ -1,0 +1,29 @@
+title: ESCU - Suspicious Process DNS Query Known Abuse Web Services - Rule
+description: This analytic detects a suspicious process making a DNS query via known,
+  abused text-paste web services, VoIP, instant messaging, and digital distribution
+  platforms used to download external files. This technique is abused by adversaries,
+  malware actors, and red teams to download a malicious file on the target host. This
+  is a good TTP indicator for possible initial access techniques. A user will experience
+  false positives if the following instant messaging is allowed or common applications
+  like telegram or discord are allowed in the corporate network.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=22 QueryName IN (\"*pastebin*\", \"*discord*\", \"\
+      *telegram*\", \"*t.me*\") process_name IN (\"cmd.exe\", \"*powershell*\", \"\
+      pwsh.exe\", \"wscript.exe\", \"cscript.exe\") \n  -  stats count min(_time)\
+      \ as firstTime max(_time) as lastTime by Image QueryName QueryStatus process_name\
+      \ QueryResults Computer \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `suspicious_process_dns_query_known_abuse_web_services_filter`"
+  level: critical
+tags:
+- T1059.005
+- 'Command and Scripting Interpreter: Visual Basic'
+- Execution
+references: Requires Sysmon data
+notes: .nan

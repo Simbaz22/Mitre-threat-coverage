@@ -1,0 +1,26 @@
+title: ESCU - Windows PowerView Constrained Delegation Discovery - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify commandlets used by the PowerView hacking tool leveraged to discover
+  Windows endpoints with Kerberos Constrained Delegation. Red Teams and adversaries
+  alike may leverage use this technique for situational awareness and Active Directory
+  Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "PowerShell\nWindows"
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (Message = \"*Get-DomainComputer*\" OR Message\
+      \ = \"*Get-NetComputer*\") AND (Message = \"*-TrustedToAuth*\") \n  -  stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by EventCode Message\
+      \ ComputerName User \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `windows_powerview_constrained_delegation_discovery_filter`"
+  level: critical
+tags:
+- T1018
+- Remote System Discovery
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

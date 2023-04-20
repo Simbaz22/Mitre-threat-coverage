@@ -1,0 +1,27 @@
+title: DS_Abnormal number of connections on Telnet ports
+description: High Number of connections on telnet ports may be indicative of a malicious
+  entity attempting to leverage telnet vulnerabilities.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  from datamodel:\"Network_Traffic\".\"All_Traffic\"\n\n  -  (app=\"\
+      telnet*\" OR dest_port=23) AND action=\"allowed\" \n\n  -  bucket span=10m _time\
+      \ \n\n  -  stats count AS number_transfers by _time src \n\n  -  eventstats\
+      \ avg(number_transfers) as transfers_avg, stdev(number_transfers) as transfers_stdev\
+      \ \n\n  -  eval threshold_value = 3\n\n  -  eval isOutlier=if(number_transfers\
+      \ > transfers_avg+(transfers_stdev * threshold_value), \"TRUE\", \"FALSE\")\
+      \ \n\n  -  isOutlier=\"TRUE\" \n\n  -  eval num_standard_deviations_away = round(abs(number_transfers\
+      \ - transfers_avg) / transfers_stdev, 2) \n\n  -  table _time, src, number_transfers,\
+      \ num_standard_deviations_away, transfers_avg, transfers_stdev"
+  level: critical
+tags:
+- T1205
+- Traffic Signaling
+- Command and Control, Defense Evasion, Persistence
+references: .nan
+notes: .nan

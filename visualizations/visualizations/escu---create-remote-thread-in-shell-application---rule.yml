@@ -1,0 +1,25 @@
+title: ESCU - Create Remote Thread In Shell Application - Rule
+description: This search is to detect suspicious process injection in command shell.
+  This technique was seen in IcedID where it execute cmd.exe process to inject its
+  shellcode as part of its execution as banking trojan. It is really uncommon to have
+  a create remote thread execution in the following application.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=8 TargetImage IN (\"*\\\\cmd.exe\", \"*\\\\powershell*\"\
+      ) \n  -  stats count min(_time) as firstTime max(_time) as lastTime by  TargetImage\
+      \ TargetProcessId SourceProcessId  EventCode StartAddress SourceImage Computer\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `create_remote_thread_in_shell_application_filter`"
+  level: critical
+tags:
+- T1055
+- Process Injection
+- Defense Evasion, Privilege Escalation
+references: Requires Sysmon data
+notes: .nan

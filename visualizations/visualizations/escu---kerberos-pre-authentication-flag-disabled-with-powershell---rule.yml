@@ -1,0 +1,31 @@
+title: ESCU - Kerberos Pre-Authentication Flag Disabled with PowerShell - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the execution of the `Set-ADAccountControl` commandlet with specific
+  parameters. `Set-ADAccountControl` is part of the Active Directory PowerShell module
+  used to manage Windows Active Directory networks. As the name suggests, `Set-ADAccountControl`
+  is used to modify User Account Control values for an Active Directory domain account.
+  With the appropiate parameters, Set-ADAccountControl allows adversaries to disable
+  Kerberos Pre-Authentication for an account to to easily perform a brute force attack
+  against the user's password offline leveraging the ASP REP Roasting technique. Red
+  Teams and adversaries alike who have obtained privileges in an Active Directory
+  network may use this technique as a backdoor or a way to escalate privileges.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "PowerShell\nWindows"
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (ScriptBlockText = \"*Set-ADAccountControl*\"\
+      \ AND ScriptBlockText=\"*DoesNotRequirePreAuth:$true*\") \n  -  stats count\
+      \ min(_time) as firstTime max(_time) as lastTime by EventCode ScriptBlockText\
+      \ Computer user_id \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `kerberos_pre_authentication_flag_disabled_with_powershell_filter`"
+  level: critical
+tags:
+- "T1558\nT1558.004"
+- Steal or Forge Kerberos Tickets
+- Steal or Forge Kerberos Tickets
+references: Increase Windows logging to include command line data and powershell logs
+notes: .nan

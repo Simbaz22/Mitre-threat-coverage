@@ -1,0 +1,25 @@
+title: ESCU - GetWmiObject Ds Group with PowerShell Script Block - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the execution of the `Get-WmiObject` commandlet used with specific parameters
+  . The `DS_Group` parameter leverages WMI to query for all domain groups. Red Teams
+  and adversaries may leverage this commandlet to enumerate domain groups for situational
+  awareness and Active Directory Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (Message=*Get-WmiObject* AND Message=\"*namespace\
+      \ root\\\\directory\\\\ldap*\" AND Message=\"*class ds_group*\") \n  -  stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by EventCode Message\
+      \ ComputerName User \n  -  `security_content_ctime(firstTime)` \n  -  `getwmiobject_ds_group_with_powershell_script_block_filter`"
+  level: critical
+tags:
+- T1069.002
+- 'Permission Groups Discovery: Domain Groups'
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

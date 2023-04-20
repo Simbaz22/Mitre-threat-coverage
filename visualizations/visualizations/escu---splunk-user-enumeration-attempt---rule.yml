@@ -1,0 +1,23 @@
+title: ESCU - Splunk User Enumeration Attempt - Rule
+description: On May 3rd, 2022, Splunk published a security advisory for  username
+  enumeration stemming from verbose login failure messages present on some REST endpoints.
+  This detection will alert on attempted exploitation in patched versions of Splunk
+  as well as actual exploitation in unpatched version of Splunk.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Splunk Internal Logs
+detection:
+  condition:
+    sigma: "`splunkd_failed_auths` \n  -  stats count(user) as auths by user, src\
+      \ \n  -  where auths>5 \n  -  stats values(user) as \"Users\", sum(auths) as\
+      \ TotalFailedAuths by src \n  -  `splunk_user_enumeration_attempt_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: .nan

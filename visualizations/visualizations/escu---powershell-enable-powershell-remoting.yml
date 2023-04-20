@@ -1,0 +1,28 @@
+title: ESCU - PowerShell Enable PowerShell Remoting
+description: This analytic utilizes PowerShell Script Block Logging (EventCode 4104)
+  to identify the use of Enable-PSRemoting cmdlet. This cmdlet allows users to enable
+  PowerShell remoting on a local or remote computer, which allows other computers
+  to run commands on the target computer. The ability to remotely execute commands
+  can be abused by attackers to take control of compromised systems and pivot to other
+  systems on the network. By detecting the use of Enable-PSRemoting cmdlet via script
+  block logging, this analytic can help organizations identify potential malicious
+  activity related to attackers attempting to gain remote control of compromised systems.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 ScriptBlockText=\"*Enable-PSRemoting*\"\n\
+      \  \n  -  stats count min(_time) as firstTime max(_time) as lastTime by Computer\
+      \ EventCode ScriptBlockText \n  \n  -  `security_content_ctime(firstTime)` \n\
+      \  \n  -  `security_content_ctime(lastTime)`\n  -  `powershell_enable_powershell_remoting_filter`"
+  level: critical
+tags:
+- T1059.001
+- 'Command and Scripting Interpreter: PowerShell'
+- Execution
+references: Increase Windows logging to include command line data and powershell logs
+notes: .nan

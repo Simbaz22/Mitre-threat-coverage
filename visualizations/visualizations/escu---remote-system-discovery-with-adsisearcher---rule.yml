@@ -1,0 +1,24 @@
+title: ESCU - Remote System Discovery with Adsisearcher - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the `[Adsisearcher]` type accelerator being used to query Active Directory
+  for domain computers. Red Teams and adversaries may leverage `[Adsisearcher]` to
+  enumerate domain computers for situational awareness and Active Directory Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: PowerShell
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (Message = \"*[adsisearcher]*\" AND Message\
+      \ = \"*objectclass=computer*\" AND Message = \"*findAll()*\") \n  -  stats count\
+      \ min(_time) as firstTime max(_time) as lastTime by EventCode Message ComputerName\
+      \ User \n  -  `security_content_ctime(firstTime)` \n  -  `remote_system_discovery_with_adsisearcher_filter`"
+  level: critical
+tags:
+- T1018
+- Remote System Discovery
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

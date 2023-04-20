@@ -1,0 +1,23 @@
+title: DS_Suspicious path of execution for known processes on Windows - CSRSS
+description: This policy detects process executing from the suspicious file path.
+  This might be an indication of malware or trojan.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats count from datamodel=\"Endpoint\".\"Processes\" where Processes.process_path!=\"\
+      *\\\\Windows\\\\System32*\" AND (Processes.parent_process=*csrss.exe* OR Processes.process_name=*csrss.exe*)\
+      \ by Processes.user Processes.dest Processes.parent_process Processes.process_name\
+      \ Processes.process_path \n  -  `drop_dm_object_name(Processes)`"
+  level: critical
+tags:
+- T1204.002
+- 'User Execution: Malicious File'
+- Execution
+references: Increase Windows logging to include command line data
+notes: Should have command line information added to the rule if we start ingesting
+  that data.

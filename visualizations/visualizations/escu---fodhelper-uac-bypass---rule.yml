@@ -1,0 +1,31 @@
+title: ESCU - FodHelper UAC Bypass - Rule
+description: "Fodhelper.exe has a known UAC bypass as it attempts to look for specific\
+  \ registry keys upon execution, that do not exist. Therefore, an attacker can write\
+  \ its malicious commands in these registry keys to be executed by fodhelper.exe\
+  \ with the highest privilege. \n1. `HKCU:\\Software\\Classes\\ms-settings\\shell\\\
+  open\\command`\n1. `HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command\\\
+  DelegateExecute`\n1. `HKCU:\\Software\\Classes\\ms-settings\\shell\\open\\command\\\
+  (default)`\nUpon triage, fodhelper.exe will have a child process and read access\
+  \ will occur on the registry keys. Isolate the endpoint and review parallel processes\
+  \ for additional behavior."
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.parent_process_name=fodhelper.exe\
+      \ by Processes.dest Processes.user Processes.parent_process Processes.process_name\
+      \ Processes.process Processes.process_id Processes.parent_process_id \n  - \
+      \ `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `fodhelper_uac_bypass_filter`"
+  level: critical
+tags:
+- "T1548.002\nT1112"
+- 'Abuse Elevation Control Mechanism: Bypass User Account Control'
+- 'Abuse Elevation Control Mechanism: Bypass User Account Control'
+references: .nan
+notes: .nan

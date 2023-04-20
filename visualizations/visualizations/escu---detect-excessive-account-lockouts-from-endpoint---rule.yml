@@ -1,0 +1,24 @@
+title: ESCU - Detect Excessive Account Lockouts From Endpoint - Rule
+description: This search identifies endpoints that have caused a relatively high number
+  of account lockouts in a short period.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime values(All_Changes.user) as user from datamodel=Change.All_Changes\
+      \ where nodename=All_Changes.Account_Management All_Changes.result=\"lockout\"\
+      \ by All_Changes.dest All_Changes.result \n  - `drop_dm_object_name(\"All_Changes\"\
+      )` \n  - `drop_dm_object_name(\"Account_Management\")`\n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  count > 5 \n  -  `detect_excessive_account_lockouts_from_endpoint_filter`"
+  level: critical
+tags:
+- "T1078\nT1078.002"
+- Valid Accounts
+- Valid Accounts
+references: .nan
+notes: .nan

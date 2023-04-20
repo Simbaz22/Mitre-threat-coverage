@@ -1,0 +1,19 @@
+title: Rare critical file modified by an user
+description: Indicative of Possible account compromise.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: EDR
+detection:
+  condition:
+    sigma: MISSING SPLUNK LOGIC
+  level: critical
+tags:
+- T1222
+- File and Directory Permissions Modification
+- Defense Evasion
+references: Requires EDR data feed
+notes: "Securonix Logic:\nDeviceEventCategory = CriticalFileModified\nAND\nfilename\
+  \ contains sys, bin, config or password"

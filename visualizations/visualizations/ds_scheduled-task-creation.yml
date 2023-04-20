@@ -1,0 +1,24 @@
+title: DS_Scheduled Task Creation
+description: This rule detects scheduled task creation.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "index=winlog EventCode=4698 AND user!=\"*$\" AND Task_Name!=\"\\\\Microsoft\\\
+      \\Windows\\\\UpdateOrchestrator\\\\AC Power Download\" AND Task_Name!=\"\\\\\
+      Microsoft\\\\Windows\\\\Windows Defender\\\\Windows Defender Cleanup\" AND Task_Name!=\"\
+      \\\\Microsoft\\\\Windows\\\\Windows Defender\\\\Windows Defender Cache Maintenance\"\
+      \ AND Task_Name!=\"\\\\Microsoft\\\\Windows\\\\Windows Defender\\\\Windows Defender\
+      \ Verification\" AND Task_Name!=\\\\Microsoft\\\\Windows\\\\Windows Defender\\\
+      \\Windows Defender Scheduled Scan\n\n  -  table Task_Name action user dest signature"
+  level: critical
+tags:
+- T1053.005
+- 'Scheduled Task/Job: Scheduled Task'
+- Execution, Persistence, Privilege Escalation
+references: .nan
+notes: .nan

@@ -1,0 +1,24 @@
+title: DS_TGS Request with a Blank or Unauthorized Account Name
+description: This analytic looks for a successful request for a Kerberos service ticket
+  from an unauthorized or blank account, which could be indicative of a silver ticket
+  attack.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Linux\nWindows"
+detection:
+  condition:
+    sigma: "\n  -  tstats count from datamodel=\"Authentication\".\"Authentication\"\
+      \ where Authentication.signature_id=4769 Authentication.user!=*GLOBEANDMAIL.NET\
+      \ Authentication.user!=*ROOT.TGAM Authentication.action=success by Authentication.signature_id\
+      \ Authentication.action Authentication.src Authentication.dest Authentication.user\n\
+      \n  -  `drop_dm_object_name(Authentication)`"
+  level: critical
+tags:
+- T1558
+- Steal or Forge Kerberos Tickets
+- Credential Access
+references: .nan
+notes: .nan

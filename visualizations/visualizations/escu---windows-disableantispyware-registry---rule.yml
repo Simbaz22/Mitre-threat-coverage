@@ -1,0 +1,28 @@
+title: ESCU - Windows DisableAntiSpyware Registry - Rule
+description: The search looks for the Registry Key DisableAntiSpyware set to disable.
+  This is consistent with Ryuk infections across a fleet of endpoints. This particular
+  behavior is typically executed when an ransomware actor gains access to an endpoint
+  and beings to perform execution. Usually, a batch (.bat) will be executed and multiple
+  registry and scheduled task modifications will occur. During triage, review parallel
+  processes and identify any further file modifications. Endpoint should be isolated.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Registry where Registry.registry_value_name=\"\
+      DisableAntiSpyware\" AND Registry.registry_value_data=\"0x00000001\" by Registry.dest\
+      \ Registry.user Registry.registry_path Registry.registry_value_data \n  -  `drop_dm_object_name(Registry)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `windows_disableantispyware_registry_filter`"
+  level: critical
+tags:
+- "T1562.001\nT1562"
+- 'Impair Defenses: Disable or Modify Tools'
+- 'Impair Defenses: Disable or Modify Tools'
+references: Increase Windows logging to include Registry events
+notes: .nan

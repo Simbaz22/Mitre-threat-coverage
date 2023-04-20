@@ -1,0 +1,27 @@
+title: ESCU - Detect Rare Executables - Rule
+description: This search will return a table of rare processes, the names of the systems
+  running them, and the users who initiated each process.
+status: "Inactive\nLow Alert Confidence"
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(Processes.dest)\
+      \ as dest values(Processes.user) as user min(_time) as firstTime max(_time)\
+      \ as lastTime from datamodel=Endpoint.Processes by Processes.process_name  \n\
+      \  -  rename Processes.process_name as process \n  -  rex field=user \"(?<user_domain>.*)\\\
+      \\\\\\(?<user_name>.*)\" \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\n\
+      \  -  [\n  -  tstats count from datamodel=Endpoint.Processes by Processes.process_name\
+      \ \n  -  rare Processes.process_name limit=30 \n  -  rename Processes.process_name\
+      \ as process\n  -  `filter_rare_process_allow_list`\n  -  table process ] \n\
+      \  -  `detect_rare_executables_filter`"
+  level: critical
+tags:
+- T1059
+- Command and Scripting Interpreter
+- Execution
+references: .nan
+notes: .nan

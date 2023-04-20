@@ -1,0 +1,31 @@
+title: ESCU - Windows Service Create with Tscon
+description: The following analytic detects potential RDP Hijacking attempts by monitoring
+  a series of actions taken by an attacker to gain unauthorized access to a remote
+  system. The attacker first runs the quser command to query the remote host for disconnected
+  user sessions. Upon identifying a disconnected session, they use the sc.exe command
+  to create a new Windows service with a binary path that launches tscon.exe. By specifying
+  the disconnected session ID and a destination ID, the attacker can transfer the
+  disconnected session to a new RDP session, effectively hijacking the user''s session.
+  This analytic allows security teams to detect and respond to RDP Hijacking attempts,
+  mitigating potential risks and impacts on targeted systems.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time)\n  as lastTime from datamodel=Endpoint.Processes where Processes.process_name=sc.exe\n\
+      \  Processes.process=\"*/dest:rdp-tcp*\" by Processes.dest Processes.user Processes.parent_process_name\
+      \ Processes.process_name\n  Processes.process Processes.process_id Processes.parent_process_id\n\
+      \  \n  -  `drop_dm_object_name(Processes)` \n  \n  -  `security_content_ctime(firstTime)`\n\
+      \  \n  -  `security_content_ctime(lastTime)` \n  -  `windows_service_create_with_tscon_filter`"
+  level: critical
+tags:
+- T1563.002
+- 'Remote Service Session Hijacking: RDP Hijacking'
+- Lateral Movement
+references: Increase Windows logging to include command line data and powershell logs
+notes: .nan

@@ -1,0 +1,29 @@
+title: ESCU - Protocols passing authentication in cleartext - Rule
+description: The following analytic identifies cleartext protocols at risk of leaking
+  sensitive information. Currently, this consists of legacy protocols such as telnet
+  (port 23), POP3 (port 110), IMAP (port 143), and non-anonymous FTP (port 21) sessions.
+  While some of these protocols may be used over SSL, they typically are found on
+  different assigned ports in those instances.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Network
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Network_Traffic where All_Traffic.action!=blocked\
+      \ AND All_Traffic.transport=\"tcp\" AND (All_Traffic.dest_port=\"23\" OR All_Traffic.dest_port=\"\
+      143\" OR All_Traffic.dest_port=\"110\" OR (All_Traffic.dest_port=\"21\" AND\
+      \ All_Traffic.user != \"anonymous\")) by All_Traffic.user All_Traffic.src All_Traffic.dest\
+      \ All_Traffic.dest_port \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `drop_dm_object_name(\"All_Traffic\")` \n  -  `protocols_passing_authentication_in_cleartext_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: .nan
+notes: Notified client this rule will not be enabled since this traffic is currently
+  allowed in their environment. Can adjust later if environment changes.

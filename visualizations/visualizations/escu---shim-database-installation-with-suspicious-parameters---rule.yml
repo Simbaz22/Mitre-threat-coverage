@@ -1,0 +1,27 @@
+title: ESCU - Shim Database Installation With Suspicious Parameters - Rule
+description: This search detects the process execution and arguments required to silently
+  create a shim database.  The sdbinst.exe application is used to install shim database
+  files (.sdb). A shim is a small library which transparently intercepts an API, changes
+  the parameters passed, handles the operation itself, or redirects the operation
+  elsewhere.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(Processes.process)\
+      \ as process min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes\
+      \ where Processes.process_name = sdbinst.exe by Processes.process_name Processes.parent_process_name\
+      \ Processes.dest Processes.user \n  -  `drop_dm_object_name(Processes)` \n \
+      \ -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `shim_database_installation_with_suspicious_parameters_filter`"
+  level: critical
+tags:
+- T1546.011
+- 'Event Triggered Execution: Application Shimming'
+- Persistence, Privilege Escalation
+references: Increase Windows logging to include command line data
+notes: .nan

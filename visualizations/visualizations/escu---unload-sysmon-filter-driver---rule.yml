@@ -1,0 +1,28 @@
+title: ESCU - Unload Sysmon Filter Driver - Rule
+description: Attackers often disable security tools to avoid detection. This search
+  looks for the usage of process `fltMC.exe` to unload a Sysmon Driver that will stop
+  sysmon from collecting the data.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ values(Processes.process) as process max(_time) as lastTime from datamodel=Endpoint.Processes\
+      \ where Processes.process_name=fltMC.exe AND Processes.process=*unload* AND\
+      \ Processes.process=*SysmonDrv*  by Processes.process_name Processes.process_id\
+      \ Processes.parent_process_name Processes.process Processes.dest Processes.user\
+      \ \n  -  `drop_dm_object_name(\"Processes\")` \n  -  `security_content_ctime(firstTime)`\n\
+      \  - `security_content_ctime(lastTime)` \n  - `unload_sysmon_filter_driver_filter`\n\
+      \  -  table firstTime lastTime dest user count process_name process_id parent_process_name\
+      \ process"
+  level: critical
+tags:
+- T1562.001
+- 'Impair Defenses: Disable or Modify Tools'
+- Defense Evasion
+references: Requires Sysmon data
+notes: .nan

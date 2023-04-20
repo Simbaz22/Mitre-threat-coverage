@@ -1,0 +1,27 @@
+title: ESCU - Unusually Long Command Line - Rule
+description: Command lines that are extremely long may be indicative of malicious
+  activity on your hosts.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Processes by Processes.user\
+      \ Processes.dest Processes.process_name Processes.process \n  -  `drop_dm_object_name(\"\
+      Processes\")` \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\n\
+      \  -   eval processlen=len(process) \n  -  eventstats stdev(processlen) as stdev,\
+      \ avg(processlen) as avg by dest \n  -  stats max(processlen) as maxlen, values(stdev)\
+      \ as stdevperhost, values(avg) as avgperhost by dest, user, process_name, process\
+      \ \n  -  `unusually_long_command_line_filter` \n  - eval threshold = 3 \n  -\
+      \  where maxlen > ((threshold*stdevperhost) + avgperhost)"
+  level: critical
+tags:
+- T1059.003
+- 'Command and Scripting Interpreter: Windows Command Shell'
+- Execution
+references: .nan
+notes: Experimental detection (not supported by splunk)

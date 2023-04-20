@@ -1,0 +1,33 @@
+title: ESCU - Detect HTML Help Spawn Child Process - Rule
+description: The following analytic identifies hh.exe (HTML Help) execution of a Compiled
+  HTML Help (CHM) that spawns a child process. This particular technique will load
+  Windows script code from a compiled help file. CHM files may contain nearly any
+  file type embedded, but only execute html/htm. Upon a successful execution, the
+  following script engines may be used for execution - JScript, VBScript, VBScript.Encode,
+  JScript.Encode, JScript.Compact. Analyst may identify vbscript.dll or jscript.dll
+  loading into hh.exe upon execution. The "htm" and "html" file extensions were the
+  only extensions observed to be supported for the execution of Shortcut commands
+  or WSH script code. During investigation, identify script content origination. Review
+  child process events and investigate further. hh.exe is natively found in C:\Windows\system32
+  and C:\Windows\syswow64.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.parent_process_name=hh.exe\
+      \ by Processes.dest Processes.user Processes.parent_process Processes.process_name\
+      \ Processes.process Processes.process_id Processes.parent_process_id \n  - \
+      \ `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `detect_html_help_spawn_child_process_filter`"
+  level: critical
+tags:
+- "T1218\nT1218.001"
+- System Binary Proxy Execution
+- System Binary Proxy Execution
+references: .nan
+notes: .nan

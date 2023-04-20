@@ -1,0 +1,25 @@
+title: ESCU - Reg exe Manipulating Windows Services Registry Keys - Rule
+description: The search looks for reg.exe modifying registry keys that define Windows
+  services and their configurations.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime values(Processes.process_name) as process_name values(Processes.parent_process_name)\
+      \ as parent_process_name values(Processes.user) as user FROM datamodel=Endpoint.Processes\
+      \ where Processes.process_name=reg.exe Processes.process=*reg* Processes.process=*add*\
+      \ Processes.process=*Services* by Processes.process_id Processes.dest Processes.process\
+      \ \n  -  `drop_dm_object_name(\"Processes\")` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `reg_exe_manipulating_windows_services_registry_keys_filter`"
+  level: critical
+tags:
+- T1574.011
+- 'Hijack Execution Flow: Services Registry Permissions Weakness'
+- Defense Evasion, Persistence, Privilege Escalation
+references: Increase Windows logging to include Registry events
+notes: .nan

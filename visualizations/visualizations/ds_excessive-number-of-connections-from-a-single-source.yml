@@ -1,0 +1,38 @@
+title: DS_Excessive number of connections from a single source
+description: An excessive number of connections from a single source could be indicative
+  of malicious behavior. At a minimal it's anomalous and needs to be investigated.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Linux\nWindows"
+detection:
+  condition:
+    sigma: "\n  -  from datamodel:\"Authentication\".\"Successful_Authentication\"\
+      \n\n  -  src!=unknown AND src!=unspecified AND src!=GMQ9PAN1 AND src!=GMHQPAN1\
+      \ AND src!=GMQ9DC01 AND src!=GMLVSMON02 AND src!=GMHQDC1 AND src!=GMQ9DC02 AND\
+      \ user!=\"SVC_Share_point\" AND user!=\"SVC_CustomerSvcBG\" AND user!=\"svc_sharepoint2016@GLOBEANDMAIL.NET\"\
+      \ AND user!=\"svc_veeam*\" AND user!=\"DESvcDatabricks\" AND user!=lvsmon* AND\
+      \ user!=svc_gmhqsql1d* AND user!=DESvcDatabricks AND user!=digitalanalytics@globeandmail.com\
+      \ AND user!=GMEXDAG1$@GLOBEANDMAIL.NET AND user!=svc_charts AND user!=HealthMailbox*\
+      \ AND user!=SVC_Sophi_ARC_UI AND src!=WORKSTATION AND user!=svc_federation@GLOBEANDMAIL.NET\
+      \ AND user!=SVC_Sophi_ARC_UI@GLOBEANDMAIL.NET AND user!=svc_Ellipsis@GLOBEANDMAIL.NET\
+      \ AND user!=svc_Ellipsis AND src!=GMHQADFS1 AND user!=GMEXMBX1$@GLOBEANDMAIL.NET\
+      \ AND user!=kcadmin AND user!=vhadmin AND user!=eoadmin AND user!=msadmin AND\
+      \ user!=twadmin AND user!=ALongAdmin AND user!=rchadmin AND user!=RSurAdmin\
+      \ AND user!=kiadmin AND user!=SVC_HQPAN AND user!=svc_Q9vpnPan AND user!=svc_vcops\n\
+      \n  -  bucket span=30m _time \n\n  -  stats count AS number_auths by _time src\n\
+      \n  -  eventstats avg(number_auths) as auths_avg, stdev(number_auths) as auths_stdev\
+      \ \n\n  -  eval threshold_value = 9\n\n  -  eval isOutlier=if(number_auths >\
+      \ auths_avg+(auths_stdev * threshold_value), \"TRUE\", \"FALSE\") \n\n  -  isOutlier=\"\
+      TRUE\" \n\n  -  eval num_standard_deviations_away = round(abs(number_auths -\
+      \ auths_avg) / auths_stdev, 2) \n\n  -  table _time, src, number_auths, num_standard_deviations_away,\
+      \ auths_avg, auths_stdev"
+  level: critical
+tags:
+- T0859
+- '#INVALID VALUE'
+- '#INVALID VALUE'
+references: .nan
+notes: .nan

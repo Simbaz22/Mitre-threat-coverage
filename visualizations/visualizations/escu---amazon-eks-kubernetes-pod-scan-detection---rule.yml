@@ -1,0 +1,25 @@
+title: ESCU - Amazon EKS Kubernetes Pod scan detection - Rule
+description: This search provides detection information on unauthenticated requests
+  against Kubernetes' Pods API
+status: "Inactive\nMissing Data Source"
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud\nLinux"
+detection:
+  condition:
+    sigma: "`aws_cloudwatchlogs_eks` \"user.username\"=\"system:anonymous\" verb=list\
+      \ objectRef.resource=pods requestURI=\"/api/v1/pods\" \n  -  rename source as\
+      \ cluster_name sourceIPs{} as src_ip \n  -  stats count min(_time) as firstTime\
+      \ max(_time) as lastTime values(responseStatus.reason) values(responseStatus.code)\
+      \ values(userAgent) values(verb) values(requestURI) by src_ip cluster_name user.username\
+      \ user.groups{} \n  -  `security_content_ctime(lastTime)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `amazon_eks_kubernetes_pod_scan_detection_filter`"
+  level: critical
+tags:
+- T1526
+- Cloud Service Discovery
+- Discovery
+references: .nan
+notes: 'Missing SourceType: kube:container:controller'

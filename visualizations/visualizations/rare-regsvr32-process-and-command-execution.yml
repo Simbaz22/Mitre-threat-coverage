@@ -1,0 +1,20 @@
+title: Rare regsvr32 process and command execution
+description: This policy detects scenarios that regsvr32 used to register and unregister
+  object linking and embedding controls, including dynamic link libraries.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: MISSING SPLUNK LOGIC
+  level: critical
+tags:
+- T1112
+- Modify Registry
+- Defense Evasion
+references: Requires Sysmon data
+notes: "Securonix Logic:\neventid = 4688\nAND\nSourceProcessName contains regsvr32\
+  \ or DestProcessName contains regsvr32 or ResourceCustomField1 regex equal to .*regsvr32.*dll.*"

@@ -1,0 +1,25 @@
+title: ESCU - Sunburst Correlation DLL and Network Event - Rule
+description: The malware sunburst will load the malicious dll by SolarWinds.BusinessLayerHost.exe.
+  After a period of 12-14 days, the malware will attempt to resolve a subdomain of
+  avsvmcloud.com. This detections will correlate both events.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "(`sysmon` EventCode=7 ImageLoaded=*SolarWinds.Orion.Core.BusinessLayer.dll)\
+      \ OR (`sysmon` EventCode=22 QueryName=*avsvmcloud.com) \n  -  eventstats dc(EventCode)\
+      \ AS dc_events \n  -  where dc_events=2 \n  -  stats min(_time) as firstTime\
+      \ max(_time) as lastTime values(ImageLoaded) AS ImageLoaded values(QueryName)\
+      \ AS QueryName by host \n  -  rename host as dest \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `sunburst_correlation_dll_and_network_event_filter`"
+  level: critical
+tags:
+- T1203
+- Exploitation for Client Execution
+- Execution
+references: Requires Sysmon data
+notes: .nan

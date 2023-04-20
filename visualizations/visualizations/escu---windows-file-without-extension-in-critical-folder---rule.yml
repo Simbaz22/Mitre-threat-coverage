@@ -1,0 +1,34 @@
+title: ESCU - Windows File Without Extension In Critical Folder - Rule
+description: This analytic is to look for suspicious file creation in the critical
+  folder like "System32\Drivers" folder without file extension. This artifacts was
+  seen in latest hermeticwiper where it drops its driver component in Driver Directory
+  both the compressed(without file extension) and the actual driver component (with
+  .sys file extension). This TTP is really a good indication that a host might be
+  compromised by this destructive malware that wipes the boot sector of the system.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Filesystem\
+      \ where Filesystem.file_path IN (\"*\\\\System32\\\\drivers\\\\*\", \"*\\\\\
+      syswow64\\\\drivers\\\\*\") by _time span=5m Filesystem.dest Filesystem.user\
+      \ Filesystem.file_name Filesystem.file_path Filesystem.process_guid Filesystem.file_create_time\
+      \ \n  -  `drop_dm_object_name(Filesystem)` \n  -  rex field=\"file_name\" \"\
+      \\.(?<extension>[^\\.]*$)\" \n  -  where isnull(extension) \n  -  join process_guid\
+      \ [\n  -  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ by _time span=5m Processes.process_name Processes.dest Processes.process_guid\
+      \ Processes.user \n  -  `drop_dm_object_name(Processes)`] \n  -  stats count\
+      \ min(_time) as firstTime max(_time) as lastTime by dest process_name process_guid\
+      \ file_name file_path file_create_time user \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `windows_file_without_extension_in_critical_folder_filter`"
+  level: critical
+tags:
+- T1485
+- Data Destruction
+- Impact
+references: Increase windows logging to include file creation, deletion and modification
+notes: .nan

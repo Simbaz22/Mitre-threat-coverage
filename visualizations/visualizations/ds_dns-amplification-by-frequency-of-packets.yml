@@ -1,0 +1,29 @@
+title: DS_DNS amplification by frequency of packets
+description: High Number of packets transmitted on DNS ports are indicative of a malicious
+  actor attempting to launch a DoS attack from an external domain.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  from datamodel:\"Network_Traffic\".\"All_Traffic\"\n\n  -  (dest_port=53\
+      \ OR app=\xE2\u20AC\x9Ddns-base\xE2\u20AC\x9D) AND (src_ip!=\"10.0.0.0/8\" AND\
+      \ src_ip!=\"172.16.0.0/12\" AND src_ip!=\"192.168.0.0/16\") AND (dest_ip=\"\
+      10.0.0.0/8\" OR dest_ip=\"172.16.0.0/12\" OR dest_ip=\"192.168.0.0/16\")\n\n\
+      \  -  bucket span=10m _time \n\n  -  stats count AS DNS_events by _time src\
+      \ \n\n  -  eventstats avg(DNS_events) as DNS_avg, stdev(DNS_events) as DNS_stdev\
+      \ \n\n  -  eval threshold_value = 6 \n\n  -  eval isOutlier=if(DNS_events >\
+      \ DNS_avg+(DNS_stdev * threshold_value), \"TRUE\", \"FALSE\") \n\n  -  isOutlier=\"\
+      TRUE\"\n\n  -  eval num_standard_deviations_away = round(abs(DNS_events - DNS_avg)\
+      \ / DNS_stdev, 2) \n\n  -  table _time, src, DNS_events, num_standard_deviations_away,\
+      \ DNS_avg, DNS_stdev"
+  level: critical
+tags:
+- T1205
+- Traffic Signaling
+- Command and Control, Defense Evasion, Persistence
+references: .nan
+notes: .nan

@@ -1,0 +1,32 @@
+title: ESCU - Modify ACL permission To Files Or Folder - Rule
+description: This analytic identifies suspicious modification of ACL permission to
+  a files or folder to make it available to everyone. This technique may be used by
+  the adversary to evade ACLs or protected files access. This changes is commonly
+  configured by the file or directory owner with appropriate permission. This behavior
+  is a good indicator if this command seen on a machine utilized by an account with
+  no permission to do so.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(Processes.process)\
+      \ as process values(Processes.process_id) as process_id count min(_time) as\
+      \ firstTime max(_time) as lastTime from datamodel=Endpoint.Processes where (Processes.process_name\
+      \ = \"cacls.exe\" OR Processes.process_name = \"icacls.exe\" OR Processes.process_name\
+      \ = \"xcacls.exe\") AND Processes.process = \"*/G*\" AND (Processes.process\
+      \ = \"* everyone:*\" OR Processes.process = \"* SYSTEM:*\" OR Processes.process\
+      \ = \"* S-1-1-0:*\") by Processes.parent_process_name Processes.process_name\
+      \ Processes.dest Processes.user \n  -  `drop_dm_object_name(Processes)` \n \
+      \ -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `modify_acl_permission_to_files_or_folder_filter`"
+  level: critical
+tags:
+- T1222
+- File and Directory Permissions Modification
+- Defense Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

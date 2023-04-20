@@ -1,0 +1,28 @@
+title: ESCU - Windows PowerShell Get-CIMInstance Remote Computer
+description: This analytic identifies the use of Get-CimInstance cmdlet with the -ComputerName
+  parameter, which indicates that the cmdlet is being used to retrieve information
+  from a remote computer. This can be useful for detecting instances of remote access,
+  such as when an attacker uses PowerShell to connect to a remote system and gather
+  information. By monitoring for this cmdlet with the -ComputerName parameter, security
+  analysts can identify potential malicious activity on remote systems and take appropriate
+  action to mitigate any threats.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 ScriptBlockText=\"*get-ciminstance*\" AND\
+      \ ScriptBlockText=\"*computername*\"  \n  -  stats count min(_time) as firstTime\
+      \ max(_time) as lastTime by EventCode ScriptBlockText Computer user_id \n  \n\
+      \  -  `security_content_ctime(firstTime)`\n  \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `windows_powershell_get_ciminstance_remote_computer_filter`"
+  level: critical
+tags:
+- T1059.001
+- 'Command and Scripting Interpreter: PowerShell'
+- Execution
+references: Increase Windows logging to include command line data and powershell logs
+notes: .nan

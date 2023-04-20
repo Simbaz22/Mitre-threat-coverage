@@ -1,0 +1,27 @@
+title: ESCU - Spoolsv Writing a DLL - Sysmon - Rule
+description: The following analytic identifies a `.dll` being written by `spoolsv.exe`.
+  This was identified during our testing of CVE-2021-34527 previously(CVE-2021-1675)
+  or PrintNightmare. Typically, this is not normal behavior for `spoolsv.exe` to write
+  a `.dll`. Current POC code used will write the suspicious DLL to disk within a path
+  of `\spool\drivers\x64\`. During triage, isolate the endpoint and review for source
+  of exploitation. Capture any additional file modification events.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventID=11 process_name=spoolsv.exe file_path=\"*\\\\spool\\\\\
+      drivers\\\\x64\\\\*\" file_name=*.dll \n  -  stats count min(_time) as firstTime\
+      \ max(_time) as lastTime by dest, UserID, process_name, file_path, file_name,\
+      \ TargetFilename, process_id \n  -  `security_content_ctime(firstTime)` \n \
+      \ -  `security_content_ctime(lastTime)` \n  -  `spoolsv_writing_a_dll___sysmon_filter`"
+  level: critical
+tags:
+- T1547.012
+- 'Boot or Logon Autostart Execution: Print Processors'
+- Persistence, Privilege Escalation
+references: Requires Sysmon data
+notes: .nan

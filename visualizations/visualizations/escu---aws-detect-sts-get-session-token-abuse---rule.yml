@@ -1,0 +1,22 @@
+title: ESCU - aws detect sts get session token abuse - Rule
+description: This search provides detection of suspicious use of sts:GetSessionToken.
+  These tokens can be created on the go and used by attackers to move laterally and
+  escalate privileges.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`aws_cloudwatchlogs_eks` ASIA userIdentity.type=IAMUser\n  -  spath eventName\
+      \ \n  -  eventName=GetSessionToken \n  -  table sourceIPAddress eventTime userIdentity.arn\
+      \ userName userAgent user_type status region \n  -  `aws_detect_sts_get_session_token_abuse_filter`"
+  level: critical
+tags:
+- T1550
+- Use Alternate Authentication Material
+- Defense Evasion, Lateral Movement
+references: .nan
+notes: THIS IS A EXPERIMENTAL DETECTION

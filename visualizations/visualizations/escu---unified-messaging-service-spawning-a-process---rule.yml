@@ -1,0 +1,33 @@
+title: ESCU - Unified Messaging Service Spawning a Process - Rule
+description: This detection identifies Microsoft Exchange Server's Unified Messaging
+  services, umworkerprocess.exe and umservice.exe, spawning a child process, indicating
+  possible exploitation of CVE-2021-26857 vulnerability. The query filters out werfault.exe
+  and wermgr.exe mostly due to potential false positives, however, if there is an
+  excessive amount of "wermgr.exe" or "WerFault.exe" failures, it may be due to the
+  active exploitation. During triage, identify any additional suspicious parallel
+  processes. Identify any recent out of place file modifications. Review Exchange
+  logs following Microsofts guide. To contain, perform egress filtering or restrict
+  public access to Exchange. In final, patch the vulnerablity and monitor.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.parent_process_name=\"\
+      umworkerprocess.exe\" OR Processes.parent_process_name=\"UMService.exe\" (Processes.process_name!=\"\
+      wermgr.exe\" OR Processes.process_name!=\"werfault.exe\") by Processes.dest\
+      \ Processes.user Processes.parent_process Processes.process_name Processes.process\
+      \ Processes.process_id Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `unified_messaging_service_spawning_a_process_filter`"
+  level: critical
+tags:
+- T1190
+- Exploit Public-Facing Application
+- Initial Access
+references: .nan
+notes: .nan

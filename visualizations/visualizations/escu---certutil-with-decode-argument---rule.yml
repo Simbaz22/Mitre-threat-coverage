@@ -1,0 +1,30 @@
+title: ESCU - CertUtil With Decode Argument - Rule
+description: CertUtil.exe may be used to `encode` and `decode` a file, including PE
+  and script code. Encoding will convert a file to base64 with `-----BEGIN CERTIFICATE-----`
+  and `-----END CERTIFICATE-----` tags. Malicious usage will include decoding a encoded
+  file that was downloaded. Once decoded, it will be loaded by a parallel process.
+  Note that there are two additional command switches that may be used - `encodehex`
+  and `decodehex`. Similarly, the file will be encoded in HEX and later decoded for
+  further execution. During triage, identify the source of the file being decoded.
+  Review its contents or execution behavior for further analysis.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where `process_certutil`\
+      \ Processes.process=*decode* by Processes.dest Processes.user Processes.parent_process\
+      \ Processes.process_name Processes.process Processes.process_id Processes.parent_process_id\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `certutil_with_decode_argument_filter`"
+  level: critical
+tags:
+- T1140
+- Deobfuscate/Decode Files or Information
+- Defense Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

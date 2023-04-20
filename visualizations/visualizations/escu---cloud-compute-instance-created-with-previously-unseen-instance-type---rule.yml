@@ -1,0 +1,29 @@
+title: ESCU - Cloud Compute Instance Created With Previously Unseen Instance Type
+  - Rule
+description: Find EC2 instances being created with previously unseen instance types.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "\n  -  tstats earliest(_time) as firstTime, latest(_time) as lastTime\
+      \ values(All_Changes.object_id) as dest, count from datamodel=Change where All_Changes.action=created\
+      \ by All_Changes.Instance_Changes.instance_type, All_Changes.user \n  -  `drop_dm_object_name(\"\
+      All_Changes\")` \n  -  `drop_dm_object_name(\"Instance_Changes\")` \n  -  where\
+      \ instance_type != \"unknown\" \n  -  lookup previously_seen_cloud_compute_instance_types\
+      \ instance_type as instance_type OUTPUTNEW firstTimeSeen, enough_data \n  -\
+      \  eventstats max(enough_data) as enough_data \n  -  where enough_data=1 \n\
+      \  -  eval firstTimeSeenInstanceType=min(firstTimeSeen) \n  -  where isnull(firstTimeSeenInstanceType)\
+      \ OR firstTimeSeenInstanceType > relative_time(now(), \"-24h@h\") \n  -  table\
+      \ firstTime, user, dest, count, instance_type \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `cloud_compute_instance_created_with_previously_unseen_instance_type_filter`"
+  level: critical
+tags:
+- T1578.003
+- 'Modify Cloud Compute Infrastructure: Delete Cloud Instance'
+- Defense Evasion
+references: .nan
+notes: .nan

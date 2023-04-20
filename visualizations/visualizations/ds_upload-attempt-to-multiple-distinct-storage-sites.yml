@@ -1,0 +1,33 @@
+title: DS_Upload Attempt to Multiple Distinct Storage Sites
+description: 'Attempting to upload data to multiple distinct storage sites may be
+  indicative of malicious insider/cyber exfiltration activity. Technique Used: Behavior
+  Anomaly for Storage site visits'
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats summariesonly=true count sum(All_Traffic.bytes_out) as total_upload_bytes,\
+      \ avg(All_Traffic.bytes_out) as avg_bytes_out, stdev(All_Traffic.bytes_out)\
+      \ as stdev_bytes_out from datamodel=\"Network_Traffic\".\"All_Traffic\" WHERE\
+      \ All_Traffic.dest_port IN (21, 22, 80, 443, 8080) AND  All_Traffic.app IN (\"\
+      adobe-cloud\",\"airtable-editing\", \"airtable-posting\", \"airtable-sharing\"\
+      , \"boxnet-downloading\", \"dropbox-downloading\", \"dropbox-paper\", \"google-cloud-storage-upload\"\
+      , \"github-uploading\", \"issuu-base\", \"jira-editing\", \"jira-posting\",\
+      \ \"linkedin-posting\", \"ms-onedrive-uploading\", \"notion-upload\", \"onedrive-uploading\"\
+      , \"pinterest-posting\", \"prezi-posting\", \"salesforce-uploading\", \"sharepoint-online-uploading\"\
+      , \"slack-editing\", \"slack-sharing\", \"splunk\", \"square\") AND All_Traffic.action\
+      \ = \"allowed\" by All_Traffic.src_ip, All_Traffic.dest_ip, All_Traffic.user,All_Traffic.dest_port,\
+      \ All_Traffic.app, All_Traffic.src_zone, All_Traffic.rule\n\n  -  eval total_upload_kb=total_upload_bytes/1024,\
+      \ upper_bound=avg_bytes_out+2*stdev_bytes_out \n\n  -  where total_upload_kb\
+      \ > upper_bound  \n\n  -  table All_Traffic.*, total_upload_kb, upper_bound"
+  level: critical
+tags:
+- T1567.002
+- 'Exfiltration Over Web Service: Exfiltration to Cloud Storage'
+- Exfiltration
+references: .nan
+notes: .nan

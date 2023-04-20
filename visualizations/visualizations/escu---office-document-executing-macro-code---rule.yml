@@ -1,0 +1,29 @@
+title: ESCU - Office Document Executing Macro Code - Rule
+description: this detection was designed to identifies suspicious office documents
+  that using macro code. Macro code is known to be one of the prevalent weaponization
+  or attack vector of threat actor. This malicious macro code is embed to a office
+  document as an attachment that may execute malicious payload, download malware payload
+  or other malware component. It is really good practice to disable macro by default
+  to avoid automatically execute macro code while opening or closing a office document
+  files.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=7 process_name IN (\"WINWORD.EXE\", \"EXCEL.EXE\",\
+      \ \"POWERPNT.EXE\") ImageLoaded IN (\"*\\\\VBE7INTL.DLL\",\"*\\\\VBE7.DLL\"\
+      , \"*\\\\VBEUI.DLL\") \n  -  stats min(_time) as firstTime max(_time) as lastTime\
+      \ values(ImageLoaded) as AllImageLoaded count by Computer EventCode Image process_name\
+      \ ProcessId ProcessGuid \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `office_document_executing_macro_code_filter`"
+  level: critical
+tags:
+- "T1566\nT1566.001"
+- Phishing
+- Phishing
+references: Requires Sysmon data
+notes: .nan

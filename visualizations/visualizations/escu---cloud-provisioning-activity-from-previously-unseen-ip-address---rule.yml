@@ -1,0 +1,30 @@
+title: ESCU - Cloud Provisioning Activity From Previously Unseen IP Address - Rule
+description: This search looks for cloud provisioning activities from previously unseen
+  IP addresses. Provisioning activities are defined broadly as any event that runs
+  or creates something.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "\n  -  tstats earliest(_time) as firstTime, latest(_time) as lastTime,\
+      \ values(All_Changes.object_id) as object_id from datamodel=Change where (All_Changes.action=started\
+      \ OR All_Changes.action=created) All_Changes.status=success by All_Changes.src,\
+      \ All_Changes.user, All_Changes.command \n  -  `drop_dm_object_name(\"All_Changes\"\
+      )` \n  -  lookup previously_seen_cloud_provisioning_activity_sources src as\
+      \ src OUTPUT firstTimeSeen, enough_data \n  -  eventstats max(enough_data) as\
+      \ enough_data \n  -  where enough_data=1 \n  -  eval firstTimeSeenSrc=min(firstTimeSeen)\
+      \ \n  -  where isnull(firstTimeSeenSrc) OR firstTimeSeenSrc > relative_time(now(),\
+      \ `previously_unseen_cloud_provisioning_activity_window`) \n  -  table firstTime,\
+      \ src, user, object_id, command \n  -  `cloud_provisioning_activity_from_previously_unseen_ip_address_filter`\
+      \ \n  -  `security_content_ctime(firstTime)`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: Too many False Positives

@@ -1,0 +1,39 @@
+title: ESCU - Windows Hide Notification Features Through Registry - Rule
+description: This analytic is to detect a suspicious registry modification to hide
+  common windows notification feature from compromised host. This technique was seen
+  in some ransomware family to add more impact to its payload that are visually seen
+  by user aside from the encrypted files and ransomware notes. Even this a good anomaly
+  detection, administrator may implement this changes for auditing or security reason.
+  In this scenario filter is needed.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Registry\
+      \ where Registry.registry_path= \"*\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\\
+      CurrentVersion\\\\Policies\\\\Explorer\\\\*\" Registry.registry_value_name IN\
+      \ (\"HideClock\", \"HideSCAHealth\", \"HideSCANetwork\", \"HideSCAPower\", \"\
+      HideSCAVolume\") Registry.registry_value_data = \"0x00000001\" by _time span=1h\
+      \ Registry.dest Registry.user Registry.registry_path Registry.registry_value_name\
+      \ Registry.registry_value_data Registry.process_guid \n  -  `drop_dm_object_name(Registry)`\
+      \ \n  - rename process_guid as proc_guid \n  - join proc_guid, _time [\n  -\
+      \  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ by _time span=1h Processes.process_id Processes.process_name Processes.process\
+      \ Processes.dest Processes.parent_process_name Processes.parent_process Processes.process_guid\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  - rename process_guid as proc_guid\
+      \ \n  -  fields _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data]\
+      \ \n  -  table _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data\
+      \ \n  -  `windows_hide_notification_features_through_registry_filter`"
+  level: critical
+tags:
+- T1112
+- Modify Registry
+- Defense Evasion
+references: Increase Windows logging to include Registry events
+notes: .nan

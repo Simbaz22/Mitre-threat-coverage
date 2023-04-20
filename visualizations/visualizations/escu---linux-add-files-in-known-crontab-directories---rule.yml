@@ -1,0 +1,29 @@
+title: ESCU - Linux Add Files In Known Crontab Directories - Rule
+description: The following analytic identifies a suspicious file creation in known
+  cron table directories. This event is commonly abuse by malware, adversaries and
+  red teamers to persist on the target or compromised host. crontab or cronjob is
+  like a schedule task in windows environment where you can create an executable or
+  script on the known crontab directories to run it base on its schedule. This Anomaly
+  query is a good indicator to look further what file is added and who added the file
+  if to consider it legitimate file.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Filesystem where Filesystem.file_path\
+      \ IN (\"*/etc/cron*\", \"*/var/spool/cron/*\") by Filesystem.dest Filesystem.file_create_time\
+      \ Filesystem.file_name Filesystem.process_guid Filesystem.file_path \n  -  `drop_dm_object_name(Filesystem)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `linux_add_files_in_known_crontab_directories_filter`"
+  level: critical
+tags:
+- "T1053.003\nT1053"
+- 'Scheduled Task/Job: Cron'
+- 'Scheduled Task/Job: Cron'
+references: Increase Linux logging to include file modification data
+notes: .nan

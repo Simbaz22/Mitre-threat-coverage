@@ -1,0 +1,31 @@
+title: ESCU - Exchange PowerShell Module Usage - Rule
+description: "The following analytic identifies the usage of Exchange PowerShell modules\
+  \ that were recently used for a proof of concept related to ProxyShell. Currently,\
+  \ there is no active data shared or data we could re-produce relate to this part\
+  \ of the ProxyShell chain of exploits.  \nInherently, the usage of the modules is\
+  \ not malicious, but reviewing parallel processes, and user, of the session will\
+  \ assist with determining the intent. \nModule - New-MailboxExportRequest will begin\
+  \ the process of exporting contents of a primary mailbox or archive to a .pst file.\
+  \ \nModule - New-managementroleassignment can assign a management role to a management\
+  \ role group, management role assignment policy, user, or universal security group\
+  \ (USG)."
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 Message IN (\"*New-MailboxExportRequest*\"\
+      , \"*New-ManagementRoleAssignment*\") \n  -  stats count min(_time) as firstTime\
+      \ max(_time) as lastTime by Path Message OpCode ComputerName User EventCode\n\
+      \  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `exchange_powershell_module_usage_filter`"
+  level: critical
+tags:
+- T1059.001
+- 'Command and Scripting Interpreter: PowerShell'
+- Execution
+references: Requires PowerShell logs
+notes: .nan

@@ -1,0 +1,29 @@
+title: ESCU - AWS IAM Assume Role Policy Brute Force - Rule
+description: The following detection identifies any malformed policy document exceptions
+  with a status of `failure`. A malformed policy document exception occurs in instances
+  where roles are attempted to be assumed, or brute forced. In a brute force attempt,
+  using a tool like CloudSploit or Pacu, an attempt will look like `arn:aws:iam::111111111111:role/aws-service-role/rds.amazonaws.com/AWSServiceRoleForRDS`.  Meaning,
+  when an adversary is attempting to identify a role name, multiple failures will
+  occur. This detection focuses on the errors of a remote attempt that is failing.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` (errorCode=MalformedPolicyDocumentException) status=failure\
+      \ (userAgent!=*.amazonaws.com) \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime values(requestParameters.policyName) as policy_name by src eventName\
+      \ eventSource aws_account_id errorCode requestParameters.policyDocument userAgent\
+      \ eventID awsRegion userIdentity.principalId user_arn \n  -  where count >=\
+      \ 2 \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `aws_iam_assume_role_policy_brute_force_filter`"
+  level: critical
+tags:
+- "T1580\nT1110"
+- Cloud Infrastructure Discovery
+- Cloud Infrastructure Discovery
+references: .nan
+notes: .nan

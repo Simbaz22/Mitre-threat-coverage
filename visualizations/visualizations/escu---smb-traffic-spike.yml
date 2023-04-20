@@ -1,0 +1,28 @@
+title: ESCU - SMB Traffic Spike
+description: This search looks for spikes in the number of Server Message Block (SMB)
+  traffic connections.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Network_Traffic\
+      \ where All_Traffic.dest_port=139 OR All_Traffic.dest_port=445 OR All_Traffic.app=smb\
+      \ by _time span=1h, All_Traffic.src \n  -  `drop_dm_object_name(\"All_Traffic\"\
+      )` \n  -  eventstats max(_time) as maxtime \n  -  stats count as num_data_samples\
+      \ max(eval(if(_time >= relative_time(maxtime, \"-70m@m\"), count, null))) as\
+      \ count avg(eval(if(_time<relative_time(maxtime, \"-70m@m\"), count, null)))\
+      \ as avg stdev(eval(if(_time<relative_time(maxtime, \"-70m@m\"), count, null)))\
+      \ as stdev by src \n  -  eval upperBound=(avg+stdev*2), isOutlier=if(count >\
+      \ upperBound AND num_data_samples >=50, 1, 0) \n  -  where isOutlier=1 \n  -\
+      \  table src count \n  -  `smb_traffic_spike_filter`"
+  level: critical
+tags:
+- T1021.002
+- 'Remote Services: SMB/Windows Admin Shares'
+- Lateral Movement
+references: .nan
+notes: .nan

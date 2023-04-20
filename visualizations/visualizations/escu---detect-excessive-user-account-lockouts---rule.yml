@@ -1,0 +1,24 @@
+title: ESCU - Detect Excessive User Account Lockouts - Rule
+description: This search detects user accounts that have been locked out a relatively
+  high number of times in a short period.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Change.All_Changes where nodename=All_Changes.Account_Management\
+      \ All_Changes.result=\"lockout\" by All_Changes.user All_Changes.result \n \
+      \ - `drop_dm_object_name(\"All_Changes\")` \n  - `drop_dm_object_name(\"Account_Management\"\
+      )`\n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  count > 5 \n  -  `detect_excessive_user_account_lockouts_filter`"
+  level: critical
+tags:
+- "T1078\nT1078.003"
+- Valid Accounts
+- Valid Accounts
+references: .nan
+notes: .nan

@@ -1,0 +1,38 @@
+title: ESCU - Eventvwr UAC Bypass
+description: The following search identifies Eventvwr bypass by identifying the registry
+  modification into a specific path that eventvwr.msc looks to (but is not valid)
+  upon execution. A successful attack will include a suspicious command to be executed
+  upon eventvwr.msc loading. Upon triage, review the parallel processes that have
+  executed. Identify any additional registry modifications on the endpoint that may
+  look suspicious. Remediate as necessary.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(Registry.registry_key_name)\
+      \ as registry_key_name values(Registry.registry_path) as registry_path min(_time)\
+      \ as firstTime max(_time) as lastTime FROM datamodel=Endpoint.Registry where\
+      \  Registry.registry_path=\"*mscfile\\\\shell\\\\open\\\\command\\\\*\" by _time\
+      \ span=1h Registry.dest Registry.user Registry.registry_path Registry.registry_value_name\
+      \ Registry.process_guid Registry.registry_key_name Registry.registry_value_data\
+      \ \n  -  `drop_dm_object_name(Registry)` \n  - rename process_guid as proc_guid\
+      \ \n  - join proc_guid, _time [\n  -  tstats `security_content_summariesonly`\
+      \ count FROM datamodel=Endpoint.Processes by _time span=1h Processes.process_id\
+      \ Processes.process_name Processes.process Processes.dest Processes.parent_process_name\
+      \ Processes.parent_process Processes.process_guid \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  - rename process_guid as proc_guid \n  -  fields _time dest user parent_process_name\
+      \ parent_process process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data registry_key_name] \n  -  table _time dest user parent_process_name\
+      \ parent_process process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data registry_key_name \n  -  `eventvwr_uac_bypass_filter`"
+  level: critical
+tags:
+- T1548.002
+- 'Abuse Elevation Control Mechanism: Bypass User Account Control'
+- Defense Evasion, Privilege Escalation
+references: Increase Windows logging to include Registry events
+notes: .nan

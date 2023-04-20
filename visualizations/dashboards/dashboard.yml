@@ -1,0 +1,952 @@
+author: DS
+darktheme: true
+name: OS Hunting Dashboard
+title: OS Hunting Dashboard
+type: dashboard
+visualizations:
+- Critical Severity Endpoint Alert
+- DS_Abnormal Amount of Data Transferred Over Covert Channels
+- DS_Abnormal Amount of Outbound FTP or SMTP Transfers by Source
+- DS_Abnormal High Number of Login Failures from Internal Source for User
+- DS_Abnormal High Number of Login Failures from Remote Address Based on Dest
+- DS_Abnormal High Number of Login Failures from Remote Address Based on Users
+- DS_Abnormal number of account enumeration attempts on a host
+- DS_Abnormal number of connections on LDAP ports
+- DS_Abnormal number of connections on Telnet ports
+- DS_Abnormal number of Kerberos authentication failures
+- DS_Activity from known malicious addresses detected on VPN via dest_ip
+- DS_Activity from known malicious addresses detected on VPN via src_ip
+- DS_Brute Force Login Attempts from a Single Source
+- DS_Child or parent process involving MSHTA executable detected
+- DS_Detect Telnet Within the Linux Environment
+- DS_Detect Xterm Terminal Emulator Within the Linux Environment
+- DS_DNS amplification by frequency of packets
+- DS_Excessive number of connections from a single source
+- DS_High Threshold AD Lockouts
+- DS_Kerberos TGS Requested without TGT Suggesting Use of Golden Ticket
+- DS_lsass process - Potential credential dumping
+- DS_Member added to built-in admin groups
+- DS_Netbios Traffic Spike
+- DS_Palo Alto Malware Event
+- DS_Password hash access
+- DS_Phishing E-mail Sender Addresses
+- DS_Possible HTTP Malicious Payload Detection
+- DS_Possible Privilege Enumeration
+- DS_Possible Privilege Escalation - Self Escalation
+- DS_Possible Rorschach Ransomware
+- DS_Potential Malicious PowerShell - Hidden Window
+- DS_Potential Malicious PowerShell - No Profile
+- DS_Potential PowerShell misuse - Version Forced
+- DS_Potential use of MSHTA executable to download malicious payload
+- DS_Rare application for known protocols on network traffic
+- DS_Rare scripting executables spawned from known processes
+- DS_Remote interactive logon to domain controller by non-admin account
+- DS_Restricted Group Change
+- DS_Scheduled Task Creation
+- DS_Scheduled task deleted
+- DS_Scheduled Task modification
+- DS_Single Source Connecting to Multiple Destinations via SSH
+- DS_Successful Login after Multiple Failed Attempts
+- DS_Successful Login after Repeated Failed Logins
+- DS_Suspicious executables on a machine
+- DS_Suspicious path of execution for known processes on Windows - CSRSS
+- DS_Suspicious path of execution for Winlogon processes
+- DS_Suspicious Sysadmin  Logon Attempts
+- DS_TGS Request with a Blank or Unauthorized Account Name
+- DS_Traffic to rare server on DHCP ports
+- DS_Upload Attempt to Multiple Distinct Storage Sites
+- DS_Use of credential dumpers
+- DS_User Logon from Multiple IP Addresses
+- ESCU - 7zip CommandLine To SMB Share Path
+- ESCU - Abnormally High AWS Instances Launched by User - MLTK - Rule
+- ESCU - Abnormally High AWS Instances Launched by User - Rule
+- ESCU - Abnormally High AWS Instances Terminated by User - MLTK - Rule
+- ESCU - Abnormally High AWS Instances Terminated by User - Rule
+- ESCU - Abnormally High Number Of Cloud Infrastructure API Calls - Rule
+- ESCU - Abnormally High Number Of Cloud Instances Destroyed - Rule
+- ESCU - Abnormally High Number Of Cloud Instances Launched - Rule
+- ESCU - Abnormally High Number Of Cloud Security Group API Calls - Rule
+- ESCU - Access LSASS Memory for Dump Creation - Rule
+- ESCU - Account Discovery With Net App
+- ESCU - Active Setup Registry Autostart
+- ESCU - Add DefaultUser And Password In Registry
+- ESCU - Add or Set Windows Defender Exclusion
+- ESCU - AdsiSearcher Account Discovery - Rule
+- ESCU - Allow File And Printing Sharing In Firewall
+- ESCU - Allow Inbound Traffic By Firewall Rule Registry
+- ESCU - Allow Inbound Traffic In Firewall Rule
+- ESCU - Allow Network Discovery In Firewall
+- ESCU - Allow Operation with Consent Admin
+- ESCU - Amazon EKS Kubernetes cluster scan detection - Rule
+- ESCU - Amazon EKS Kubernetes Pod scan detection - Rule
+- ESCU - Anomalous usage of 7zip
+- ESCU - Any Powershell DownloadFile - Rule
+- ESCU - Any Powershell DownloadString - Rule
+- ESCU - Attacker Tools On Endpoint - Rule
+- ESCU - Attempt To Add Certificate To Untrusted Store - Rule
+- ESCU - Attempt To Stop Security Service - Rule
+- ESCU - Attempted Credential Dump From Registry via Reg exe - Rule
+- ESCU - Auto Admin Logon Registry Entry - Rule
+- ESCU - AWS Cloud Provisioning From Previously Unseen City - Rule
+- ESCU - AWS Cloud Provisioning From Previously Unseen Country - Rule
+- ESCU - AWS Cloud Provisioning From Previously Unseen IP Address - Rule
+- ESCU - AWS Cloud Provisioning From Previously Unseen Region - Rule
+- ESCU - AWS Create Policy Version to allow all resources - Rule
+- ESCU - AWS CreateAccessKey - Rule
+- ESCU - AWS CreateLoginProfile - Rule
+- ESCU - AWS Cross Account Activity From Previously Unseen Account - Rule
+- ESCU - aws detect attach to role policy - Rule
+- ESCU - aws detect permanent key creation - Rule
+- ESCU - aws detect role creation - Rule
+- ESCU - aws detect sts assume role abuse - Rule
+- ESCU - aws detect sts get session token abuse - Rule
+- ESCU - AWS Detect Users creating keys with encrypt policy without MFA - Rule
+- ESCU - AWS Detect Users with KMS keys performing encryption S3 - Rule
+- ESCU - AWS ECR Container Upload Outside Business Hours - Rule
+- ESCU - AWS ECR Container Upload Unknown User - Rule
+- ESCU - AWS EKS Kubernetes cluster sensitive object access - Rule
+- ESCU - AWS Excessive Security Scanning - Rule
+- ESCU - AWS IAM AccessDenied Discovery Events - Rule
+- ESCU - AWS IAM Assume Role Policy Brute Force - Rule
+- ESCU - AWS IAM Delete Policy - Rule
+- ESCU - AWS IAM Failure Group Deletion - Rule
+- ESCU - AWS IAM Successful Group Deletion - Rule
+- ESCU - AWS Lambda UpdateFunctionCode - Rule
+- ESCU - AWS Network Access Control List Created with All Open Ports - Rule
+- ESCU - AWS Network Access Control List Deleted - Rule
+- ESCU - AWS SAML Access by Provider User and Principal - Rule
+- ESCU - AWS SAML Update identity provider - Rule
+- ESCU - AWS SetDefaultPolicyVersion - Rule
+- ESCU - AWS UpdateLoginProfile - Rule
+- ESCU - Batch File Write to System32 - Rule
+- ESCU - Bcdedit Command Back To Normal Mode Boot - Rule
+- ESCU - BCDEdit Failure Recovery Modification - Rule
+- ESCU - BITS Job Persistence - Rule
+- ESCU - BITSAdmin Download File - Rule
+- ESCU - CertUtil Download With URLCache and Split Arguments - Rule
+- ESCU - CertUtil Download With VerifyCtl and Split Arguments - Rule
+- ESCU - Certutil exe certificate extraction - Rule
+- ESCU - CertUtil With Decode Argument - Rule
+- ESCU - Change Default File Association - Rule
+- ESCU - Change To Safe Mode With Network Config - Rule
+- ESCU - CHCP Command Execution - Rule
+- ESCU - Check Elevated CMD using whoami - Rule
+- ESCU - Child Processes of Spoolsv exe - Rule
+- ESCU - Circle CI Disable Security Job - Rule
+- ESCU - Circle CI Disable Security Step - Rule
+- ESCU - Clear Unallocated Sector Using Cipher App - Rule
+- ESCU - Clients Connecting to Multiple DNS Servers - Rule
+- ESCU - Clop Common Exec Parameter - Rule
+- ESCU - Clop Ransomware Known Service Name - Rule
+- ESCU - Cloud API Calls From Previously Unseen User Roles - Rule
+- ESCU - Cloud Compute Instance Created By Previously Unseen User - Rule
+- ESCU - Cloud Compute Instance Created In Previously Unused Region - Rule
+- ESCU - Cloud Compute Instance Created With Previously Unseen Image - Rule
+- ESCU - Cloud Compute Instance Created With Previously Unseen Instance Type - Rule
+- ESCU - Cloud Instance Modified By Previously Unseen User - Rule
+- ESCU - Cloud Network Access Control List Deleted - Rule
+- ESCU - Cloud Provisioning Activity From Previously Unseen City - Rule
+- ESCU - Cloud Provisioning Activity From Previously Unseen Country - Rule
+- ESCU - Cloud Provisioning Activity From Previously Unseen IP Address - Rule
+- ESCU - Cloud Provisioning Activity From Previously Unseen Region - Rule
+- ESCU - CMD Carry Out String Command Parameter - Rule
+- ESCU - CMD Echo Pipe - Escalation - Rule
+- ESCU - Cmdline Tool Not Executed In CMD Shell - Rule
+- ESCU - CMLUA Or CMSTPLUA UAC Bypass - Rule
+- ESCU - Cobalt Strike Named Pipes - Rule
+- ESCU - Common Ransomware Extensions - Rule
+- ESCU - Common Ransomware Notes - Rule
+- ESCU - Conti Common Exec parameter - Rule
+- ESCU - Control Loading from World Writable Directory - Rule
+- ESCU - Correlation by Repository and Risk - Rule
+- ESCU - Correlation by User and Risk - Rule
+- ESCU - Create local admin accounts using net exe - Rule
+- ESCU - Create or delete windows shares using net exe - Rule
+- ESCU - Create Remote Thread In Shell Application - Rule
+- ESCU - Create Remote Thread into LSASS - Rule
+- ESCU - Creation of lsass Dump with Taskmgr - Rule
+- ESCU - Creation of Shadow Copy - Rule
+- ESCU - Creation of Shadow Copy with wmic and powershell - Rule
+- ESCU - Credential Dumping via Copy Command from Shadow Copy - Rule
+- ESCU - Credential Dumping via Symlink to Shadow Copy - Rule
+- ESCU - CSC Net On The Fly Compilation - Rule
+- ESCU - Curl Download and Bash Execution - Rule
+- ESCU - Delete ShadowCopy With PowerShell - Rule
+- ESCU - Deleting Of Net Users - Rule
+- ESCU - Deleting Shadow Copies - Rule
+- ESCU - Detect Activity Related to Pass the Hash Attacks - Rule
+- ESCU - Detect API activity from users without MFA - Rule
+- ESCU - Detect ARP Poisoning - Rule
+- ESCU - Detect attackers scanning for vulnerable JBoss servers - Rule
+- ESCU - Detect AWS API Activities From Unapproved Accounts - Rule
+- ESCU - Detect AWS Console Login by New User - Rule
+- ESCU - Detect AWS Console Login by User from New City - Rule
+- ESCU - Detect AWS Console Login by User from New Country - Rule
+- ESCU - Detect AzureHound Command-Line Arguments - Rule
+- ESCU - Detect AzureHound File Modifications - Rule
+- ESCU - Detect Baron Samedit CVE-2021-3156 - Rule
+- ESCU - Detect Baron Samedit CVE-2021-3156 Segfault - Rule
+- ESCU - Detect Baron Samedit CVE-2021-3156 via OSQuery - Rule
+- ESCU - Detect Computer Changed with Anonymous Account - Rule
+- ESCU - Detect Copy of ShadowCopy with Script Block Logging - Rule
+- ESCU - Detect Credential Dumping through LSASS access - Rule
+- ESCU - Detect DNS requests to Phishing Sites leveraging EvilGinx2 - Rule
+- ESCU - Detect Empire with PowerShell Script Block Logging - Rule
+- ESCU - Detect Excessive Account Lockouts From Endpoint - Rule
+- ESCU - Detect Excessive User Account Lockouts - Rule
+- ESCU - Detect Exchange Web Shell - Rule
+- ESCU - Detect F5 TMUI RCE CVE-2020-5902 - Rule
+- ESCU - Detect GCP Storage access from a new IP - Rule
+- ESCU - Detect hosts connecting to dynamic domain providers - Rule
+- ESCU - Detect HTML Help Renamed - Rule
+- ESCU - Detect HTML Help Spawn Child Process - Rule
+- ESCU - Detect HTML Help URL in Command Line - Rule
+- ESCU - Detect HTML Help Using InfoTech Storage Handlers - Rule
+- ESCU - Detect IPv6 Network Infrastructure Threats - Rule
+- ESCU - Detect Large Outbound ICMP Packets - Rule
+- ESCU - Detect Long DNS TXT Record Response - Rule
+- ESCU - Detect malicious requests to exploit JBoss servers - Rule
+- ESCU - Detect Mimikatz Using Loaded Images - Rule
+- ESCU - Detect Mimikatz Via PowerShell And EventCode 4703 - Rule
+- ESCU - Detect Mimikatz With PowerShell Script Block Logging - Rule
+- ESCU - Detect mshta inline hta execution - Rule
+- ESCU - Detect mshta renamed - Rule
+- ESCU - Detect MSHTA Url in Command Line - Rule
+- ESCU - Detect new API calls from user roles - Rule
+- ESCU - Detect New Local Admin account - Rule
+- ESCU - Detect New Login Attempts to Routers - Rule
+- ESCU - Detect New Open GCP Storage Buckets - Rule
+- ESCU - Detect New Open S3 buckets - Rule
+- ESCU - Detect New Open S3 Buckets over AWS CLI - Rule
+- ESCU - Detect new user AWS Console Login - Rule
+- ESCU - Detect Outbound LDAP Traffic - Rule
+- ESCU - Detect Outbound SMB Traffic - Rule
+- ESCU - Detect Outlook exe writing a zip file - Rule
+- ESCU - Detect Path Interception By Creation Of program exe - Rule
+- ESCU - Detect Port Security Violation - Rule
+- ESCU - Detect processes used for System Network Configuration Discovery - Rule
+- ESCU - Detect Prohibited Applications Spawning cmd exe - Rule
+- ESCU - Detect PsExec With accepteula Flag - Rule
+- ESCU - Detect Rare Executables - Rule
+- ESCU - Detect RClone Command-Line Usage - Rule
+- ESCU - Detect Regasm Spawning a Process - Rule
+- ESCU - Detect Regasm with Network Connection - Rule
+- ESCU - Detect Regasm with no Command Line Arguments - Rule
+- ESCU - Detect Regsvcs Spawning a Process - Rule
+- ESCU - Detect Regsvcs with Network Connection - Rule
+- ESCU - Detect Regsvcs with No Command Line Arguments - Rule
+- ESCU - Detect Regsvr32 Application Control Bypass - Rule
+- ESCU - Detect Renamed 7-Zip - Rule
+- ESCU - Detect Renamed PSExec - Rule
+- ESCU - Detect Renamed RClone - Rule
+- ESCU - Detect Renamed WinRAR - Rule
+- ESCU - Detect Rogue DHCP Server - Rule
+- ESCU - Detect Rundll32 Application Control Bypass - advpack - Rule
+- ESCU - Detect Rundll32 Application Control Bypass - setupapi - Rule
+- ESCU - Detect Rundll32 Application Control Bypass - syssetup - Rule
+- ESCU - Detect Rundll32 Inline HTA Execution - Rule
+- ESCU - Detect S3 access from a new IP - Rule
+- ESCU - Detect shared ec2 snapshot - Rule
+- ESCU - Detect SharpHound Command-Line Arguments - Rule
+- ESCU - Detect SharpHound File Modifications - Rule
+- ESCU - Detect SharpHound Usage - Rule
+- ESCU - Detect SNICat SNI Exfiltration - Rule
+- ESCU - Detect Software Download To Network Device - Rule
+- ESCU - Detect Spike in AWS API Activity - Rule
+- ESCU - Detect Spike in AWS Security Hub Alerts for EC2 Instance - Rule
+- ESCU - Detect Spike in AWS Security Hub Alerts for User - Rule
+- ESCU - Detect Spike in blocked Outbound Traffic from your AWS - Rule
+- ESCU - Detect Spike in Network ACL Activity - Rule
+- ESCU - Detect Spike in S3 Bucket deletion - Rule
+- ESCU - Detect Spike in Security Group Activity - Rule
+- ESCU - Detect Traffic Mirroring - Rule
+- ESCU - Detect Unauthorized Assets by MAC address - Rule
+- ESCU - Detect USB device insertion - Rule
+- ESCU - Detect Use of cmd exe to Launch Script Interpreters - Rule
+- ESCU - Detect web traffic to dynamic domain providers - Rule
+- ESCU - Detect Windows DNS SIGRed via Splunk Stream - Rule
+- ESCU - Detect Windows DNS SIGRed via Zeek - Rule
+- ESCU - Detect WMI Event Subscription Persistence - Rule
+- ESCU - Detect Zerologon via Zeek - Rule
+- ESCU - Detection of DNS Tunnels - Rule
+- ESCU - Detection of tools built by NirSoft - Rule
+- ESCU - Disable AMSI Through Registry - Rule
+- ESCU - Disable Defender AntiVirus Registry - Rule
+- ESCU - Disable Defender BlockAtFirstSeen Feature - Rule
+- ESCU - Disable Defender Enhanced Notification - Rule
+- ESCU - Disable Defender MpEngine Registry - Rule
+- ESCU - Disable Defender Spynet Reporting - Rule
+- ESCU - Disable Defender Submit Samples Consent Feature - Rule
+- ESCU - Disable ETW Through Registry
+- ESCU - Disable Logs Using WevtUtil
+- ESCU - Disable Registry Tool
+- ESCU - Disable Schedule Task
+- ESCU - Disable Security Logs Using MiniNt Registry
+- ESCU - Disable Show Hidden Files
+- ESCU - Disable UAC Remote Restriction
+- ESCU - Disable Windows App Hotkeys
+- ESCU - Disable Windows Behavior Monitoring
+- ESCU - Disable Windows SmartScreen Protection
+- ESCU - Disabled Kerberos Pre-Authentication Discovery With Get-ADUser - Rule
+- ESCU - Disabled Kerberos Pre-Authentication Discovery With PowerView - Rule
+- ESCU - Disabling CMD Application
+- ESCU - Disabling ControlPanel
+- ESCU - Disabling Defender Services
+- ESCU - Disabling Firewall with Netsh
+- ESCU - Disabling FolderOptions Windows Feature
+- ESCU - Disabling Net User Account
+- ESCU - Disabling NoRun Windows App
+- ESCU - Disabling Remote User Account Control - Rule
+- ESCU - Disabling SystemRestore In Registry
+- ESCU - Disabling Task Manager
+- ESCU - DLLHost with no Command Line Arguments with Network - Rule
+- ESCU - DNS Exfiltration Using Nslookup App - Rule
+- ESCU - DNS Query Length Outliers - MLTK - Rule
+- ESCU - DNS Query Length With High Standard Deviation - Rule
+- ESCU - DNS Query Requests Resolved by Unauthorized DNS Servers - Rule
+- ESCU - DNS record changed - Rule
+- ESCU - Domain Account Discovery with Dsquery
+- ESCU - Domain Account Discovery With Net App
+- ESCU - Domain Account Discovery with Wmic
+- ESCU - Domain Controller Discovery with Nltest
+- ESCU - Domain Controller Discovery with Wmic
+- ESCU - Domain Group Discovery with Adsisearcher - Rule
+- ESCU - Domain Group Discovery With Dsquery
+- ESCU - Domain Group Discovery With Net
+- ESCU - Domain Group Discovery With Wmic
+- ESCU - Download Files Using Telegram
+- ESCU - Drop IcedID License dat
+- ESCU - DSQuery Domain Discovery - Rule
+- ESCU - Dump LSASS via comsvcs DLL
+- ESCU - Dump LSASS via procdump Rename - Rule
+- ESCU - Dump LSASS via procdump
+- ESCU - EC2 Instance Modified With Previously Unseen User - Rule
+- ESCU - EC2 Instance Started In Previously Unseen Region - Rule
+- ESCU - EC2 Instance Started With Previously Unseen AMI - Rule
+- ESCU - EC2 Instance Started With Previously Unseen Instance Type - Rule
+- ESCU - EC2 Instance Started With Previously Unseen User - Rule
+- ESCU - Elevated Group Discovery With Net
+- ESCU - Elevated Group Discovery With Wmic
+- ESCU - Email Attachments With Lots Of Spaces - Rule
+- ESCU - Email files written outside of the Outlook directory
+- ESCU - Email servers sending high volume traffic to hosts - Rule
+- ESCU - Enable RDP In Other Port Number
+- ESCU - Enable WDigest UseLogonCredential Registry
+- ESCU - Enumerate Users Local Group Using Telegram
+- ESCU - Esentutl SAM Copy
+- ESCU - ETW Registry Disabled
+- ESCU - Eventvwr UAC Bypass
+- ESCU - Excel Spawning PowerShell
+- ESCU - Excel Spawning Windows Script Host
+- ESCU - Excessive Attempt To Disable Services
+- ESCU - Excessive distinct processes from Windows Temp
+- ESCU - Excessive DNS Failures - Rule
+- ESCU - Excessive File Deletion In WinDefender Folder
+- ESCU - Excessive number of service control start as disabled
+- ESCU - Excessive number of taskhost processes
+- ESCU - Excessive Service Stop Attempt
+- ESCU - Excessive Usage Of Cacls App
+- ESCU - Excessive Usage Of Net App
+- ESCU - Excessive Usage of NSLOOKUP App
+- ESCU - Excessive Usage Of SC Service Utility
+- ESCU - Excessive Usage Of Taskkill
+- ESCU - Exchange PowerShell Abuse via SSRF - Rule
+- ESCU - Exchange PowerShell Module Usage - Rule
+- ESCU - Executables Or Script Creation In Suspicious Path - Rule
+- ESCU - Execute Javascript With Jscript COM CLSID - Rule
+- ESCU - Execution of File with Multiple Extensions - Rule
+- ESCU - Execution of File With Spaces Before Extension - Rule
+- ESCU - Extended Period Without Successful Netbackup Backups - Rule
+- ESCU - Extraction of Registry Hives - Rule
+- ESCU - F5 BIG-IP iControl REST Vulnerability CVE-2022-1388 - Rule
+- ESCU - File with Samsam Extension - Rule
+- ESCU - Firewall Allowed Program Enable - Rule
+- ESCU - First time seen command line argument - Rule
+- ESCU - First Time Seen Running Windows Service - Rule
+- ESCU - FodHelper UAC Bypass - Rule
+- ESCU - Fsutil Zeroing File - Rule
+- ESCU - GCP Detect accounts with high risk roles by project - Rule
+- ESCU - GCP Detect gcploit framework - Rule
+- ESCU - GCP Detect high risk permissions by resource and account - Rule
+- ESCU - gcp detect oauth token abuse - Rule
+- ESCU - GCP GCR container uploaded - Rule
+- ESCU - GCP Kubernetes cluster pod scan detection - Rule
+- ESCU - GCP Kubernetes cluster scan detection - Rule
+- ESCU - Gdrive suspicious file sharing - Rule
+- ESCU - Get ADDefaultDomainPasswordPolicy with Powershell - Rule
+- ESCU - Get ADDefaultDomainPasswordPolicy with Powershell Script Block - Rule
+- ESCU - Get ADUser with PowerShell - Rule
+- ESCU - Get ADUser with PowerShell Script Block - Rule
+- ESCU - Get ADUserResultantPasswordPolicy with Powershell - Rule
+- ESCU - Get ADUserResultantPasswordPolicy with Powershell Script Block - Rule
+- ESCU - Get DomainPolicy with Powershell - Rule
+- ESCU - Get DomainPolicy with Powershell Script Block - Rule
+- ESCU - Get-DomainTrust with PowerShell - Rule
+- ESCU - Get-DomainTrust with PowerShell Script Block - Rule
+- ESCU - Get DomainUser with PowerShell - Rule
+- ESCU - Get DomainUser with PowerShell Script Block - Rule
+- ESCU - Get-ForestTrust with PowerShell - Rule
+- ESCU - Get-ForestTrust with PowerShell Script Block - Rule
+- ESCU - Get WMIObject Group Discovery - Rule
+- ESCU - Get WMIObject Group Discovery with Script Block Logging - Rule
+- ESCU - GetAdComputer with PowerShell - Rule
+- ESCU - GetAdComputer with PowerShell Script Block - Rule
+- ESCU - GetAdGroup with PowerShell - Rule
+- ESCU - GetAdGroup with PowerShell Script Block - Rule
+- ESCU - GetCurrent User with PowerShell - Rule
+- ESCU - GetCurrent User with PowerShell Script Block - Rule
+- ESCU - GetDomainComputer with PowerShell - Rule
+- ESCU - GetDomainComputer with PowerShell Script Block - Rule
+- ESCU - GetDomainController with PowerShell - Rule
+- ESCU - GetDomainController with PowerShell Script Block - Rule
+- ESCU - GetDomainGroup with PowerShell - Rule
+- ESCU - GetDomainGroup with PowerShell Script Block - Rule
+- ESCU - GetLocalUser with PowerShell - Rule
+- ESCU - GetLocalUser with PowerShell Script Block - Rule
+- ESCU - GetNetTcpconnection with PowerShell - Rule
+- ESCU - GetNetTcpconnection with PowerShell Script Block - Rule
+- ESCU - GetWmiObject Ds Computer with PowerShell - Rule
+- ESCU - GetWmiObject Ds Computer with PowerShell Script Block - Rule
+- ESCU - GetWmiObject Ds Group with PowerShell - Rule
+- ESCU - GetWmiObject Ds Group with PowerShell Script Block - Rule
+- ESCU - GetWmiObject DS User with PowerShell - Rule
+- ESCU - GetWmiObject DS User with PowerShell Script Block - Rule
+- ESCU - GetWmiObject User Account with PowerShell - Rule
+- ESCU - GetWmiObject User Account with PowerShell Script Block - Rule
+- ESCU - GitHub Actions Disable Security Workflow - Rule
+- ESCU - Github Commit Changes In Master - Rule
+- ESCU - Github Commit In Develop - Rule
+- ESCU - GitHub Dependabot Alert - Rule
+- ESCU - GitHub Pull Request from Unknown User - Rule
+- ESCU - GPUpdate with no Command Line Arguments with Network - Rule
+- ESCU - Gsuite Drive Share In External Email - Rule
+- ESCU - GSuite Email Suspicious Attachment - Rule
+- ESCU - Gsuite Email Suspicious Subject With Attachment - Rule
+- ESCU - Gsuite Email With Known Abuse Web Service Link - Rule
+- ESCU - Gsuite Outbound Email With Attachment To External Domain - Rule
+- ESCU - Gsuite suspicious calendar invite - Rule
+- ESCU - Gsuite Suspicious Shared File Name - Rule
+- ESCU - Hide User Account From Sign-In Screen - Rule
+- ESCU - Hiding Files And Directories With Attrib exe - Rule
+- ESCU - High Frequency Copy Of Files In Network Share - Rule
+- ESCU - High Number of Login Failures from a single source - Rule
+- ESCU - High Process Termination Frequency - Rule
+- ESCU - Hosts receiving high volume of network traffic from email server - Rule
+- ESCU - Hunting for Log4Shell - Rule
+- ESCU - Icacls Deny Command - Rule
+- ESCU - ICACLS Grant Command - Rule
+- ESCU - IcedID Exfiltrated Archived File Creation - Rule
+- ESCU - Identify New User Accounts - Rule
+- ESCU - Impacket Lateral Movement Commandline Parameters - Rule
+- ESCU - Interactive Session on Remote Endpoint with PowerShell - Rule
+- ESCU - Java Class File download by Java User Agent - Rule
+- ESCU - Java Writing JSP File - Rule
+- ESCU - Jscript Execution Using Cscript App - Rule
+- ESCU - Kerberoasting spn request with RC4 encryption - Rule
+- ESCU - Kerberos Pre-Authentication Flag Disabled in UserAccountControl - Rule
+- ESCU - Kerberos Pre-Authentication Flag Disabled with PowerShell - Rule
+- ESCU - Kerberos Service Ticket Request Using RC4 Encryption - Rule
+- ESCU - Kerberos TGT Request Using RC4 Encryption - Rule
+- ESCU - Kerberos User Enumeration - Rule
+- ESCU - Kubernetes AWS detect most active service accounts by pod - Rule
+- ESCU - Kubernetes AWS detect RBAC authorization by account - Rule
+- ESCU - Kubernetes AWS detect sensitive role access - Rule
+- ESCU - Kubernetes AWS detect service accounts forbidden failure access - Rule
+- ESCU - Kubernetes AWS detect suspicious kubectl calls - Rule
+- ESCU - Kubernetes Azure active service accounts by pod namespace - Rule
+- ESCU - Kubernetes Azure detect RBAC authorization by account - Rule
+- ESCU - Kubernetes Azure detect sensitive object access - Rule
+- ESCU - Kubernetes Azure detect sensitive role access - Rule
+- ESCU - Kubernetes Azure detect service accounts forbidden failure access - Rule
+- ESCU - Kubernetes Azure detect suspicious kubectl calls - Rule
+- ESCU - Kubernetes Azure pod scan fingerprint - Rule
+- ESCU - Kubernetes Azure scan fingerprint - Rule
+- ESCU - Kubernetes GCP detect most active service accounts by pod - Rule
+- ESCU - Kubernetes GCP detect RBAC authorizations by account - Rule
+- ESCU - Kubernetes GCP detect sensitive object access - Rule
+- ESCU - Kubernetes GCP detect sensitive role access - Rule
+- ESCU - Kubernetes GCP detect service accounts forbidden failure access - Rule
+- ESCU - Kubernetes GCP detect suspicious kubectl calls - Rule
+- ESCU - Kubernetes Nginx Ingress LFI - Rule
+- ESCU - Kubernetes Nginx Ingress RFI - Rule
+- ESCU - Kubernetes Scanner Image Pulling - Rule
+- ESCU - Large Volume of DNS ANY Queries - Rule
+- ESCU - Linux Account Manipulation Of SSH Config and Keys - Rule
+- ESCU - Linux Add Files In Known Crontab Directories - Rule
+- ESCU - Linux Add User Account - Rule
+- ESCU - Linux Adding Crontab Using List Parameter - Rule
+- ESCU - Linux At Allow Config File Creation - Rule
+- ESCU - Linux At Application Execution - Rule
+- ESCU - Linux Change File Owner To Root - Rule
+- ESCU - Linux Common Process For Elevation Control - Rule
+- ESCU - Linux DD File Overwrite - Rule
+- ESCU - Linux Deleting Critical Directory Using RM Command - Rule
+- ESCU - Linux Deletion Of Cron Jobs - Rule
+- ESCU - Linux Deletion Of Init Daemon Script - Rule
+- ESCU - Linux Deletion Of Services - Rule
+- ESCU - Linux Deletion of SSL Certificate - Rule
+- ESCU - Linux Disable Services - Rule
+- ESCU - Linux Doas Conf File Creation - Rule
+- ESCU - Linux Doas Tool Execution - Rule
+- ESCU - Linux Edit Cron Table Parameter - Rule
+- ESCU - Linux File Created In Kernel Driver Directory - Rule
+- ESCU - Linux File Creation In Init Boot Directory - Rule
+- ESCU - Linux File Creation In Profile Directory - Rule
+- ESCU - Linux High Frequency Of File Deletion In Boot Folder - Rule
+- ESCU - Linux High Frequency Of File Deletion In Etc Folder - Rule
+- ESCU - Linux Insert Kernel Module Using Insmod Utility - Rule
+- ESCU - Linux Install Kernel Module Using Modprobe Utility - Rule
+- ESCU - Linux Iptables Firewall Modification - Rule
+- ESCU - Linux Java Spawning Shell - Rule
+- ESCU - Linux Kworker Process In Writable Process Path - Rule
+- ESCU - Linux NOPASSWD Entry In Sudoers File - Rule
+- ESCU - Linux pkexec Privilege Escalation - Rule
+- ESCU - Linux Possible Access Or Modification Of sshd Config File - Rule
+- ESCU - Linux Possible Access To Credential Files - Rule
+- ESCU - Linux Possible Access To Sudoers File - Rule
+- ESCU - Linux Possible Append Command To At Allow Config File - Rule
+- ESCU - Linux Possible Append Command To Profile Config File - Rule
+- ESCU - Linux Possible Append Cronjob Entry on Existing Cronjob File - Rule
+- ESCU - Linux Possible Cronjob Modification With Editor - Rule
+- ESCU - Linux Possible Ssh Key File Creation - Rule
+- ESCU - Linux Preload Hijack Library Calls - Rule
+- ESCU - Linux Service File Created In Systemd Directory - Rule
+- ESCU - Linux Service Restarted - Rule
+- ESCU - Linux Service Started Or Enabled - Rule
+- ESCU - Linux Setuid Using Chmod Utility - Rule
+- ESCU - Linux Setuid Using Setcap Utility - Rule
+- ESCU - Linux Shred Overwrite Command - Rule
+- ESCU - Linux Stdout Redirection To Dev Null File - Rule
+- ESCU - Linux Stop Services - Rule
+- ESCU - Linux Sudo OR Su Execution - Rule
+- ESCU - Linux Sudoers Tmp File Creation - Rule
+- ESCU - Linux System Network Discovery - Rule
+- ESCU - Linux Visudo Utility Execution - Rule
+- ESCU - Loading Of Dynwrapx Module - Rule
+- ESCU - Local Account Discovery with Net - Rule
+- ESCU - Local Account Discovery With Wmic - Rule
+- ESCU - Log4Shell CVE-2021-44228 Exploitation - Rule
+- ESCU - Log4Shell JNDI Payload Injection Attempt - Rule
+- ESCU - Log4Shell JNDI Payload Injection with Outbound Connection - Rule
+- ESCU - Logon Script Event Trigger Execution - Rule
+- ESCU - MacOS - Re-opened Applications - Rule
+- ESCU - MacOS LOLbin - Rule
+- ESCU - MacOS plutil - Rule
+- ESCU - Mailsniper Invoke functions - Rule
+- ESCU - Malicious InProcServer32 Modification - Rule
+- ESCU - Malicious Powershell Executed As A Service - Rule
+- ESCU - Malicious PowerShell Process - Encoded Command - Rule
+- ESCU - Malicious PowerShell Process - Execution Policy Bypass - Rule
+- ESCU - Malicious PowerShell Process With Obfuscation Techniques - Rule
+- ESCU - Mimikatz PassTheTicket CommandLine Parameters - Rule
+- ESCU - Mmc LOLBAS Execution Process Spawn - Rule
+- ESCU - Modification Of Wallpaper - Rule
+- ESCU - Modify ACL permission To Files Or Folder - Rule
+- ESCU - Monitor DNS For Brand Abuse - Rule
+- ESCU - Monitor Email For Brand Abuse - Rule
+- ESCU - Monitor Registry Keys for Print Monitors - Rule
+- ESCU - Monitor Web Traffic For Brand Abuse - Rule
+- ESCU - MS Exchange Mailbox Replication service writing Active Server Pages - Rule
+- ESCU - MS Scripting Process Loading Ldap Module - Rule
+- ESCU - MS Scripting Process Loading WMI Module - Rule
+- ESCU - MSBuild Suspicious Spawned By Script Process - Rule
+- ESCU - Mshta spawning Rundll32 OR Regsvr32 Process - Rule
+- ESCU - MSHTML Module Load in Office Product - Rule
+- ESCU - MSI Module Loaded by Non-System Binary - Rule
+- ESCU - Msmpeng Application DLL Side Loading - Rule
+- ESCU - Multiple Archive Files Http Post Traffic - Rule
+- ESCU - Multiple Okta Users With Invalid Credentials From The Same IP - Rule
+- ESCU - Net Localgroup Discovery - Rule
+- ESCU - NET Profiler UAC bypass - Rule
+- ESCU - Network Connection Discovery With Arp - Rule
+- ESCU - Network Connection Discovery With Net - Rule
+- ESCU - Network Connection Discovery With Netstat - Rule
+- ESCU - Network Discovery Using Route Windows App - Rule
+- ESCU - Nishang PowershellTCPOneLine - Rule
+- ESCU - NLTest Domain Trust Discovery - Rule
+- ESCU - No Windows Updates in a time frame - Rule
+- ESCU - Non Chrome Process Accessing Chrome Default Dir - Rule
+- ESCU - Non Firefox Process Access Firefox Profile Dir - Rule
+- ESCU - Ntdsutil Export NTDS - Rule
+- ESCU - O365 Suspicious User Email Forwarding - Rule
+- ESCU - Office Application Drop Executable - Rule
+- ESCU - Office Application Spawn Regsvr32 process - Rule
+- ESCU - Office Application Spawn rundll32 process - Rule
+- ESCU - Office Document Creating Schedule Task - Rule
+- ESCU - Office Document Executing Macro Code - Rule
+- ESCU - Office Document Spawned Child Process To Download - Rule
+- ESCU - Office Product Spawn CMD Process - Rule
+- ESCU - Office Product Spawning BITSAdmin - Rule
+- ESCU - Office Product Spawning CertUtil - Rule
+- ESCU - Office Product Spawning MSHTA - Rule
+- ESCU - Office Product Spawning Rundll32 with no DLL - Rule
+- ESCU - Office Product Spawning Wmic - Rule
+- ESCU - Office Product Writing cab or inf - Rule
+- ESCU - Office Spawning Control - Rule
+- ESCU - Okta Account Lockout Events - Rule
+- ESCU - Okta Failed SSO Attempts - Rule
+- ESCU - Okta User Logins From Multiple Cities - Rule
+- ESCU - Open Redirect in Splunk Web - Rule
+- ESCU - Osquery pack - ColdRoot detection - Rule
+- ESCU - Outbound Network Connection from Java Using Default Ports - Rule
+- ESCU - Overwriting Accessibility Binaries - Rule
+- ESCU - Password Policy Discovery with Net - Rule
+- ESCU - Path traversal SPL injection - Rule
+- ESCU - Permission Modification using Takeown App - Rule
+- ESCU - PetitPotam Network Share Access Request - Rule
+- ESCU - PetitPotam Suspicious Kerberos TGT Request - Rule
+- ESCU - Ping Sleep Batch Command - Rule
+- ESCU - Plain HTTP POST Exfiltrated Data - Rule
+- ESCU - Possible Browser Pass View Parameter - Rule
+- ESCU - Possible Lateral Movement PowerShell Spawn - Rule
+- ESCU - Potentially malicious code on commandline - Rule
+- ESCU - PowerShell - Connect To Internet With Hidden Window - Rule
+- ESCU - PowerShell 4104 Hunting - Rule
+- ESCU - Powershell Creating Thread Mutex - Rule
+- ESCU - Powershell Disable Security Monitoring - Rule
+- ESCU - PowerShell Domain Enumeration - Rule
+- ESCU - PowerShell Enable PowerShell Remoting
+- ESCU - Powershell Enable SMB1Protocol Feature - Rule
+- ESCU - Powershell Execute COM Object - Rule
+- ESCU - Powershell Fileless Process Injection via GetProcAddress - Rule
+- ESCU - Powershell Fileless Script Contains Base64 Encoded Content - Rule
+- ESCU - PowerShell Get LocalGroup Discovery - Rule
+- ESCU - Powershell Get LocalGroup Discovery with Script Block Logging - Rule
+- ESCU - PowerShell Invoke CIMMethod CIMSession
+- ESCU - PowerShell Invoke-WmiExec Usage
+- ESCU - PowerShell Loading DotNET into Memory via Reflection - Rule
+- ESCU - Powershell Processing Stream Of Data - Rule
+- ESCU - Powershell Remote Thread To Known Windows Process - Rule
+- ESCU - Powershell Remove Windows Defender Directory - Rule
+- ESCU - PowerShell Start-BitsTransfer - Rule
+- ESCU - PowerShell Start or Stop Service
+- ESCU - Powershell Using memory As Backing Store - Rule
+- ESCU - Print Processor Registry Autostart - Rule
+- ESCU - Print Spooler Adding A Printer Driver - Rule
+- ESCU - Print Spooler Failed to Load a Plug-in - Rule
+- ESCU - Process Creating LNK file in Suspicious Location - Rule
+- ESCU - Process Deleting Its Process File Path - Rule
+- ESCU - Process Execution via WMI - Rule
+- ESCU - Process Kill Base On File Path - Rule
+- ESCU - Process Writing DynamicWrapperX - Rule
+- ESCU - Processes created by netsh - Rule
+- ESCU - Processes launching netsh - Rule
+- ESCU - Processes Tapping Keyboard Events - Rule
+- ESCU - Prohibited Network Traffic Allowed - Rule
+- ESCU - Prohibited Software On Endpoint - Rule
+- ESCU - Protocol or Port Mismatch - Rule
+- ESCU - Protocols passing authentication in cleartext - Rule
+- ESCU - Randomly Generated Scheduled Task Name - Rule
+- ESCU - Randomly Generated Windows Service Name - Rule
+- ESCU - Ransomware Notes bulk creation - Rule
+- ESCU - Recon AVProduct Through Pwh or WMI - Rule
+- ESCU - Recon Using WMI Class - Rule
+- ESCU - Recursive Delete of Directory In Batch CMD - Rule
+- ESCU - Reg exe Manipulating Windows Services Registry Keys - Rule
+- ESCU - Reg exe used to hide files directories via registry keys - Rule
+- ESCU - Registry Keys for Creating SHIM Databases - Rule
+- ESCU - Registry Keys Used For Persistence - Rule
+- ESCU - Registry Keys Used For Privilege Escalation - Rule
+- ESCU - Regsvr32 Silent and Install Param Dll Loading - Rule
+- ESCU - Regsvr32 with Known Silent Switch Cmdline - Rule
+- ESCU - Remcos client registry install entry - Rule
+- ESCU - Remcos RAT File Creation in Remcos Folder - Rule
+- ESCU - Remote Desktop Network Bruteforce
+- ESCU - Remote Desktop Network Traffic - Rule
+- ESCU - Remote Desktop Process Running On System - Rule
+- ESCU - Remote Process Instantiation via DCOM and PowerShell - Rule
+- ESCU - Remote Process Instantiation via DCOM and PowerShell Script Block - Rule
+- ESCU - Remote Process Instantiation via WinRM and PowerShell - Rule
+- ESCU - Remote Process Instantiation via WinRM and PowerShell Script Block - Rule
+- ESCU - Remote Process Instantiation via WinRM and Winrs - Rule
+- ESCU - Remote Process Instantiation via WMI - Rule
+- ESCU - Remote Process Instantiation via WMI and PowerShell - Rule
+- ESCU - Remote Process Instantiation via WMI and PowerShell Script Block - Rule
+- ESCU - Remote Registry Key modifications - Rule
+- ESCU - Remote System Discovery with Adsisearcher - Rule
+- ESCU - Remote System Discovery with Dsquery - Rule
+- ESCU - Remote System Discovery with Net - Rule
+- ESCU - Remote System Discovery with Wmic - Rule
+- ESCU - Remote WMI Command Attempt - Rule
+- ESCU - Resize ShadowStorage volume - Rule
+- ESCU - Revil Common Exec Parameter - Rule
+- ESCU - Revil Registry Entry - Rule
+- ESCU - Rubeus Command Line Parameters - Rule
+- ESCU - Rubeus Kerberos Ticket Exports Through Winlogon Access - Rule
+- ESCU - Runas Execution in CommandLine - Rule
+- ESCU - RunDLL Loading DLL By Ordinal - Rule
+- ESCU - Rundll32 Control RunDLL Hunt - Rule
+- ESCU - Rundll32 Control RunDLL World Writable Directory - Rule
+- ESCU - Rundll32 Create Remote Thread To A Process - Rule
+- ESCU - Rundll32 CreateRemoteThread In Browser - Rule
+- ESCU - Rundll32 DNSQuery - Rule
+- ESCU - Rundll32 Process Creating Exe Dll Files - Rule
+- ESCU - Rundll32 Shimcache Flush - Rule
+- ESCU - Rundll32 with no Command Line Arguments with Network - Rule
+- ESCU - Ryuk Test Files Detected - Rule
+- ESCU - Ryuk Wake on LAN Command - Rule
+- ESCU - SAM Database File Access Attempt - Rule
+- ESCU - Samsam Test File Write - Rule
+- ESCU - Sc exe Manipulating Windows Services - Rule
+- ESCU - SchCache Change By App Connect And Create ADSI Object - Rule
+- ESCU - Scheduled Task Creation on Remote Endpoint using At - Rule
+- ESCU - Scheduled Task Deleted Or Created via CMD - Rule
+- ESCU - Scheduled Task Initiation on Remote Endpoint - Rule
+- ESCU - Scheduled tasks used in BadRabbit ransomware - Rule
+- ESCU - Schtasks Run Task On Demand - Rule
+- ESCU - Schtasks scheduling job on remote system - Rule
+- ESCU - Schtasks used for forcing a reboot - Rule
+- ESCU - Screensaver Event Trigger Execution - Rule
+- ESCU - Script Execution via WMI - Rule
+- ESCU - Sdclt UAC Bypass - Rule
+- ESCU - Sdelete Application Execution - Rule
+- ESCU - SearchProtocolHost with no Command Line with Network - Rule
+- ESCU - SecretDumps Offline NTDS Dumping Tool - Rule
+- ESCU - ServicePrincipalNames Discovery with PowerShell - Rule
+- ESCU - ServicePrincipalNames Discovery with SetSPN - Rule
+- ESCU - Services Escalate Exe - Rule
+- ESCU - Services LOLBAS Execution Process Spawn - Rule
+- ESCU - Set Default PowerShell Execution Policy To Unrestricted or Bypass - Rule
+- ESCU - Shim Database File Creation - Rule
+- ESCU - Shim Database Installation With Suspicious Parameters - Rule
+- ESCU - Short Lived Scheduled Task - Rule
+- ESCU - Short Lived Windows Accounts - Rule
+- ESCU - SilentCleanup UAC Bypass - Rule
+- ESCU - Single Letter Process On Endpoint - Rule
+- ESCU - SLUI RunAs Elevated - Rule
+- ESCU - SLUI Spawning a Process - Rule
+- ESCU - SMB Traffic Spike - MLTK - Rule
+- ESCU - SMB Traffic Spike
+- ESCU - Spectre and Meltdown Vulnerable Systems - Rule
+- ESCU - Spike in File Writes - Rule
+- ESCU - Splunk DoS via Malformed S2S Request - Rule
+- ESCU - Splunk Enterprise Information Disclosure - Rule
+- ESCU - Splunk User Enumeration Attempt - Rule
+- ESCU - Splunk XSS in Monitoring Console - Rule
+- ESCU - Spoolsv Spawning Rundll32 - Rule
+- ESCU - Spoolsv Suspicious Loaded Modules - Rule
+- ESCU - Spoolsv Suspicious Process Access - Rule
+- ESCU - Spoolsv Writing a DLL - Rule
+- ESCU - Spoolsv Writing a DLL - Sysmon - Rule
+- ESCU - Spring4Shell Payload URL Request - Rule
+- ESCU - SQL Injection with Long URLs - Rule
+- ESCU - Sqlite Module In Temp Folder - Rule
+- ESCU - Sunburst Correlation DLL and Network Event - Rule
+- ESCU - Supernova Webshell - Rule
+- ESCU - Suspicious Changes to File Associations - Rule
+- ESCU - Suspicious Computer Account Name Change - Rule
+- ESCU - Suspicious Copy on System32 - Rule
+- ESCU - Suspicious Curl Network Connection - Rule
+- ESCU - Suspicious DLLHost no Command Line Arguments - Rule
+- ESCU - Suspicious Driver Loaded Path - Rule
+- ESCU - Suspicious Email - UBA Anomaly - Rule
+- ESCU - Suspicious Email Attachment Extensions - Rule
+- ESCU - Suspicious File Write - Rule
+- ESCU - Suspicious GPUpdate no Command Line Arguments - Rule
+- ESCU - Suspicious IcedID Rundll32 Cmdline - Rule
+- ESCU - Suspicious Image Creation In Appdata Folder - Rule
+- ESCU - Suspicious Java Classes - Rule
+- ESCU - Suspicious Kerberos Service Ticket Request - Rule
+- ESCU - Suspicious Linux Discovery Commands - Rule
+- ESCU - Suspicious microsoft workflow compiler rename - Rule
+- ESCU - Suspicious microsoft workflow compiler usage - Rule
+- ESCU - Suspicious msbuild path - Rule
+- ESCU - Suspicious MSBuild Rename - Rule
+- ESCU - Suspicious MSBuild Spawn - Rule
+- ESCU - Suspicious mshta child process - Rule
+- ESCU - Suspicious mshta spawn - Rule
+- ESCU - Suspicious PlistBuddy Usage - Rule
+- ESCU - Suspicious PlistBuddy Usage via OSquery - Rule
+- ESCU - Suspicious Powershell Command-Line Arguments - Rule
+- ESCU - Suspicious Process DNS Query Known Abuse Web Services - Rule
+- ESCU - Suspicious Process With Discord DNS Query - Rule
+- ESCU - Suspicious Reg exe Process - Rule
+- ESCU - Suspicious Regsvr32 Register Suspicious Path - Rule
+- ESCU - Suspicious Rundll32 dllregisterserver - Rule
+- ESCU - Suspicious Rundll32 no Command Line Arguments - Rule
+- ESCU - Suspicious Rundll32 PluginInit - Rule
+- ESCU - Suspicious Rundll32 Rename - Rule
+- ESCU - Suspicious Rundll32 StartW - Rule
+- ESCU - Suspicious Scheduled Task from Public Directory - Rule
+- ESCU - Suspicious SearchProtocolHost no Command Line Arguments - Rule
+- ESCU - Suspicious SQLite3 LSQuarantine Behavior - Rule
+- ESCU - Suspicious Ticket Granting Ticket Request - Rule
+- ESCU - Suspicious WAV file in Appdata Folder - Rule
+- ESCU - Suspicious wevtutil Usage - Rule
+- ESCU - Suspicious writes to System Volume Information - Rule
+- ESCU - Suspicious writes to windows Recycle Bin - Rule
+- ESCU - Svchost LOLBAS Execution Process Spawn - Rule
+- ESCU - System Info Gathering Using Dxdiag Application - Rule
+- ESCU - System Information Discovery Detection - Rule
+- ESCU - System Processes Run From Unexpected Locations - Rule
+- ESCU - System User Discovery With Query - Rule
+- ESCU - System User Discovery With Whoami - Rule
+- ESCU - Time Provider Persistence Registry - Rule
+- ESCU - TOR Traffic - Rule
+- ESCU - Trickbot Named Pipe - Rule
+- ESCU - UAC Bypass MMC Load Unsigned Dll - Rule
+- ESCU - UAC Bypass With Colorui COM Object - Rule
+- ESCU - Uncommon Processes On Endpoint - Rule
+- ESCU - Unified Messaging Service Spawning a Process - Rule
+- ESCU - Uninstall App Using MsiExec - Rule
+- ESCU - Unknown Process Using The Kerberos Protocol - Rule
+- ESCU - Unload Sysmon Filter Driver - Rule
+- ESCU - Unloading AMSI via Reflection - Rule
+- ESCU - Unsigned Image Loaded by LSASS - Rule
+- ESCU - Unsuccessful Netbackup backups - Rule
+- ESCU - Unusual Number of Computer Service Tickets Requested - Rule
+- ESCU - Unusual Number of Kerberos Service Tickets Requested - Rule
+- ESCU - Unusual Number of Remote Endpoint Authentication Events - Rule
+- ESCU - Unusually Long Command Line - MLTK - Rule
+- ESCU - Unusually Long Command Line - Rule
+- ESCU - Unusually Long Content-Type Length - Rule
+- ESCU - User Discovery With Env Vars PowerShell - Rule
+- ESCU - User Discovery With Env Vars PowerShell Script Block - Rule
+- ESCU - USN Journal Deletion - Rule
+- ESCU - Vbscript Execution Using Wscript App - Rule
+- ESCU - Verclsid CLSID Execution - Rule
+- ESCU - W3WP Spawning Shell - Rule
+- ESCU - WBAdmin Delete System Backups - Rule
+- ESCU - Wbemprox COM Object Execution - Rule
+- ESCU - Web Fraud - Account Harvesting - Rule
+- ESCU - Web Fraud - Anomalous User Clickspeed - Rule
+- ESCU - Web Fraud - Password Sharing Across Accounts - Rule
+- ESCU - Web JSP Request via URL - Rule
+- ESCU - Web Servers Executing Suspicious Processes - Rule
+- ESCU - Web Spring Cloud Function FunctionRouter - Rule
+- ESCU - Web Spring4Shell HTTP Request Class Module - Rule
+- ESCU - Wermgr Process Connecting To IP Check Web Services - Rule
+- ESCU - Wermgr Process Create Executable File - Rule
+- ESCU - Wermgr Process Spawned CMD Or Powershell Process - Rule
+- ESCU - Wget Download and Bash Execution - Rule
+- ESCU - Windows AdFind Exe - Rule
+- ESCU - Windows Command and Scripting Interpreter Path Traversal Exec - Rule
+- ESCU - Windows connhost exe started forcefully - Rule
+- ESCU - Windows Curl Download to Suspicious Path - Rule
+- ESCU - Windows Curl Upload to Remote Destination - Rule
+- ESCU - Windows Defender Exclusion Registry Entry - Rule
+- ESCU - Windows Deleted Registry By A Non Critical Process File Path - Rule
+- ESCU - Windows Disable Change Password Through Registry - Rule
+- ESCU - Windows Disable Lock Workstation Feature Through Registry - Rule
+- ESCU - Windows Disable Memory Crash Dump - Rule
+- ESCU - Windows Disable Notification Center - Rule
+- ESCU - Windows Disable Shutdown Button Through Registry - Rule
+- ESCU - Windows Disable Windows Group Policy Features Through Registry - Rule
+- ESCU - Windows DisableAntiSpyware Registry - Rule
+- ESCU - Windows DiskCryptor Usage - Rule
+- ESCU - Windows Diskshadow Proxy Execution - Rule
+- ESCU - Windows DISM Remove Defender - Rule
+- ESCU - Windows DotNet Binary in Non Standard Path - Rule
+- ESCU - Windows Drivers Loaded by Signature - Rule
+- ESCU - Windows Enable Win32_ScheduledJob via Registry
+- ESCU - Windows Event For Service Disabled - Rule
+- ESCU - Windows Event Log Cleared
+- ESCU - Windows Excessive Disabled Services Event - Rule
+- ESCU - Windows Execute Arbitrary Commands with MSDT - Rule
+- ESCU - Windows File Without Extension In Critical Folder - Rule
+- ESCU - Windows Get-AdComputer Unconstrained Delegation Discovery - Rule
+- ESCU - Windows Hidden Schedule Task Settings - Rule
+- ESCU - Windows Hide Notification Features Through Registry - Rule
+- ESCU - Windows High File Deletion Frequency - Rule
+- ESCU - Windows hosts file modification - Rule
+- ESCU - Windows Hunting System Account Targeting Lsass - Rule
+- ESCU - Windows Indirect Command Execution Via forfiles - Rule
+- ESCU - Windows Indirect Command Execution Via pcalua - Rule
+- ESCU - Windows InstallUtil Credential Theft - Rule
+- ESCU - Windows InstallUtil in Non Standard Path - Rule
+- ESCU - Windows InstallUtil Remote Network Connection - Rule
+- ESCU - Windows InstallUtil Uninstall Option - Rule
+- ESCU - Windows InstallUtil Uninstall Option with Network - Rule
+- ESCU - Windows InstallUtil URL in Command Line - Rule
+- ESCU - Windows ISO LNK File Creation - Rule
+- ESCU - Windows Java Spawning Shells - Rule
+- ESCU - Windows KrbRelayUp Service Creation - Rule
+- ESCU - Windows Lateral Tool Transfer RemCom
+- ESCU - Windows Linked Policies In ADSI Discovery - Rule
+- ESCU - Windows Modify Show Compress Color And Info Tip Registry - Rule
+- ESCU - Windows Multiple Disabled Users Failed To Authenticate Wth Kerberos - Rule
+- ESCU - Windows Multiple Invalid Users Fail To Authenticate Using Kerberos - Rule
+- ESCU - Windows Multiple Users Fail To Authenticate Wth ExplicitCredentials - Rule
+- ESCU - Windows Multiple Users Failed To Authenticate From Host Using NTLM - Rule
+- ESCU - Windows Multiple Users Failed To Authenticate From Process - Rule
+- ESCU - Windows Multiple Users Remotely Failed To Authenticate From Host - Rule
+- ESCU - Windows NirSoft AdvancedRun - Rule
+- ESCU - Windows NirSoft Utilities - Rule
+- ESCU - Windows Non-System Account Targeting Lsass - Rule
+- ESCU - Windows Office Product Spawning MSDT - Rule
+- ESCU - Windows Possible Credential Dumping - Rule
+- ESCU - Windows PowerShell Get-CIMInstance Remote Computer
+- ESCU - Windows PowerShell WMI Win32_ScheduledJob
+- ESCU - Windows PowerView Constrained Delegation Discovery - Rule
+- ESCU - Windows PowerView Unconstrained Delegation Discovery - Rule
+- ESCU - Windows Process With NamedPipe CommandLine - Rule
+- ESCU - Windows Processes Killed By Industroyer2 Malware - Rule
+- ESCU - Windows Raccine Scheduled Task Deletion - Rule
+- ESCU - Windows Rasautou DLL Execution - Rule
+- ESCU - Windows Raw Access To Disk Volume Partition - Rule
+- ESCU - Windows Raw Access To Master Boot Record Drive - Rule
+- ESCU - Windows Registry Certificate Added - Rule
+- ESCU - Windows Registry Delete Task SD - Rule
+- ESCU - Windows Registry Modification for Safe Mode Persistence - Rule
+- ESCU - Windows Remote Assistance Spawning Process - Rule
+- ESCU - Windows Root Domain linked policies Discovery - Rule
+- ESCU - Windows Schtasks Create Run As System - Rule
+- ESCU - Windows Security Account Manager Stopped - Rule
+- ESCU - Windows Service Create Kernel Mode Driver - Rule
+- ESCU - Windows Service Create RemComSvc
+- ESCU - Windows Service Create with Tscon
+- ESCU - Windows Service Created With Suspicious Service Path - Rule
+- ESCU - Windows Service Created Within Public Path - Rule
+- ESCU - Windows Service Creation on Remote Endpoint - Rule
+- ESCU - Windows Service Creation Using Registry Entry - Rule
+- ESCU - Windows Service Initiation on Remote Endpoint - Rule
+- ESCU - Windows System File on Disk - Rule
+- ESCU - Windows Terminating Lsass Process - Rule
+- ESCU - Windows WMI Process Call Create - Rule
+- ESCU - WinEvent Scheduled Task Created to Spawn Shell - Rule
+- ESCU - WinEvent Scheduled Task Created Within Public Path - Rule
+- ESCU - WinEvent Windows Task Scheduler Event Action Started - Rule
+- ESCU - Winhlp32 Spawning a Process - Rule
+- ESCU - WinRM Spawning a Process - Rule
+- ESCU - Winword Spawning Cmd - Rule
+- ESCU - Winword Spawning PowerShell - Rule
+- ESCU - Winword Spawning Windows Script Host - Rule
+- ESCU - WMI Permanent Event Subscription - Rule
+- ESCU - WMI Recon Running Process Or Services - Rule
+- ESCU - WMI Temporary Event Subscription - Rule
+- ESCU - Wmic Group Discovery - Rule
+- ESCU - Wmic NonInteractive App Uninstallation - Rule
+- ESCU - WMIC XSL Execution via URL - Rule
+- ESCU - Wmiprsve LOLBAS Execution Process Spawn - Rule
+- ESCU - Wscript Or Cscript Suspicious Child Process - Rule
+- ESCU - Wsmprovhost LOLBAS Execution Process Spawn - Rule
+- ESCU - WSReset UAC Bypass - Rule
+- ESCU - XMRIG Driver Loaded - Rule
+- ESCU - XSL Script Execution With WMIC - Rule
+- ESCU-Powershell Get LocalGroup Discovery with Script Block Logging - Rule
+- Fileshares operations
+- GAM Encoded PowerShell
+- Local files operations
+- Logon Activities
+- Pipe Events
+- PowerShell Activity
+- Process Activities
+- Process Execution
+- Ransomware activity detected
+- Rare critical file modified by an user
+- Rare file hashes for high severity endpoint alerts
+- Rare registry modification by an account
+- Rare regsvr32 process and command execution
+- RDP Activity
+- Registry operations
+- Services and Drivers operations
+- Suspicious Process Activity - Potential Lateral Movement WinRM Execution Analytic-A2B
+- Suspicious Registry Activity - Registry Service Change Potential Attack Analytic
+  -A2B
+- Suspicious Registry Activity - Wdigest Downgrade Attack Analytic -A2B
+- Suspicious Registry Modification Observed
+- Tasks operations
+- Traffic to Known Attacker on IPS or IDS-57
+- VPN activity by Terminated Users_NGFirewall
+- WMI Permanent Event Subscription
+- WMI Activity

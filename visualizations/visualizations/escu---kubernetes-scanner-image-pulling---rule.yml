@@ -1,0 +1,26 @@
+title: ESCU - Kubernetes Scanner Image Pulling - Rule
+description: This search uses the Kubernetes logs from Splunk Connect from Kubernetes
+  to detect Kubernetes Security Scanner.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Cloud
+detection:
+  condition:
+    sigma: "`kube_objects_events` object.message IN (\"Pulling image *kube-hunter*\"\
+      , \"Pulling image *kube-bench*\", \"Pulling image *kube-recon*\", \"Pulling\
+      \ image *kube-recon*\") \n  -  rename object.* AS * \n  -  rename involvedObject.*\
+      \ AS * \n  -  rename source.host AS host \n  -  eval phase=\"operate\" \n  -\
+      \  eval severity=\"high\" \n  -  stats min(_time) as firstTime max(_time) as\
+      \ lastTime count by host, name, namespace, kind, reason, message, phase, severity\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `kubernetes_scanner_image_pulling_filter`"
+  level: critical
+tags:
+- T1526
+- Cloud Service Discovery
+- Discovery
+references: .nan
+notes: 'Missing SourceType: kube:container:controller'

@@ -1,0 +1,28 @@
+title: ESCU - Detect New Open GCP Storage Buckets - Rule
+description: This search looks for GCP PubSub events where a user has created an open/public
+  GCP Storage bucket.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "`google_gcp_pubsub_message` data.resource.type=gcs_bucket data.protoPayload.methodName=storage.setIamPermissions\
+      \ \n  -  spath output=action path=data.protoPayload.serviceData.policyDelta.bindingDeltas{}.action\
+      \ \n  -  spath output=user path=data.protoPayload.authenticationInfo.principalEmail\
+      \ \n  -  spath output=location path=data.protoPayload.resourceLocation.currentLocations{}\
+      \ \n  -  spath output=src path=data.protoPayload.requestMetadata.callerIp \n\
+      \  -  spath output=bucketName path=data.protoPayload.resourceName \n  -  spath\
+      \ output=role path=data.protoPayload.serviceData.policyDelta.bindingDeltas{}.role\
+      \ \n  -  spath output=member path=data.protoPayload.serviceData.policyDelta.bindingDeltas{}.member\
+      \ \n  -  (member=allUsers AND action=ADD) \n  -  table  _time, bucketName, src,\
+      \ user, location, action, role, member \n  -  `detect_new_open_gcp_storage_buckets_filter`"
+  level: critical
+tags:
+- T1530
+- Data from Cloud Storage
+- Collection
+references: .nan
+notes: Rule not applicable to this client

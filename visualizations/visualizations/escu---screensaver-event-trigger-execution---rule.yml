@@ -1,0 +1,28 @@
+title: ESCU - Screensaver Event Trigger Execution - Rule
+description: This analytic is developed to detect possible event trigger execution
+  through screensaver registry entry modification for persistence or privilege escalation.
+  This technique was seen in several APT and malware where they put the malicious
+  payload path to the SCRNSAVE.EXE registry key to redirect the execution to their
+  malicious payload path. This TTP is a good indicator that some attacker may modify
+  this entry for their persistence and privilege escalation.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count  min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Registry where (Registry.registry_path=\"\
+      *\\\\Control Panel\\\\Desktop\\\\SCRNSAVE.EXE*\") by Registry.dest Registry.user\
+      \ Registry.registry_path Registry.registry_key_name Registry.registry_value_name\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `drop_dm_object_name(Registry)` \n  -  `screensaver_event_trigger_execution_filter`"
+  level: critical
+tags:
+- T1546.002
+- 'Event Triggered Execution: Screensaver'
+- Persistence, Privilege Escalation
+references: Increase Windows logging to include Registry events
+notes: .nan

@@ -1,0 +1,21 @@
+title: Traffic to Known Attacker on IPS or IDS-57
+description: Multiple Dropped event followed by Successfully allowed/accepted event
+  could be a possible Security Breach or a Successful targetted attack.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: IDS and/or IPS
+detection:
+  condition:
+    sigma: MISSING SPLUNK LOGIC
+  level: critical
+tags:
+- T1133
+- External Remote Services
+- Initial Access, Persistence
+references: Requires IDS and/or IPS data feed
+notes: "Securonix:\nmessage is not null and IPAddress is not null\nDestAddress in\
+  \ \nTORIPS, DSHIELD_HIGH_BL_IPADDRESS, BOOZ_ALLEN_MALICIOUS_DOMAIN_LIST, CIARMYIPBLOCKLIST,\
+  \ BOOZ_ALLEN_MALICIOUS_IP_LIST, FEODOBLOCKLIST, MALWAREDOMAINS"

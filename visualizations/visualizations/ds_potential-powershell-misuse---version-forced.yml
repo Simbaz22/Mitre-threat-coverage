@@ -1,0 +1,19 @@
+title: DS_Potential PowerShell misuse - Version Forced
+description: Alerts on powershell with the -version force argument.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: MISSING SPLUNK LOGIC
+  level: critical
+tags:
+- T1059.001
+- 'Command and Scripting Interpreter: PowerShell'
+- Execution
+references: Increase Windows logging to include command line data and powershell logs
+notes: "Securonix Logic:\neventid = 4100 or 4104 or 4688\nAND\nrawevent contains \"\
+  -version\""

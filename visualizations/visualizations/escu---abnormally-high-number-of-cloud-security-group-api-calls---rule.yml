@@ -1,0 +1,32 @@
+title: ESCU - Abnormally High Number Of Cloud Security Group API Calls - Rule
+description: This search will detect a spike in the number of API calls made to your
+  cloud infrastructure environment about security groups by a user.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "\n  -  tstats count as security_group_api_calls values(All_Changes.command)\
+      \ as command from datamodel=Change where All_Changes.object_category=firewall\
+      \ AND All_Changes.status=success by All_Changes.user _time span=1h \n  -  `drop_dm_object_name(\"\
+      All_Changes\")` \n  -  eval HourOfDay=strftime(_time, \"%H\") \n  -  eval HourOfDay=floor(HourOfDay/4)*4\
+      \ \n  -  eval DayOfWeek=strftime(_time, \"%w\") \n  -  eval isWeekend=if(DayOfWeek\
+      \ >= 1 AND DayOfWeek <= 5, 0, 1) \n  -  join user HourOfDay isWeekend [ summary\
+      \ cloud_excessive_security_group_api_calls_v1] \n  -  where cardinality >=16\
+      \ \n  -  apply cloud_excessive_security_group_api_calls_v1 threshold=0.005 \n\
+      \  -  rename \"IsOutlier(security_group_api_calls)\" as isOutlier \n  -  where\
+      \ isOutlier=1 \n  -  eval expected_upper_threshold = mvindex(split(mvindex(BoundaryRanges,\
+      \ -1), \":\"), 0) \n  -  where security_group_api_calls > expected_upper_threshold\
+      \ \n  -  eval distance_from_threshold = security_group_api_calls - expected_upper_threshold\
+      \ \n  -  table _time, user, command, security_group_api_calls, expected_upper_threshold,\
+      \ distance_from_threshold \n  -  `abnormally_high_number_of_cloud_security_group_api_calls_filter`"
+  level: critical
+tags:
+- T1078.004
+- 'Valid Accounts: Cloud Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: Requires Splunk MLTK
+notes: Experimental Detection - Machine Learning Toolkit (MLTK) required

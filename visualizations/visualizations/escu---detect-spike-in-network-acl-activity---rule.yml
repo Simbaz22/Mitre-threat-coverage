@@ -1,0 +1,38 @@
+title: ESCU - Detect Spike in Network ACL Activity - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  will detect users creating spikes in API activity related to network access-control
+  lists (ACLs)in your AWS environment. This search is deprecated and have been translated
+  to use the latest Change Datamodel.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` `network_acl_events` [`cloudtrail` `network_acl_events` \n\
+      \  -  spath output=arn path=userIdentity.arn \n  -  stats count as apiCalls\
+      \ by arn \n  -  inputlookup network_acl_activity_baseline append=t \n  -  fields\
+      \ - latestCount \n  -  stats values(*) as * by arn \n  -  rename apiCalls as\
+      \ latestCount \n  -  eval newAvgApiCalls=avgApiCalls + (latestCount-avgApiCalls)/720\
+      \ \n  -  eval newStdevApiCalls=sqrt(((pow(stdevApiCalls, 2)*719 + (latestCount-newAvgApiCalls)*(latestCount-avgApiCalls))/720))\
+      \ \n  -  eval avgApiCalls=coalesce(newAvgApiCalls, avgApiCalls), stdevApiCalls=coalesce(newStdevApiCalls,\
+      \ stdevApiCalls), numDataPoints=if(isnull(latestCount), numDataPoints, numDataPoints+1)\
+      \ \n  -  table arn, latestCount, numDataPoints, avgApiCalls, stdevApiCalls \n\
+      \  -  outputlookup network_acl_activity_baseline \n  -  eval dataPointThreshold\
+      \ = 15, deviationThreshold = 3 \n  -  eval isSpike=if((latestCount > avgApiCalls+deviationThreshold*stdevApiCalls)\
+      \ AND numDataPoints > dataPointThreshold, 1, 0) \n  -  where isSpike=1 \n  -\
+      \  rename arn as userIdentity.arn \n  -  table userIdentity.arn] \n  -  spath\
+      \ output=user userIdentity.arn \n  -  stats values(eventName) as eventNames,\
+      \ count as numberOfApiCalls, dc(eventName) as uniqueApisCalled by user \n  -\
+      \  `detect_spike_in_network_acl_activity_filter`"
+  level: critical
+tags:
+- T1562.007
+- 'Impair Defenses: Disable or Modify Cloud Firewall'
+- Defense Evasion
+references: .nan
+notes: Rule Deprecated by Splunk

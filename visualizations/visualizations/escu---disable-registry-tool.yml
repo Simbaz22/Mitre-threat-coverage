@@ -1,0 +1,36 @@
+title: ESCU - Disable Registry Tool
+description: This search identifies modification of registry to disable the regedit
+  or registry tools of the windows operating system. Since registry tool is a swiss
+  knife in analyzing registry, malware such as RAT or trojan Spy disable this application
+  to prevent the removal of their registry entry such as persistence, file less components
+  and defense evasion.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Registry\
+      \ where Registry.registry_path= \"*\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\\
+      CurrentVersion\\\\Policies\\\\System\\\\DisableRegistryTools\" Registry.registry_value_data\
+      \ = \"0x00000001\" by _time span=1h Registry.dest Registry.user Registry.registry_path\
+      \ Registry.registry_value_name Registry.registry_value_data Registry.process_guid\
+      \ \n  -  `drop_dm_object_name(Registry)` \n  - rename process_guid as proc_guid\
+      \ \n  - join proc_guid, _time [\n  -  tstats `security_content_summariesonly`\
+      \ count FROM datamodel=Endpoint.Processes by _time span=1h Processes.process_id\
+      \ Processes.process_name Processes.process Processes.dest Processes.parent_process_name\
+      \ Processes.parent_process Processes.process_guid \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  - rename process_guid as proc_guid \n  -  fields _time dest user parent_process_name\
+      \ parent_process process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data] \n  -  table _time dest user parent_process_name parent_process\
+      \ process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data \n  -  `disable_registry_tool_filter`"
+  level: critical
+tags:
+- T1562.001
+- 'Impair Defenses: Disable or Modify Tools'
+- Defense Evasion
+references: Increase Windows logging to include Registry events
+notes: .nan

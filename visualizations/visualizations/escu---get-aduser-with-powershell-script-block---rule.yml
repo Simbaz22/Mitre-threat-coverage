@@ -1,0 +1,25 @@
+title: ESCU - Get ADUser with PowerShell Script Block - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the execution of the `Get-AdGUser` commandlet. The `Get-AdUser` commandlet
+  is used to return a list of all domain users. Red Teams and adversaries may leverage
+  this commandlet to enumerate domain groups for situational awareness and Active
+  Directory Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 Message = \"*get-aduser*\" Message = \"*-filter*\"\
+      \ \n  -  stats count min(_time) as firstTime max(_time) as lastTime by EventCode\
+      \ Message ComputerName User \n  -  `security_content_ctime(firstTime)` \n  -\
+      \  `security_content_ctime(lastTime)` \n  -  `get_aduser_with_powershell_script_block_filter`"
+  level: critical
+tags:
+- T1087.002
+- 'Account Discovery: Domain Account'
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

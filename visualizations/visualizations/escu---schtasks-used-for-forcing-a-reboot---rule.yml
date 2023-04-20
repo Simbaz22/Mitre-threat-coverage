@@ -1,0 +1,25 @@
+title: ESCU - Schtasks used for forcing a reboot - Rule
+description: This search looks for flags passed to schtasks.exe on the command-line
+  that indicate that a forced reboot of system is scheduled.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(Processes.process)\
+      \ as process min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes\
+      \ where Processes.process_name=schtasks.exe Processes.process=\"*shutdown*\"\
+      \ Processes.process=\"*/create *\" by Processes.process_name Processes.parent_process_name\
+      \ Processes.dest Processes.user \n  -  `drop_dm_object_name(Processes)` \n \
+      \ -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `schtasks_used_for_forcing_a_reboot_filter`"
+  level: critical
+tags:
+- T1053.005
+- 'Scheduled Task/Job: Scheduled Task'
+- Execution, Persistence, Privilege Escalation
+references: Increase Windows logging to include command line data
+notes: .nan

@@ -1,0 +1,34 @@
+title: ESCU - Windows Multiple Users Remotely Failed To Authenticate From Host - Rule
+description: "The following analytic identifies a source host failing to authenticate\
+  \ against a remote host with 30 unique users. This behavior could represent an adversary\
+  \ performing a Password Spraying attack against an Active Directory environment\
+  \ to obtain initial access or elevate privileges. Active Directory environments\
+  \ can be very different depending on the organization. Users should test this detection\
+  \ and customize the arbitrary threshold when needed. Event 4625 documents each and\
+  \ every failed attempt to logon to the local computer. This event generates on domain\
+  \ controllers, member servers, and workstations. Logon Type 3 describes an remote\
+  \ authentication attempt.\nThis logic can be used for real time security monitoring\
+  \ as well as threat hunting exercises. This detection will trigger on the host that\
+  \ is the target of the password spraying attack. This could be a domain controller\
+  \ as well as a member server or workstation.\nThe analytics returned fields allow\
+  \ analysts to investigate the event further by providing fields like source process\
+  \ name, source account and attempted user accounts."
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4625 Logon_Type=3 src_ip!=\"-\" \n  -\
+      \  bucket span=30m _time \n  -  stats dc(user) AS unique_accounts values(user)\
+      \ as tried_accounts by _time, src_ip, name, Workstation_Name \n  -  where unique_accounts\
+      \ > 10 \n  -  `windows_multiple_users_remotely_failed_to_authenticate_from_host_filter`"
+  level: critical
+tags:
+- "T1110.003\nT1110"
+- 'Brute Force: Password Spraying'
+- 'Brute Force: Password Spraying'
+references: .nan
+notes: .nan

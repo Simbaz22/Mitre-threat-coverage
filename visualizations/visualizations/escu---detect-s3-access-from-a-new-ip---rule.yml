@@ -1,0 +1,28 @@
+title: ESCU - Detect S3 access from a new IP - Rule
+description: This search looks at S3 bucket-access logs and detects new or previously
+  unseen remote IP addresses that have successfully accessed an S3 bucket.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`aws_s3_accesslogs` http_status=200  [`aws_s3_accesslogs` http_status=200\
+      \ \n  -  stats earliest(_time) as firstTime latest(_time) as lastTime by bucket_name\
+      \ remote_ip \n  -  inputlookup append=t previously_seen_S3_access_from_remote_ip.csv\
+      \ \n  -  stats min(firstTime) as firstTime, max(lastTime) as lastTime by bucket_name\
+      \ remote_ip \n  -  outputlookup previously_seen_S3_access_from_remote_ip.csv\
+      \ \n  -  eval newIP=if(firstTime >= relative_time(now(), \"-70m@m\"), 1, 0)\
+      \ \n  -  where newIP=1 \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  table bucket_name remote_ip]\n  -  iplocation remote_ip \n  - rename\
+      \ remote_ip as src_ip \n  -  table _time bucket_name src_ip City Country operation\
+      \ request_uri \n  -  `detect_s3_access_from_a_new_ip_filter`"
+  level: critical
+tags:
+- T1530
+- Data from Cloud Storage
+- Collection
+references: .nan
+notes: Missing aws:s3:accesslogs SourceType

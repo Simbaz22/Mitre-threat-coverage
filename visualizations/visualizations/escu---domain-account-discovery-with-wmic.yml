@@ -1,0 +1,29 @@
+title: ESCU - Domain Account Discovery with Wmic
+description: This analytic looks for the execution of `wmic.exe` with command-line
+  arguments utilized to query for domain users. Red Teams and adversaries alike use
+  wmic.exe to enumerate domain users for situational awareness and Active Directory
+  Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=\"\
+      wmic.exe\" AND Processes.process = \"*/NAMESPACE:\\\\\\\\root\\\\directory\\\
+      \\ldap*\" AND Processes.process = \"*ds_user*\" AND Processes.process = \"*GET*\"\
+      \ AND Processes.process = \"*ds_samaccountname*\" by Processes.dest Processes.user\
+      \ Processes.parent_process Processes.process_name Processes.process Processes.process_id\
+      \ Processes.parent_process_id Processes.parent_process_name \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `domain_account_discovery_with_wmic_filter`"
+  level: critical
+tags:
+- T1087.002
+- 'Account Discovery: Domain Account'
+- Discovery
+references: Increase Windows logging to include command line data
+notes: .nan

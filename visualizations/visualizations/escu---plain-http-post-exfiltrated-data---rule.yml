@@ -1,0 +1,26 @@
+title: ESCU - Plain HTTP POST Exfiltrated Data - Rule
+description: This search is to detect potential plain HTTP POST method data exfiltration.
+  This network traffic is commonly used by trickbot, trojanspy, keylogger or APT adversary
+  where arguments or commands are sent in plain text to the remote C2 server using
+  HTTP POST method as part of data exfiltration.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "HTTP Stream\nNetwork"
+detection:
+  condition:
+    sigma: "`stream_http` http_method=POST form_data IN (\"*wermgr.exe*\",\"*svchost.exe*\"\
+      , \"*name=\\\"proclist\\\"*\",\"*ipconfig*\", \"*name=\\\"sysinfo\\\"*\", \"\
+      *net view*\") \n  - stats values(form_data) as http_request_body min(_time)\
+      \ as firstTime max(_time) as lastTime count by http_method http_user_agent uri_path\
+      \ url bytes_in bytes_out \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `plain_http_post_exfiltrated_data_filter`"
+  level: critical
+tags:
+- "T1048.003\nT1048"
+- 'Exfiltration Over Alternative Protocol: Exfiltration Over Unencrypted Non-C2 Protocol'
+- 'Exfiltration Over Alternative Protocol: Exfiltration Over Unencrypted Non-C2 Protocol'
+references: Requires HTTP Stream logs
+notes: .nan

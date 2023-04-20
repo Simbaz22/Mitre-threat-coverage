@@ -1,0 +1,32 @@
+title: ESCU - Abnormally High Number Of Cloud Instances Launched - Rule
+description: This search finds for the number successfully created cloud instances
+  for every 4 hour block. This is split up between weekdays and the weekend. It then
+  applies the probability densitiy model previously created and alerts on any outliers.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "\n  -  tstats count as instances_launched values(All_Changes.object_id)\
+      \ as object_id from datamodel=Change where (All_Changes.action=created) AND\
+      \ All_Changes.status=success AND All_Changes.object_category=instance by All_Changes.user\
+      \ _time span=1h \n  -  `drop_dm_object_name(\"All_Changes\")` \n  -  eval HourOfDay=strftime(_time,\
+      \ \"%H\") \n  -  eval HourOfDay=floor(HourOfDay/4)*4 \n  -  eval DayOfWeek=strftime(_time,\
+      \ \"%w\") \n  -  eval isWeekend=if(DayOfWeek >= 1 AND DayOfWeek <= 5, 0, 1)\
+      \ \n  -  join HourOfDay isWeekend [summary cloud_excessive_instances_created_v1]\
+      \ \n  -  where cardinality >=16 \n  -  apply cloud_excessive_instances_created_v1\
+      \ threshold=0.005 \n  -  rename \"IsOutlier(instances_launched)\" as isOutlier\
+      \ \n  -  where isOutlier=1 \n  -  eval expected_upper_threshold = mvindex(split(mvindex(BoundaryRanges,\
+      \ -1), \":\"), 0) \n  -  eval distance_from_threshold = instances_launched -\
+      \ expected_upper_threshold \n  -  table _time, user, instances_launched, expected_upper_threshold,\
+      \ distance_from_threshold, object_id \n  -  `abnormally_high_number_of_cloud_instances_launched_filter`"
+  level: critical
+tags:
+- T1078.004
+- 'Valid Accounts: Cloud Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: Requires Splunk MLTK
+notes: Experimental Detection - Machine Learning Toolkit (MLTK) required

@@ -1,0 +1,25 @@
+title: ESCU - Amazon EKS Kubernetes cluster scan detection - Rule
+description: This search provides information of unauthenticated requests via user
+  agent, and authentication data against Kubernetes cluster in AWS
+status: "Inactive\nMissing Data Source"
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud\nLinux"
+detection:
+  condition:
+    sigma: "`aws_cloudwatchlogs_eks` \"user.username\"=\"system:anonymous\" userAgent!=\"\
+      AWS Security Scanner\" \n  -  rename sourceIPs{} as src_ip \n  -  stats count\
+      \ min(_time) as firstTime max(_time) as lastTime values(responseStatus.reason)\
+      \ values(source) as cluster_name values(responseStatus.code) values(userAgent)\
+      \ as http_user_agent values(verb) values(requestURI) by src_ip user.username\
+      \ user.groups{} \n  -  `security_content_ctime(lastTime)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  - `amazon_eks_kubernetes_cluster_scan_detection_filter`"
+  level: critical
+tags:
+- T1526
+- Cloud Service Discovery
+- Discovery
+references: .nan
+notes: 'Missing SourceType: kube:container:controller'

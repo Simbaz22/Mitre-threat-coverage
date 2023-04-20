@@ -1,0 +1,26 @@
+title: ESCU - Windows Non-System Account Targeting Lsass - Rule
+description: The following analytic identifies non SYSTEM accounts requesting access
+  to lsass.exe. This behavior may be related to credential dumping or applications
+  requiring access to credentials. Triaging this event will require understanding
+  the GrantedAccess from the SourceImage. In addition, whether the account is privileged
+  or not. Review the process requesting permissions and review parallel processes.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=10 TargetImage=*lsass.exe SourceUser!=\"NT AUTHORITY\\\
+      \\*\" \n  -  stats count min(_time) as firstTime max(_time) as lastTime by Computer,\
+      \ TargetImage, GrantedAccess, SourceImage, SourceProcessId, SourceUser, TargetUser\
+      \ \n  -  rename Computer as dest \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `windows_non_system_account_targeting_lsass_filter`"
+  level: critical
+tags:
+- T1003.001
+- 'OS Credential Dumping: LSASS Memory'
+- Credential Access
+references: Requires Sysmon data
+notes: .nan

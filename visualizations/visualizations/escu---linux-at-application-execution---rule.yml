@@ -1,0 +1,28 @@
+title: ESCU - Linux At Application Execution - Rule
+description: The following analytic identifies a suspicious process creation of At
+  application. This process can be used by malware, adversaries and red teamers to
+  create persistence entry to the targeted or compromised host with their malicious
+  code. This anomaly detection can be a good indicator to investigate the event before
+  and after this process execution, when it was executed and what schedule task it
+  will execute.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Processes\
+      \ where  Processes.process_name IN (\"at\", \"atd\") OR Processes.parent_process_name\
+      \ IN (\"at\", \"atd\") by Processes.dest Processes.user Processes.parent_process_name\
+      \ Processes.process_name Processes.process Processes.process_id Processes.parent_process_id\
+      \ Processes.process_guid \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `linux_at_application_execution_filter`"
+  level: critical
+tags:
+- "T1053.002\nT1053"
+- 'Scheduled Task/Job: At'
+- 'Scheduled Task/Job: At'
+references: Increase Linux Logs to include Command Line data
+notes: .nan

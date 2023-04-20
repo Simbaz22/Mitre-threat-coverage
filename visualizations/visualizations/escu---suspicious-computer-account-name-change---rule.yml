@@ -1,0 +1,27 @@
+title: ESCU - Suspicious Computer Account Name Change - Rule
+description: As part of the sAMAccountName Spoofing (CVE-2021-42278) and Domain Controller
+  Impersonation (CVE-2021-42287) exploitation chain, adversaries need to create a
+  new computer account name and rename it to match the name of a domain controller
+  account without the ending '$'. In Windows Active Directory environments, computer
+  account names always end with `$`. This analytic leverages Event Id 4781, `The name
+  of an account was changed`, to identify a computer account rename event with a suspicious
+  name that does not terminate with `$`. This behavior could represent an exploitation
+  attempt of CVE-2021-42278 and CVE-2021-42287 for privilege escalation.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4781 Old_Account_Name=\"*$\" New_Account_Name!=\"\
+      *$\" \n  -  table _time, ComputerName, Account_Name, Old_Account_Name, New_Account_Name\
+      \ \n  -  `suspicious_computer_account_name_change_filter`"
+  level: critical
+tags:
+- T1078.002
+- 'Valid Accounts: Domain Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: Increase Windows logging to include command line data
+notes: .nan

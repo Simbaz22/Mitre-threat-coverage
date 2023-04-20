@@ -1,0 +1,26 @@
+title: ESCU - AWS IAM AccessDenied Discovery Events - Rule
+description: The following detection identifies excessive AccessDenied events within
+  an hour timeframe. It is possible that an access key to AWS may have been stolen
+  and is being misused to perform discovery events. In these instances, the access
+  is not available with the key stolen therefore these events will be generated.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` (errorCode = \"AccessDenied\") user_type=IAMUser (userAgent!=*.amazonaws.com)\
+      \ \n  -  bucket _time span=1h \n  -  stats count as failures min(_time) as firstTime\
+      \ max(_time) as lastTime, dc(eventName) as methods, dc(eventSource) as sources\
+      \ by src_ip, userIdentity.arn, _time \n  -  where failures >= 5 and methods\
+      \ >= 1 and sources >= 1 \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `aws_iam_accessdenied_discovery_events_filter`"
+  level: critical
+tags:
+- T1580
+- Cloud Infrastructure Discovery
+- Discovery
+references: .nan
+notes: .nan

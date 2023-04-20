@@ -1,0 +1,28 @@
+title: ESCU - NET Profiler UAC bypass - Rule
+description: This search is to detect modification of registry to bypass UAC windows
+  feature. This technique is to add a payload dll path on .NET COR file path that
+  will be loaded by mmc.exe as soon it was executed. This detection rely on monitoring
+  the registry key and values in the detection area. It may happened that windows
+  update some dll related to mmc.exe and add dll path in this registry. In this case
+  filtering is needed.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Registry where Registry.registry_path=\
+      \ \"*\\\\Environment\\\\COR_PROFILER_PATH\" Registry.registry_value_data = \"\
+      *.dll\" by Registry.registry_path Registry.registry_key_name Registry.registry_value_data\
+      \ Registry.dest \n  -  `drop_dm_object_name(Registry)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `net_profiler_uac_bypass_filter`"
+  level: critical
+tags:
+- "T1548.002\nT1548"
+- 'Abuse Elevation Control Mechanism: Bypass User Account Control'
+- 'Abuse Elevation Control Mechanism: Bypass User Account Control'
+references: Increase Windows logging to include Registry events
+notes: .nan

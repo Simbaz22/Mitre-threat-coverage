@@ -1,0 +1,25 @@
+title: ESCU - CMLUA Or CMSTPLUA UAC Bypass - Rule
+description: This analytic detects a potential process using COM Object like CMLUA
+  or CMSTPLUA to bypass UAC. This technique has been used by ransomware adversaries
+  to gain administrative privileges to its running process.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=7  ImageLoaded IN (\"*\\\\CMLUA.dll\", \"*\\\\CMSTPLUA.dll\"\
+      , \"*\\\\CMLUAUTIL.dll\") NOT(process_name IN(\"CMSTP.exe\", \"CMMGR32.exe\"\
+      )) NOT(Image IN(\"*\\\\windows\\\\*\", \"*\\\\program files*\")) \n  -  stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by Image ImageLoaded\
+      \ process_name Computer EventCode Signed ProcessId \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `cmlua_or_cmstplua_uac_bypass_filter`"
+  level: critical
+tags:
+- "T1218\nT1218.003"
+- System Binary Proxy Execution
+- System Binary Proxy Execution
+references: Requires Sysmon data
+notes: .nan

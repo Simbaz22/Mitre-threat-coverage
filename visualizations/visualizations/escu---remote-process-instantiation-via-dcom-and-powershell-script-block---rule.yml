@@ -1,0 +1,27 @@
+title: ESCU - Remote Process Instantiation via DCOM and PowerShell Script Block -
+  Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the execution of PowerShell with arguments utilized to start a process
+  on a remote endpoint by abusing the DCOM protocol. Specifically, this search looks
+  for the abuse of ShellExecute and ExecuteShellCommand. Red Teams and adversaries
+  alike may abuse DCOM for lateral movement and remote code execution.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: PowerShell
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (ScriptBlockText=\"*Document.Application.ShellExecute*\"\
+      \ OR ScriptBlockText=\"*Document.ActiveView.ExecuteShellCommand*\") \n  -  stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by EventCode ScriptBlockText\
+      \ Computer user_id \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `remote_process_instantiation_via_dcom_and_powershell_script_block_filter`"
+  level: critical
+tags:
+- "T1021\nT1021.003"
+- Remote Services
+- Remote Services
+references: Requires PowerShell logs
+notes: .nan

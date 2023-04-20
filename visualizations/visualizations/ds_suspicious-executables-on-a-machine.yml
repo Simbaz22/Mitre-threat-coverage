@@ -1,0 +1,22 @@
+title: DS_Suspicious executables on a machine
+description: This anomaly monitors for suspicious executables run on a machine
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats count from datamodel=\"Endpoint\".\"Processes\" where Processes.process_name\
+      \ IN (psexec.exe, mimikatz.exe, metasploit.exe, net.exe, psexecsvc.exe, at.exe)\
+      \ OR Processes.parent_process_name IN (psexec.exe, mimikatz.exe, metasploit.exe,\
+      \ net.exe, psexecsvc.exe, at.exe) by Processes.action Processes.dest Processes.user\
+      \ Processes.parent_process_path Processes.process \n  -  `drop_dm_object_name(Processes)`"
+  level: critical
+tags:
+- T1204
+- User Execution
+- Execution
+references: .nan
+notes: .nan

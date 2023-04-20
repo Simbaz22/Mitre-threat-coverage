@@ -1,0 +1,25 @@
+title: ESCU - Spoolsv Suspicious Loaded Modules - Rule
+description: This search is to detect suspicious loading of dll in specific path relative
+  to printnightmare exploitation. In this search we try to detect the loaded modules
+  made by spoolsv.exe after the exploitation.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=7 Image =\"*\\\\spoolsv.exe\" ImageLoaded=\"*\\\\Windows\\\
+      \\System32\\\\spool\\\\drivers\\\\x64\\\\*\" ImageLoaded = \"*.dll\" \n  - \
+      \ stats dc(ImageLoaded) as countImgloaded values(ImageLoaded) as ImgLoaded count\
+      \ min(_time) as firstTime max(_time) as lastTime by Image Computer process_id\
+      \ EventCode \n  -  where countImgloaded >= 3 \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `spoolsv_suspicious_loaded_modules_filter`"
+  level: critical
+tags:
+- T1547.012
+- 'Boot or Logon Autostart Execution: Print Processors'
+- Persistence, Privilege Escalation
+references: Requires Sysmon data
+notes: .nan

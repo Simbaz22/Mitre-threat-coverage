@@ -1,0 +1,27 @@
+title: ESCU - System Information Discovery Detection - Rule
+description: Detect system information discovery techniques used by attackers to understand
+  configurations of the system to further exploit it.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where (Processes.process=\"\
+      *wmic* qfe*\" OR Processes.process=*systeminfo* OR Processes.process=*hostname*)\
+      \ by Processes.user Processes.process_name Processes.process Processes.dest\
+      \ Processes.parent_process_name \n  -  `drop_dm_object_name(Processes)` \n \
+      \ -  eventstats dc(process) as dc_processes_by_dest by dest \n  -  where dc_processes_by_dest\
+      \ > 2 \n  -  stats values(process) as process min(firstTime) as firstTime max(lastTime)\
+      \ as lastTime by user, dest parent_process_name \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `system_information_discovery_detection_filter`"
+  level: critical
+tags:
+- T1082
+- System Information Discovery
+- Discovery
+references: Increase Windows logging to include command line data
+notes: .nan

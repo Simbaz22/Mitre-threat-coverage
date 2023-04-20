@@ -1,0 +1,24 @@
+title: ESCU - GitHub Dependabot Alert - Rule
+description: This search looks for Dependabot Alerts in Github logs.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: AWS
+detection:
+  condition:
+    sigma: "`github` alert.id=* action=create \n  -  rename repository.full_name as\
+      \ repository, repository.html_url as repository_url sender.login as user \n\
+      \  -  stats min(_time) as firstTime max(_time) as lastTime by action alert.affected_package_name\
+      \ alert.affected_range alert.created_at alert.external_identifier alert.external_reference\
+      \ alert.fixed_in alert.severity repository repository_url user \n  -  eval phase=\"\
+      code\" \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `github_dependabot_alert_filter`"
+  level: critical
+tags:
+- T1195.001
+- 'Supply Chain Compromise: Compromise Software Dependencies and Development Tools'
+- Initial Access
+references: Requires errorMessage field in AWS logs
+notes: .nan

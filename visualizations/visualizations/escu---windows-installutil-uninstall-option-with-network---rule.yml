@@ -1,0 +1,41 @@
+title: ESCU - Windows InstallUtil Uninstall Option with Network - Rule
+description: "The following analytic identifies the Windows InstallUtil.exe binary\
+  \ making a remote network connection. This technique may be used to download and\
+  \ execute code while bypassing application control using the `/u` (uninstall) switch.\
+  \ \nInstallUtil uses the functions install and uninstall within the System.Configuration.Install\
+  \ namespace to process .net assembly. Install function requires admin privileges,\
+  \ however, uninstall function can be run as an unprivileged user.\nWhen `InstallUtil.exe`\
+  \ is used in a malicous manner, the path to an executable on the filesystem is typically\
+  \ specified. Take note of the parent process. In a suspicious instance, this will\
+  \ be spawned from a non-standard process like `Cmd.exe`, `PowerShell.exe` or `Explorer.exe`.\
+  \ \nIf used by a developer, typically this will be found with multiple command-line\
+  \ switches/arguments and spawn from Visual Studio. \nDuring triage review resulting\
+  \ network connections, file modifications, and parallel processes. Capture any artifacts\
+  \ and review further."
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ where `process_installutil` Processes.process IN (\"*/u*\", \"*uninstall*\"\
+      ) by _time span=1h  Processes.process_id Processes.process_name Processes.dest\
+      \ Processes.process_path Processes.process Processes.parent_process_name \n\
+      \  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  join  process_id [\n  - \
+      \ tstats `security_content_summariesonly` count FROM datamodel=Network_Traffic.All_Traffic\
+      \ where All_Traffic.dest_port != 0 by All_Traffic.process_id All_Traffic.dest\
+      \ All_Traffic.dest_port \n  -  `drop_dm_object_name(All_Traffic)` \n  -  rename\
+      \ dest as C2 ] \n  -  table _time dest parent_process_name process_name process_path\
+      \ process process_id dest_port C2 \n  -  `windows_installutil_uninstall_option_with_network_filter`"
+  level: critical
+tags:
+- T1218.004
+- 'System Binary Proxy Execution: InstallUtil'
+- Defense Evasion
+references: "Increase Windows logging to include command line data\nRequires Sysmon\
+  \ data"
+notes: .nan

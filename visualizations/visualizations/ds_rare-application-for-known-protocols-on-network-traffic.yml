@@ -1,0 +1,26 @@
+title: DS_Rare application for known protocols on network traffic
+description: Rare application used by a known protocol may be indicative of a malicious
+  entity attempting to evade defensive measures.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats count from datamodel=\"Network_Traffic\".\"All_Traffic\"\
+      \ where All_Traffic.action=\"allowed\" AND NOT All_Traffic.app IN (not-applicable,\
+      \ incomplete, insufficient-data, ftp, stun, traceroute, dns*, *snmp*, *smb*,\
+      \ *netbios*, smtp*, ntp*, http, ssl, ssh, rpc, rdp, ldap, telnet, msrpc*, \"\
+      windows-remote-management\") AND All_Traffic.dest_port IN (53, 137, 138, 139,\
+      \ 25, 161, 162, 123, 20, 21, 22, 389, 135, 23, 636, 5985, 5986) by All_Traffic.app,\
+      \ All_Traffic.user, All_Traffic.src_ip, All_Traffic.src_port, All_Traffic.dest_ip,\
+      \ All_Traffic.dest_port \n  -  `drop_dm_object_name(All_Traffic)`"
+  level: critical
+tags:
+- T1571
+- Non-Standard Port
+- Command and Control
+references: .nan
+notes: .nan

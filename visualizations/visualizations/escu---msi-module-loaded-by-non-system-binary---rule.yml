@@ -1,0 +1,31 @@
+title: ESCU - MSI Module Loaded by Non-System Binary - Rule
+description: "The following hunting analytic identifies `msi.dll` being loaded by\
+  \ a binary not located in `system32`, `syswow64`, `winsxs` or `windows` paths. This\
+  \ behavior is most recently related to InstallerFileTakeOver, or CVE-2021-41379,\
+  \ and DLL side-loading. CVE-2021-41379 requires a binary to be dropped and `msi.dll`\
+  \ to be loaded by it. To Successful exploitation of this issue happens in four parts\
+  \ \n1. Generation of an MSI that will trigger bad behavior. \n1. Preparing a directory\
+  \ for MSI installation. \n1. Inducing an error state. \n1. Racing to introduce a\
+  \ junction and a symlink to trick msiexec.exe to modify the attacker specified file.\
+  \ \nIn addition, `msi.dll` has been abused in DLL side-loading attacks by being\
+  \ loaded by non-system binaries."
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=7 ImageLoaded=\"*\\\\msi.dll\" NOT (Image IN (\"*\\\
+      \\System32\\\\*\",\"*\\\\syswow64\\\\*\",\"*\\\\windows\\\\*\", \"*\\\\winsxs\\\
+      \\*\")) \n  -  stats count min(_time) as firstTime max(_time) as lastTime by\
+      \ Image ImageLoaded process_name Computer EventCode ProcessId \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `msi_module_loaded_by_non_system_binary_filter`"
+  level: critical
+tags:
+- "T1574.002\nT1574"
+- 'Hijack Execution Flow: DLL Side-Loading'
+- 'Hijack Execution Flow: DLL Side-Loading'
+references: Requires Sysmon data
+notes: .nan

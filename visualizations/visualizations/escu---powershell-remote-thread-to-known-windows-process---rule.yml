@@ -1,0 +1,29 @@
+title: ESCU - Powershell Remote Thread To Known Windows Process - Rule
+description: this search is designed to detect suspicious powershell process that
+  tries to inject code and to known/critical windows process and execute it using
+  CreateRemoteThread. This technique is seen in several malware like trickbot and
+  offensive tooling like cobaltstrike where it load a shellcode to svchost.exe to
+  execute reverse shell to c2 and download another payload
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode = 8 process_name IN (\"powershell_ise.exe\", \"powershell.exe\"\
+      ) TargetImage IN (\"*\\\\svchost.exe\",\"*\\\\csrss.exe\" \"*\\\\gpupdate.exe\"\
+      , \"*\\\\explorer.exe\",\"*\\\\services.exe\",\"*\\\\winlogon.exe\",\"*\\\\\
+      smss.exe\",\"*\\\\wininit.exe\",\"*\\\\userinit.exe\",\"*\\\\spoolsv.exe\",\"\
+      *\\\\taskhost.exe\") \n  -  stats  min(_time) as firstTime max(_time) as lastTime\
+      \ count by SourceImage process_name SourceProcessId SourceProcessGuid TargetImage\
+      \ TargetProcessId NewThreadId StartAddress Computer EventCode \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `powershell_remote_thread_to_known_windows_process_filter`"
+  level: critical
+tags:
+- T1055
+- Process Injection
+- Defense Evasion, Privilege Escalation
+references: Increase Windows logging to include command line data and powershell logs
+notes: .nan

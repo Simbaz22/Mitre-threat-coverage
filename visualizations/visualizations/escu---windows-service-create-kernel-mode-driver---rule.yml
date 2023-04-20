@@ -1,0 +1,25 @@
+title: ESCU - Windows Service Create Kernel Mode Driver - Rule
+description: The following analytic identifes a new kernel driver being added to Windows
+  using sc.exe. Adding a Kernel driver is not common day to day and should be investigated
+  to further understand the source.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=sc.exe\
+      \ Processes.process=\"*kernel*\" by Processes.dest Processes.user Processes.parent_process_name\
+      \ Processes.process_name Processes.process Processes.process_id Processes.parent_process_id\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `windows_service_create_kernel_mode_driver_filter`"
+  level: critical
+tags:
+- "T1543.003\nT1543\nT1068"
+- 'Create or Modify System Process: Windows Service'
+- 'Create or Modify System Process: Windows Service'
+references: Increase Windows logging to include command line data
+notes: .nan

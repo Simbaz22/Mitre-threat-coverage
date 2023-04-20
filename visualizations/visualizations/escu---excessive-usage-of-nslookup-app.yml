@@ -1,0 +1,29 @@
+title: ESCU - Excessive Usage of NSLOOKUP App
+description: This search is to detect potential DNS exfiltration using nslookup application.
+  This technique are seen in couple of malware and APT group to exfiltrated collected
+  data in a infected machine or infected network. This detection is looking for unique
+  use of nslookup where it tries to use specific record type (TXT, A, AAAA) that are
+  commonly used by attacker and also the retry parameter which is designed to query
+  C2 DNS multiple tries.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "`sysmon` EventCode = 1 process_name = \"nslookup.exe\" \n  -   bucket\
+      \ _time span=15m \n  -  stats count as numNsLookup by Computer, _time \n  -\
+      \   eventstats avg(numNsLookup) as avgNsLookup, stdev(numNsLookup) as stdNsLookup,\
+      \ count as numSlots by Computer \n  -   eval upperThreshold=(avgNsLookup + stdNsLookup\
+      \ *3) \n  -   eval isOutlier=if(avgNsLookup > 20 and avgNsLookup >= upperThreshold,\
+      \ 1, 0) \n  -   isOutlier=1 \n  -  `security_content_ctime(firstTime)` \n  -\
+      \  `security_content_ctime(lastTime)` \n  -  `excessive_usage_of_nslookup_app_filter`"
+  level: critical
+tags:
+- T1048
+- Exfiltration Over Alternative Protocol
+- Exfiltration
+references: Requires Sysmon data
+notes: .nan

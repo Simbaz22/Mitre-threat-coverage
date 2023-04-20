@@ -1,0 +1,29 @@
+title: ESCU - Detect IPv6 Network Infrastructure Threats - Rule
+description: By enabling IPv6 First Hop Security as a Layer 2 Security measure on
+  the organization's network devices, we will be able to detect various attacks such
+  as packet forging in the Infrastructure.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "`cisco_networks` facility=\"SISF\" mnemonic IN (\"IP_THEFT\",\"MAC_THEFT\"\
+      ,\"MAC_AND_IP_THEFT\",\"PAK_DROP\") \n  -  eval src_interface=src_int_prefix_long+src_int_suffix\
+      \ \n  -  eval dest_interface=dest_int_prefix_long+dest_int_suffix \n  -  stats\
+      \ min(_time) AS firstTime max(_time) AS lastTime values(src_mac) AS src_mac\
+      \ values(src_vlan) AS src_vlan values(mnemonic) AS mnemonic values(vendor_explanation)\
+      \ AS vendor_explanation values(src_ip) AS src_ip values(dest_ip) AS dest_ip\
+      \ values(dest_interface) AS dest_interface values(action) AS action count BY\
+      \ host src_interface \n  -  table host src_interface dest_interface src_mac\
+      \ src_ip dest_ip src_vlan mnemonic vendor_explanation action count \n  -  `security_content_ctime(firstTime)`\
+      \ \n  - `security_content_ctime(lastTime)` \n  -  `detect_ipv6_network_infrastructure_threats_filter`"
+  level: critical
+tags:
+- "T1200\nT1498\nT1557\nT1557.002"
+- Hardware Additions
+- Hardware Additions
+references: .nan
+notes: Rule not applicable to this client

@@ -1,0 +1,20 @@
+title: DS_Phishing E-mail Sender Addresses
+description: Alerts on e-mail address sender names that have been flagged for phishing
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "index=\"firewall\" AND sender=\"rivista@trekking.it\"\n\n  -  table sender,\
+      \ recipient, receive_time, src_ip, dest, dest_ip, subject, user, src_user, src_zone,\
+      \ threat_name,action"
+  level: critical
+tags:
+- T1566
+- Phishing
+- Initial Access
+references: .nan
+notes: .nan

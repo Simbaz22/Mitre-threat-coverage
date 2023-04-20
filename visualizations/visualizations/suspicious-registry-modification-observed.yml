@@ -1,0 +1,20 @@
+title: Suspicious Registry Modification Observed
+description: This analytic looks for suspicious registry modifications made by admin
+  accounts.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: MISSING SPLUNK LOGIC
+  level: critical
+tags:
+- T1112
+- Modify Registry
+- Defense Evasion
+references: Increase Windows logging to include Registry events
+notes: "Securonix Logic:\nresourcename = IRCDPCTXMXA7 and accountname = Administrator\
+  \ and baseeventid = 4657"

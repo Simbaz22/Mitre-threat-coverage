@@ -1,0 +1,24 @@
+title: ESCU - Unsuccessful Netbackup backups - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  gives you the hosts where a backup was attempted and then failed.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`netbackup` \n  -  stats latest(_time) as latestTime by COMPUTERNAME,\
+      \ MESSAGE \n  -  MESSAGE=\"An error occurred, failed to backup.\" \n  -  `security_content_ctime(latestTime)`\
+      \ \n  -  rename COMPUTERNAME as dest, MESSAGE as signature \n  -  table latestTime,\
+      \ dest, signature \n  -  `unsuccessful_netbackup_backups_filter`"
+  level: critical
+tags:
+- T1490
+- Inhibit System Recovery
+- Impact
+references: .nan
+notes: Deprecated

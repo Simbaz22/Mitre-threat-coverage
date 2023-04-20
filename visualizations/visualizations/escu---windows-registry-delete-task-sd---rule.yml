@@ -1,0 +1,31 @@
+title: ESCU - Windows Registry Delete Task SD - Rule
+description: The following analytic identifies a process attempting to delete a scheduled
+  task SD (Security Descriptor) from within the registry path of that task. This may
+  occur from a non-standard process running and may not come from reg.exe. This particular
+  behavior will remove the actual Task Name from the Task Scheduler GUI and from the
+  command-line query - schtasks.exe /query. In addition, in order to perform this
+  action, the user context will need to be SYSTEM.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Registry\
+      \ where Registry.registry_path IN (\"*\\\\Schedule\\\\TaskCache\\\\Tree\\\\\
+      *\") Registry.user=\"SYSTEM\" Registry.registry_value_name=\"SD\" (Registry.action=Deleted\
+      \ OR Registry.action=modified) by _time  Registry.dest Registry.process_guid\
+      \ Registry.user Registry.registry_path Registry.registry_value_name Registry.registry_key_name\
+      \ Registry.registry_value_data Registry.status Registry.action \n  -  `drop_dm_object_name(Registry)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `windows_registry_delete_task_sd_filter`"
+  level: critical
+tags:
+- "T1053.005\nT1562"
+- 'Scheduled Task/Job: Scheduled Task'
+- 'Scheduled Task/Job: Scheduled Task'
+references: "Increase Windows logging to include Registry events\nIncrease Windows\
+  \ logging to include command line data"
+notes: .nan

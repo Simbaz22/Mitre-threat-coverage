@@ -1,0 +1,26 @@
+title: ESCU - Circle CI Disable Security Job - Rule
+description: This search looks for disable security job in CircleCI pipeline.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Cloud
+detection:
+  condition:
+    sigma: "`circleci` \n  -  rename vcs.committer_name as user vcs.subject as commit_message\
+      \ vcs.url as url workflows.* as * \n  -  stats values(job_name) as job_names\
+      \ by workflow_id workflow_name user commit_message url branch \n  -  lookup\
+      \ mandatory_job_for_workflow workflow_name OUTPUTNEW job_name AS mandatory_job\
+      \ \n  -  mandatory_job=* \n  -  eval mandatory_job_executed=if(like(job_names,\
+      \ \"%\".mandatory_job.\"%\"), 1, 0) \n  -  where mandatory_job_executed=0 \n\
+      \  -  eval phase=\"build\" \n  -  rex field=url \"(?<repository>[^\\/]*\\/[^\\\
+      /]*)$\" \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `circle_ci_disable_security_job_filter`"
+  level: critical
+tags:
+- T1554
+- Compromise Client Software Binary
+- Persistence
+references: .nan
+notes: 'Missing SourceType: CircleCI'

@@ -1,0 +1,27 @@
+title: ESCU - Powershell Processing Stream Of Data - Rule
+description: The following analytic identifies suspicious PowerShell script execution
+  via EventCode 4104 that is processing compressed stream data. This is typically
+  found in obfuscated PowerShell or PowerShell executing embedded .NET or binary files
+  that are stream flattened and will be deflated durnig execution. During triage,
+  review parallel processes within the same timeframe. Review the full script block
+  to identify other related artifacts.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: PowerShell
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 Message = \"*IO.Compression.*\" OR Message\
+      \ = \"*IO.StreamReader*\" OR Message = \"*]::Decompress*\" \n  -  stats count\
+      \ min(_time) as firstTime max(_time) as lastTime by EventCode Message ComputerName\
+      \ User \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `powershell_processing_stream_of_data_filter`"
+  level: critical
+tags:
+- "T1059\nT1059.001"
+- Command and Scripting Interpreter
+- Command and Scripting Interpreter
+references: .nan
+notes: .nan

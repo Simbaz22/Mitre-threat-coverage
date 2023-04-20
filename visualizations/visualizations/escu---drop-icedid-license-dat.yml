@@ -1,0 +1,24 @@
+title: ESCU - Drop IcedID License dat
+description: This search is to detect dropping a suspicious file named as "license.dat"
+  in %appdata%. This behavior seen in latest IcedID malware that contain the actual
+  core bot that will be injected in other process to do banking stealing.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "`sysmon` EventCode= 11  TargetFilename = \"*\\\\license.dat\" AND (TargetFilename=\"\
+      *\\\\appdata\\\\*\" OR TargetFilename=\"*\\\\programdata\\\\*\") \n  - stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by TargetFilename EventCode\
+      \ process_id  process_name Computer \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `drop_icedid_license_dat_filter`"
+  level: critical
+tags:
+- T1204
+- User Execution
+- Execution
+references: Requires Sysmon data
+notes: .nan

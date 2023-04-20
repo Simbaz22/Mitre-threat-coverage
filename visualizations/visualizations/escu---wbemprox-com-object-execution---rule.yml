@@ -1,0 +1,25 @@
+title: ESCU - Wbemprox COM Object Execution - Rule
+description: this search is designed to detect potential malicious process loading
+  COM object to wbemprox.dll,
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=7  ImageLoaded IN (\"*\\\\fastprox.dll\", \"*\\\\wbemprox.dll\"\
+      , \"*\\\\wbemcomn.dll\") NOT (process_name IN (\"wmiprvse.exe\", \"WmiApSrv.exe\"\
+      , \"unsecapp.exe\")) NOT(Image IN(\"*\\\\windows\\\\*\",\"*\\\\program files*\"\
+      , \"*\\\\wbem\\\\*\")) \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by Image ImageLoaded process_name Computer EventCode Signed ProcessId\
+      \ Hashes IMPHASH \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `wbemprox_com_object_execution_filter`"
+  level: critical
+tags:
+- T1218.003
+- 'System Binary Proxy Execution: CMSTP'
+- Defense Evasion
+references: Requires Sysmon data
+notes: .nan

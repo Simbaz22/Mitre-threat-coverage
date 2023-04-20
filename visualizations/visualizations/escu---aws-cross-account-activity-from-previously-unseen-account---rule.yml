@@ -1,0 +1,30 @@
+title: ESCU - AWS Cross Account Activity From Previously Unseen Account - Rule
+description: This search looks for AssumeRole events where an IAM role in a different
+  account is requested for the first time.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "\n  -  tstats min(_time) as firstTime max(_time) as lastTime from datamodel=Authentication\
+      \ where Authentication.signature=AssumeRole by Authentication.vendor_account\
+      \ Authentication.user Authentication.src Authentication.user_role \n  -  `drop_dm_object_name(Authentication)`\
+      \ \n  -  rex field=user_role \"arn:aws:sts:*:(?<dest_account>.*):\" \n  -  where\
+      \ vendor_account != dest_account \n  -  rename vendor_account as requestingAccountId\
+      \ dest_account as requestedAccountId \n  -  lookup previously_seen_aws_cross_account_activity\
+      \ requestingAccountId, requestedAccountId, OUTPUTNEW firstTime \n  -  eval status\
+      \ = if(firstTime > relative_time(now(), \"-24h@h\"),\"New Cross Account Activity\"\
+      ,\"Previously Seen\") \n  -   where status = \"New Cross Account Activity\"\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\n\
+      \  -  `aws_cross_account_activity_from_previously_unseen_account_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: "Requires lookup to be populated\nUnsupported experimental detection by\
+  \ Splunk"
+notes: .nan

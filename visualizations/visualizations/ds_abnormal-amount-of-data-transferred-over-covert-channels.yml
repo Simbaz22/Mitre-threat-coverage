@@ -1,0 +1,31 @@
+title: DS_Abnormal Amount of Data Transferred Over Covert Channels
+description: High Volume of Data transmitted from ports including telnet, SSH or the
+  ICMP protocol may be indicative of covert channel data transmission known to be
+  used by malware or malicious insiders.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  from datamodel:\"Network_Traffic\".\"All_Traffic\"\n\n  -  (app=\"\
+      icmp\" OR app=\"telnet\" OR app=\"ssh\" OR dest_port=22 OR dest_port=23) AND\
+      \ (src_ip=\"10.0.0.0/8\" OR src_ip=\"172.16.0.0/12\" OR src_ip=\"192.168.0.0/16\"\
+      ) AND (bytes_out>300) AND (dest_ip!=\"10.0.0.0/8\" AND dest_ip!=\"172.16.0.0/12\"\
+      \ AND dest_ip!=\"192.168.0.0/16\")\n\n  -  bucket span=10m _time \n\n  -  stats\
+      \ count AS number_transfers by _time src \n\n  -  eventstats avg(number_transfers)\
+      \ as transfers_avg, stdev(number_transfers) as transfers_stdev \n\n  -  eval\
+      \ threshold_value = 3\n\n  -  eval isOutlier=if(number_transfers > transfers_avg+(transfers_stdev\
+      \ * threshold_value), \"TRUE\", \"FALSE\") \n\n  -  isOutlier=\"TRUE\" \n\n\
+      \  -  eval num_standard_deviations_away = round(abs(number_transfers - transfers_avg)\
+      \ / transfers_stdev, 2) \n\n  -  table _time, src, number_transfers, num_standard_deviations_away,\
+      \ transfers_avg, transfers_stdev"
+  level: critical
+tags:
+- T1048
+- Exfiltration Over Alternative Protocol
+- Exfiltration
+references: .nan
+notes: .nan

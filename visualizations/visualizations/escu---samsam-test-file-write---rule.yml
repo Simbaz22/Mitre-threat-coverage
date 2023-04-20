@@ -1,0 +1,24 @@
+title: ESCU - Samsam Test File Write - Rule
+description: The search looks for a file named "test.txt" written to the windows system
+  directory tree, which is consistent with Samsam propagation.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime values(Filesystem.user) as user values(Filesystem.dest)\
+      \ as dest values(Filesystem.file_name) as file_name from datamodel=Endpoint.Filesystem\
+      \ where Filesystem.file_path=*\\\\windows\\\\system32\\\\test.txt by Filesystem.file_path\
+      \ \n  -  `drop_dm_object_name(Filesystem)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `samsam_test_file_write_filter`"
+  level: critical
+tags:
+- T1486
+- Data Encrypted for Impact
+- Impact
+references: Increase Windows logging to include command line data
+notes: .nan

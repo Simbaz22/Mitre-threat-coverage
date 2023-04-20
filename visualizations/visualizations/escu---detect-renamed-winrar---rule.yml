@@ -1,0 +1,28 @@
+title: ESCU - Detect Renamed WinRAR - Rule
+description: The following analtyic identifies renamed instances of `WinRAR.exe`.
+  In most cases, it is not common for WinRAR to be used renamed, however it is common
+  to be installed by a third party application and executed from a non-standard path.
+  During triage, validate additional metadata from the binary that this is `WinRAR`.
+  Review parallel processes and file modifications.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.original_file_name=WinRAR.exe\
+      \ (Processes.process_name!=rar.exe OR Processes.process_name!=winrar.exe) by\
+      \ Processes.dest Processes.user Processes.parent_process_name Processes.process_name\
+      \ Processes.process Processes.process_id Processes.parent_process_id Processes.original_file_name\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `detect_renamed_winrar_filter`"
+  level: critical
+tags:
+- "T1560.001\nT1560"
+- 'Archive Collected Data: Archive via Utility'
+- 'Archive Collected Data: Archive via Utility'
+references: Requires Sysmon data
+notes: .nan

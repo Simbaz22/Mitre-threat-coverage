@@ -1,0 +1,27 @@
+title: ESCU - Cloud API Calls From Previously Unseen User Roles - Rule
+description: This search looks for new commands from each user role.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "\n  -  tstats earliest(_time) as firstTime, latest(_time) as lastTime\
+      \ from datamodel=Change where All_Changes.user_type=AssumedRole AND All_Changes.status=success\
+      \ by All_Changes.user, All_Changes.command All_Changes.object \n  -  `drop_dm_object_name(\"\
+      All_Changes\")` \n  -  lookup previously_seen_cloud_api_calls_per_user_role\
+      \ user as user, command as command OUTPUT firstTimeSeen, enough_data \n  - \
+      \ eventstats max(enough_data) as enough_data \n  -  where enough_data=1 \n \
+      \ -  eval firstTimeSeenUserApiCall=min(firstTimeSeen) \n  -  where isnull(firstTimeSeenUserApiCall)\
+      \ OR firstTimeSeenUserApiCall > relative_time(now(),\"-24h@h\") \n  -  table\
+      \ firstTime, user, object, command \n  - `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)`\n  -  `cloud_api_calls_from_previously_unseen_user_roles_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: THIS IS A EXPERIMENTAL DETECTION

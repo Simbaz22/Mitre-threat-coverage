@@ -1,0 +1,29 @@
+title: ESCU - Runas Execution in CommandLine - Rule
+description: This analytic look for a spawned runas.exe process with a administrator
+  user option parameter. This parameter was abused by adversaries, malware author
+  or even red teams to gain elevated privileges in target host. This is a good hunting
+  query to figure out privilege escalation tactics that may used for different stages
+  like lateral movement but take note that administrator may use this command in purpose
+  so its better to see other event context before and after this analytic.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where `process_runas`\
+      \ AND Processes.process = \"*/user:*\" AND Processes.process = \"*admin*\" by\
+      \ Processes.dest Processes.user Processes.parent_process_name Processes.parent_process\
+      \ Processes.process_name Processes.process Processes.process_id Processes.parent_process_id\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `runas_execution_in_commandline_filter`"
+  level: critical
+tags:
+- T1134.001
+- 'Access Token Manipulation: Token Impersonation/Theft'
+- Defense Evasion, Privilege Escalation
+references: Increase Windows logging to include command line data
+notes: .nan

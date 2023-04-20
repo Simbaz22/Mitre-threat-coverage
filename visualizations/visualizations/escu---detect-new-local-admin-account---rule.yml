@@ -1,0 +1,23 @@
+title: ESCU - Detect New Local Admin account - Rule
+description: This search looks for newly created accounts that have been elevated
+  to local administrators.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4720 OR (EventCode=4732 Group_Name=Administrators)\
+      \ \n  -  transaction member_id connected=false maxspan=180m \n  -  rename member_id\
+      \ as user \n  -  stats count min(_time) as firstTime max(_time) as lastTime\
+      \ by user dest \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `detect_new_local_admin_account_filter`"
+  level: critical
+tags:
+- "T1136.001\nT1136"
+- 'Create Account: Local Account'
+- 'Create Account: Local Account'
+references: .nan
+notes: .nan

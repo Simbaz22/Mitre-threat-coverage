@@ -1,0 +1,30 @@
+title: ESCU - Print Spooler Adding A Printer Driver - Rule
+description: "The following analytic identifies new printer drivers being load by\
+  \ utilizing the Windows PrintService operational logs, EventCode 316. This was identified\
+  \ during our testing of CVE-2021-34527 previously (CVE-2021-1675) or PrintNightmare.\
+  \ \nWithin the proof of concept code, the following event will occur - \"Printer\
+  \ driver 1234 for Windows x64 Version-3 was added or updated. Files:- UNIDRV.DLL,\
+  \ kernelbase.dll, evil.dll. No user action is required.\" \nDuring triage, isolate\
+  \ the endpoint and review for source of exploitation. Capture any additional file\
+  \ modification events and review the source of where the exploitation began."
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`printservice` EventCode=316 category = \"Adding a printer driver\" Message\
+      \ = \"*kernelbase.dll,*\" Message = \"*UNIDRV.DLL,*\" Message = \"*.DLL.*\"\
+      \ \n  -  stats  count min(_time) as firstTime max(_time) as lastTime by OpCode\
+      \ EventCode ComputerName Message \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `print_spooler_adding_a_printer_driver_filter`"
+  level: critical
+tags:
+- T1547.012
+- 'Boot or Logon Autostart Execution: Print Processors'
+- Persistence, Privilege Escalation
+references: Increase Windows logging to include PrintService Admin and Operational
+  logs
+notes: .nan

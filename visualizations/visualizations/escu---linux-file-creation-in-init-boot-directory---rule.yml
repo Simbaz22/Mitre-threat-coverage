@@ -1,0 +1,28 @@
+title: ESCU - Linux File Creation In Init Boot Directory - Rule
+description: This analytic looks for suspicious file creation on init system directories
+  for automatic execution of script or file upon boot up. This technique is commonly
+  abuse by adversaries, malware author and red teamer to persist on the targeted or
+  compromised host. This behavior can be executed or use by an administrator or network
+  operator to add script files or binary files as part of a task or automation. filter
+  is needed.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Filesystem where Filesystem.file_path\
+      \ IN (\"*/etc/init.d/*\", \"*/etc/rc.d/*\", \"*/sbin/init.d/*\", \"*/etc/rc.local*\"\
+      ) by Filesystem.dest Filesystem.file_name Filesystem.process_guid Filesystem.file_path\
+      \ \n  -  `drop_dm_object_name(Filesystem)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `linux_file_creation_in_init_boot_directory_filter`"
+  level: critical
+tags:
+- "T1037.004\nT1037"
+- 'Boot or Logon Initialization Scripts: RC Scripts'
+- 'Boot or Logon Initialization Scripts: RC Scripts'
+references: Increase Linux logging to include file creation, deletion and modification
+notes: .nan

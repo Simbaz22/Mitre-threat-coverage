@@ -1,0 +1,28 @@
+title: ESCU - Print Processor Registry Autostart - Rule
+description: This analytic is to detect a suspicious modification or new registry
+  entry regarding print processor. This registry is known to be abuse by turla or
+  other APT to gain persistence and privilege escalation to the compromised machine.
+  This is done by adding the malicious dll payload on the new created key in this
+  registry that will be executed as it restarted the spoolsv.exe process and services.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count  min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Registry where Registry.registry_path\
+      \ =\"*\\\\Control\\\\Print\\\\Environments\\\\Windows x64\\\\Print Processors*\"\
+      \ by Registry.dest  Registry.user Registry.registry_path Registry.registry_key_name\
+      \ Registry.registry_value_name \n  -  `security_content_ctime(lastTime)` \n\
+      \  -  `security_content_ctime(firstTime)` \n  -  `drop_dm_object_name(Registry)`\
+      \ \n  -  `print_processor_registry_autostart_filter`"
+  level: critical
+tags:
+- T1547.012
+- 'Boot or Logon Autostart Execution: Print Processors'
+- Persistence, Privilege Escalation
+references: Increase Windows logging to include Registry events
+notes: .nan

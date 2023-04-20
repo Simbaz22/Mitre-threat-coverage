@@ -1,0 +1,26 @@
+title: ESCU - Network Discovery Using Route Windows App - Rule
+description: This analytic look for a spawned process of route.exe windows application.
+  Adversaries and red teams alike abuse this application the recon or do a network
+  discovery on a target host. but one possible false positive might be an automated
+  tool used by a system administator or a powershell script in amazon ec2 config services.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where `process_route`\
+      \ by Processes.dest Processes.user Processes.parent_process_name Processes.parent_process\
+      \ Processes.process_name Processes.process Processes.process_id Processes.parent_process_id\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `network_discovery_using_route_windows_app_filter`"
+  level: critical
+tags:
+- "T1016\nT1016.001"
+- System Network Configuration Discovery
+- System Network Configuration Discovery
+references: .nan
+notes: .nan

@@ -1,0 +1,35 @@
+title: ESCU - AWS Cloud Provisioning From Previously Unseen Region - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  looks for AWS provisioning activities from previously unseen regions. Region in
+  this context is similar to a state in the United States. Provisioning activities
+  are defined broadly as any event that begins with "Run" or "Create." This search
+  is deprecated and have been translated to use the latest Change Datamodel.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` (eventName=Run* OR eventName=Create*) \n  -  iplocation sourceIPAddress\
+      \ \n  -  Region=* [`cloudtrail` (eventName=Run* OR eventName=Create*) \n  -\
+      \  iplocation sourceIPAddress \n  -  Region=* \n  -  stats earliest(_time) as\
+      \ firstTime, latest(_time) as lastTime by sourceIPAddress, City, Region, Country\
+      \ \n  -  inputlookup append=t previously_seen_provisioning_activity_src.csv\
+      \ \n  -  stats min(firstTime) as firstTime max(lastTime) as lastTime by sourceIPAddress,\
+      \ City, Region, Country \n  -  outputlookup previously_seen_provisioning_activity_src.csv\
+      \ \n  -  stats min(firstTime) as firstTime max(lastTime) as lastTime by Region\
+      \ \n  -  eval newRegion=if(firstTime >= relative_time(now(), \"-70m@m\"), 1,\
+      \ 0) \n  -  where newRegion=1 \n  -  table Region] \n  -  spath output=user\
+      \ userIdentity.arn \n  -  rename sourceIPAddress as src_ip \n  -  table _time,\
+      \ user, src_ip, Region, eventName, errorCode \n  -  `aws_cloud_provisioning_from_previously_unseen_region_filter`"
+  level: critical
+tags:
+- T1535
+- Unused/Unsupported Cloud Regions
+- Defense Evasion
+references: .nan
+notes: Deprecated by Splunk

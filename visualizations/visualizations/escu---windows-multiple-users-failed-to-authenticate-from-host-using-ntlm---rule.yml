@@ -1,0 +1,38 @@
+title: ESCU - Windows Multiple Users Failed To Authenticate From Host Using NTLM -
+  Rule
+description: "The following analytic identifies one source endpoint failing to authenticate\
+  \ with 30 unique invalid users using the NTLM protocol. This behavior could represent\
+  \ an adversary performing a Password Spraying attack against an Active Directory\
+  \ environment using NTLM to obtain initial access or elevate privileges. Active\
+  \ Directory environments can be very different depending on the organization. Users\
+  \ should test this detection and customize the arbitrary threshold when needed.\
+  \ As attackers progress in a breach, mistakes will be made. In certain scenarios,\
+  \ adversaries may execute a password spraying attack using an invalid list of users.\
+  \ Event 4776 is generated on the computer that is authoritative for the provided\
+  \ credentials. For domain accounts, the domain controller is authoritative. For\
+  \ local accounts, the local computer is authoritative. Error code 0xC0000064 stands\
+  \ for `The username you typed does not exist` (the attempted user is a legitimate\
+  \ domain user).\nThis logic can be used for real time security monitoring as well\
+  \ as threat hunting exercises. This detection will only trigger on domain controllers,\
+  \ not on member servers or workstations.\nThe analytics returned fields allow analysts\
+  \ to investigate the event further by providing fields like source workstation name\
+  \ and attempted user accounts."
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4776 Error_Code=0xC000006A \n  -  bucket\
+      \ span=30m _time \n  -  stats dc(Logon_Account) AS unique_accounts values(Logon_Account)\
+      \ as tried_accounts by _time, Source_Workstation \n  -  where unique_accounts\
+      \ > 10 \n  -  `windows_multiple_invalid_users_failed_to_authenticate_using_ntlm_filter`"
+  level: critical
+tags:
+- "T1110.003\nT1110"
+- 'Brute Force: Password Spraying'
+- 'Brute Force: Password Spraying'
+references: .nan
+notes: .nan

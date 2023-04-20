@@ -1,0 +1,31 @@
+title: ESCU - Wmic NonInteractive App Uninstallation - Rule
+description: This analytic is to detect a suspicious wmic commandlined that uninstall
+  application non interactively. This technique was seen in IceID to uninstall av
+  products to the compromised host to bypassed and evade detections. This Hunting
+  query maybe a good indicator that some process tries to uninstall application using
+  wmic which is not a common behavior. This approach may seen in some script or third
+  part appication to uninstall their application but it is a good thing to check what
+  it uninstall and why.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=wmic.exe\
+      \ Processes.process=\"* product *\" Processes.process=\"*where name*\" Processes.process=\"\
+      *call uninstall*\" Processes.process=\"*/nointeractive*\" by Processes.dest\
+      \ Processes.user Processes.parent_process_name Processes.process_name Processes.process\
+      \ Processes.original_file_name Processes.process_id Processes.parent_process_id\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `wmic_noninteractive_app_uninstallation_filter`"
+  level: critical
+tags:
+- "T1562.001\nT1562"
+- 'Impair Defenses: Disable or Modify Tools'
+- 'Impair Defenses: Disable or Modify Tools'
+references: Increase Windows logging to include command line data
+notes: .nan

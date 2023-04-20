@@ -1,0 +1,27 @@
+title: ESCU - Web Fraud - Anomalous User Clickspeed - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  is used to examine web sessions to identify those where the clicks are occurring
+  too quickly for a human or are occurring with a near-perfect cadence (high periodicity
+  or low standard deviation), resembling a script driven session.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Web
+detection:
+  condition:
+    sigma: "`stream_http` http_content_type=text* \n  -  rex field=cookie \"form_key=(?<session_id>\\\
+      w+)\" \n  -  streamstats window=2 current=1 range(_time) as TimeDelta by session_id\
+      \ \n  -  where TimeDelta>0 \n  - stats count stdev(TimeDelta) as ClickSpeedStdDev\
+      \ avg(TimeDelta) as ClickSpeedAvg by session_id \n  -  where count>5 AND (ClickSpeedStdDev<.5\
+      \ OR ClickSpeedAvg<.5) \n  -  `web_fraud___anomalous_user_clickspeed_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: Requires Web logs
+notes: Deprecated by Splunk

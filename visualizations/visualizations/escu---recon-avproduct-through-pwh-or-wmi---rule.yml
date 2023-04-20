@@ -1,0 +1,27 @@
+title: ESCU - Recon AVProduct Through Pwh or WMI - Rule
+description: The following analytic identifies suspicious PowerShell script execution
+  via EventCode 4104 performing checks to identify anti-virus products installed on
+  the endpoint. This technique is commonly found in malware and APT events where the
+  adversary will map all running security applications or services. During triage,
+  review parallel processes within the same timeframe. Review the full script block
+  to identify other related artifacts.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: PowerShell
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (ScriptBlockText = \"*SELECT*\" OR ScriptBlockText\
+      \ = \"*WMIC*\") AND (ScriptBlockText = \"*AntiVirusProduct*\" OR ScriptBlockText\
+      \ = \"*AntiSpywareProduct*\") \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by EventCode ScriptBlockText Computer user_id \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `recon_avproduct_through_pwh_or_wmi_filter`"
+  level: critical
+tags:
+- T1592
+- Gather Victim Host Information
+- Reconnaissance
+references: Requires PowerShell logs
+notes: .nan

@@ -1,0 +1,25 @@
+title: ESCU - aws detect role creation - Rule
+description: This search provides detection of role creation by IAM users. Role creation
+  is an event by itself if user is creating a new role with trust policies different
+  than the available in AWS and it can be used for lateral movement and escalation
+  of privileges.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`aws_cloudwatchlogs_eks` event_name=CreateRole action=created userIdentity.type=AssumedRole\
+      \ requestParameters.description=Allows* \n  -  table sourceIPAddress userIdentity.principalId\
+      \ userIdentity.arn action event_name awsRegion http_user_agent mfa_auth msg\
+      \ requestParameters.roleName requestParameters.description responseElements.role.arn\
+      \ responseElements.role.createDate \n  -  `aws_detect_role_creation_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: THIS IS A EXPERIMENTAL DETECTION

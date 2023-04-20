@@ -1,0 +1,26 @@
+title: ESCU - File with Samsam Extension - Rule
+description: The search looks for file writes with extensions consistent with a SamSam
+  ransomware attack.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime values(Filesystem.user) as user values(Filesystem.dest)\
+      \ as dest values(Filesystem.file_path) as file_path from datamodel=Endpoint.Filesystem\
+      \ by Filesystem.file_name \n  -  `drop_dm_object_name(Filesystem)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `security_content_ctime(firstTime)`\n  -  rex field=file_name \"(?<file_extension>\\\
+      .[^\\.]+)$\" \n  -  file_extension=.stubbin OR file_extension=.berkshire OR\
+      \ file_extension=.satoshi OR file_extension=.sophos OR file_extension=.keyxml\
+      \ \n  -  `file_with_samsam_extension_filter`"
+  level: critical
+tags:
+- T1587.001
+- 'Develop Capabilities: Malware'
+- Resource Development
+references: Increase Windows logging to include file modification data
+notes: .nan

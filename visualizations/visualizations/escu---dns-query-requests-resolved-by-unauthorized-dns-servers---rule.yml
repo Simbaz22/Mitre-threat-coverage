@@ -1,0 +1,24 @@
+title: ESCU - DNS Query Requests Resolved by Unauthorized DNS Servers - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  will detect DNS requests resolved by unauthorized DNS servers. Legitimate DNS servers
+  should be identified in the Enterprise Security Assets and Identity Framework.'
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Network_Resolution\
+      \ where DNS.dest_category != dns_server AND DNS.src_category != dns_server by\
+      \ DNS.src DNS.dest \n  -  `drop_dm_object_name(\"DNS\")` \n  -  `dns_query_requests_resolved_by_unauthorized_dns_servers_filter`"
+  level: critical
+tags:
+- T1071.004
+- 'Application Layer Protocol: DNS'
+- Command and Control
+references: Requires DNS Data
+notes: Deprecated by Splunk

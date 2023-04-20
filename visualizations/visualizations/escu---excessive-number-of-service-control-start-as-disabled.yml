@@ -1,0 +1,30 @@
+title: ESCU - Excessive number of service control start as disabled
+description: This detection targets behaviors observed when threat actors have used
+  sc.exe to modify services. We observed malware in a honey pot spawning numerous
+  sc.exe processes in a short period of time, presumably to impair defenses, possibly
+  to block others from compromising the same machine.  This detection will alert when
+  we see both an excessive number of sc.exe processes launched with specific commandline
+  arguments to disable the start of certain services.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` distinct_count(Processes.process)\
+      \ as distinct_cmdlines values(Processes.process_id) as process_ids min(_time)\
+      \ as firstTime max(_time) as lastTime FROM datamodel=Endpoint.Processes WHERE\
+      \ Processes.process_name = \"sc.exe\" AND Processes.process=\"*start= disabled*\"\
+      \ by Processes.dest Processes.user Processes.parent_process Processes.process_name\
+      \ Processes.parent_process_id, _time span=30m \n  -  where distinct_cmdlines\
+      \ >= 8 \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `excessive_number_of_service_control_start_as_disabled_filter`"
+  level: critical
+tags:
+- T1562
+- Impair Defenses
+- Defense Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

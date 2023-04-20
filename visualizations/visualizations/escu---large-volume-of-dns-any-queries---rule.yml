@@ -1,0 +1,22 @@
+title: ESCU - Large Volume of DNS ANY Queries - Rule
+description: The search is used to identify attempts to use your DNS Infrastructure
+  for DDoS purposes via a DNS amplification attack leveraging ANY queries.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Network_Resolution\
+      \ where nodename=DNS \"DNS.message_type\"=\"QUERY\" \"DNS.record_type\"=\"ANY\"\
+      \ by \"DNS.dest\" \n  -  `drop_dm_object_name(\"DNS\")` \n  -  where count>200\
+      \ \n  -  `large_volume_of_dns_any_queries_filter`"
+  level: critical
+tags:
+- "T1498\nT1498.002"
+- Network Denial of Service
+- Network Denial of Service
+references: Requires DNS data
+notes: .nan

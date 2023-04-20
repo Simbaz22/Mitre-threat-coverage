@@ -1,0 +1,29 @@
+title: ESCU - Nishang PowershellTCPOneLine - Rule
+description: This query detects the Nishang Invoke-PowerShellTCPOneLine utility that
+  spawns a call back to a remote command and control server. This is a powershell
+  oneliner. In addition, this will capture on the command-line additional utilities
+  used by Nishang. Triage the endpoint and identify any parallel processes that look
+  suspicious. Review the reputation of the remote IP or domain contacted by the powershell
+  process.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where `process_powershell`\
+      \ (Processes.process=*Net.Sockets.TCPClient* AND Processes.process=*System.Text.ASCIIEncoding*)\
+      \ by Processes.dest Processes.user Processes.parent_process Processes.original_file_name\
+      \ Processes.process_name Processes.process Processes.process_id Processes.parent_process_id\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)`\n  -  `nishang_powershelltcponeline_filter`"
+  level: critical
+tags:
+- "T1059\nT1059.001"
+- Command and Scripting Interpreter
+- Command and Scripting Interpreter
+references: Increase Windows logging to include command line data and powershell logs
+notes: .nan

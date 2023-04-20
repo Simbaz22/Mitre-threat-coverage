@@ -1,0 +1,25 @@
+title: ESCU - AdsiSearcher Account Discovery - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the `[Adsisearcher]` type accelerator being used to query Active Directory
+  for domain groups. Red Teams and adversaries may leverage `[Adsisearcher]` to enumerate
+  domain users for situational awareness and Active Directory Discovery.
+status: "Inactive\nMissing Data Source"
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 Message = \"*[adsisearcher]*\" Message = \"\
+      *objectcategory=user*\" Message = \"*.findAll()*\" \n  -  stats count min(_time)\
+      \ as firstTime max(_time) as lastTime by EventCode Message ComputerName User\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `adsisearcher_account_discovery_filter`"
+  level: critical
+tags:
+- T1087.002
+- 'Account Discovery: Domain Account'
+- Discovery
+references: Requires PowerShell logs
+notes: Requires powershell

@@ -1,0 +1,24 @@
+title: ESCU - Detect Mimikatz Using Loaded Images - Rule
+description: This search looks for reading loaded Images unique to credential dumping
+  with Mimikatz. Deprecated because mimikatz libraries changed and very noisy sysmon
+  Event Code.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=7 \n  -  stats values(ImageLoaded) as ImageLoaded values(ProcessId)\
+      \ as ProcessId by Computer, Image \n  -  ImageLoaded=*WinSCard.dll ImageLoaded=*cryptdll.dll\
+      \ ImageLoaded=*hid.dll ImageLoaded=*samlib.dll ImageLoaded=*vaultcli.dll \n\
+      \  -  rename Computer as dest \n  -  `security_content_ctime(firstTime)`\n \
+      \ -  `security_content_ctime(lastTime)` \n  -  `detect_mimikatz_using_loaded_images_filter`"
+  level: critical
+tags:
+- "T1003.001\nT1003"
+- 'OS Credential Dumping: LSASS Memory'
+- 'OS Credential Dumping: LSASS Memory'
+references: Requires Sysmon data
+notes: .nan

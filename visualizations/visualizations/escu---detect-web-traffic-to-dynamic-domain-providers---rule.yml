@@ -1,0 +1,24 @@
+title: ESCU - Detect web traffic to dynamic domain providers - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  looks for web connections to dynamic DNS providers.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Web
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(Web.url) as\
+      \ url min(_time) as firstTime from datamodel=Web where Web.status=200 by Web.src\
+      \ Web.dest Web.status \n  -  `drop_dm_object_name(\"Web\")` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `dynamic_dns_web_traffic` \n  -  `detect_web_traffic_to_dynamic_domain_providers_filter`"
+  level: critical
+tags:
+- T1071.001
+- 'Application Layer Protocol: Web Protocols'
+- Command and Control
+references: .nan
+notes: Deprecated by Splunk

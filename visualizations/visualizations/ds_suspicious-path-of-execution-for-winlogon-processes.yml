@@ -1,0 +1,24 @@
+title: DS_Suspicious path of execution for Winlogon processes
+description: This policy detects process executing from the suspicious file path.
+  This might be an indication of malware or trojan.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(Processes.process)\
+      \ as process min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes\
+      \ where Processes.parent_process_name=winlogon.exe Processes.parent_process_path!=\"\
+      *\\\\Windows\\\\System32\\\\*\" by Processes.process_name Processes.parent_process_name\
+      \ Processes.parent_process_path Processes.dest Processes.user \n\n  -  `drop_dm_object_name(Processes)`\n\
+      \n  -  `security_content_ctime(firstTime)` \n\n  -  `security_content_ctime(lastTime)`"
+  level: critical
+tags:
+- T1204.002
+- 'User Execution: Malicious File'
+- Execution
+references: .nan
+notes: .nan

@@ -1,0 +1,29 @@
+title: ESCU - Suspicious Kerberos Service Ticket Request - Rule
+description: As part of the sAMAccountName Spoofing (CVE-2021-42278) and Domain Controller
+  Impersonation (CVE-2021-42287) exploitation chain, adversaries will request and
+  obtain a Kerberos Service Ticket (TGS) with a domain controller computer account
+  as the Service Name. This Service Ticket can be then used to take control of the
+  domain controller on the final part of the attack. This analytic leverages Event
+  Id 4769, `A Kerberos service ticket was requested`, to identify an unusual TGS request
+  where the Account_Name requesting the ticket matches the Service_Name field. This
+  behavior could represent an exploitation attempt of CVE-2021-42278 and CVE-2021-42287
+  for privilege escalation.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4769 \n  -  eval isSuspicious = if(lower(Service_Name)\
+      \ = lower(mvindex(split(Account_Name,\"@\"),0)+\"$\"),1,0) \n  -  where isSuspicious\
+      \ = 1 \n  -  table _time, Client_Address, Account_Name, Service_Name, Failure_Code,\
+      \ isSuspicious \n  -  `suspicious_kerberos_service_ticket_request_filter`"
+  level: critical
+tags:
+- T1078.002
+- 'Valid Accounts: Domain Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: .nan

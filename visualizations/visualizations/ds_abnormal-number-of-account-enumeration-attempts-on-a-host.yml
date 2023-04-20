@@ -1,0 +1,26 @@
+title: DS_Abnormal number of account enumeration attempts on a host
+description: High number of distinct accounts used during failed authentication events
+  or lockout events may be indicative of malicious insider/cyber actor attempting
+  to guess passwords for accounts.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Linux\nWindows"
+detection:
+  condition:
+    sigma: "\n  -  from datamodel:\"Authentication\".\"Failed_Authentication\" \n\n\
+      \  -  signature_id IN (4776, 4740, 4625) AND user!=*$*\n\n  -  bucket span=30m\
+      \ _time \n\n  -  stats dc(user) as unique_user values(user) as failed_user by\
+      \ dest signature_id _time \n\n  -  eventstats avg(unique_user) as avg_failed_login,\
+      \ stdev(unique_user) as user_std \n\n  -  eval upperBound=(avg_failed_login+user_std*3)\
+      \ \n\n  -  eval isOutlier=if(unique_user > upperBound, \"True\", \"False\")\
+      \ \n\n  -  isOutlier=\"True\""
+  level: critical
+tags:
+- T1087
+- Account Discovery
+- Discovery
+references: .nan
+notes: .nan

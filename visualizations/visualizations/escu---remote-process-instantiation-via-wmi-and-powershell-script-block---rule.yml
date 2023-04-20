@@ -1,0 +1,25 @@
+title: ESCU - Remote Process Instantiation via WMI and PowerShell Script Block - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the execution of the `Invoke-WmiMethod` commandlet with arguments utilized
+  to start a process on a remote endpoint by abusing WMI. Red Teams and adversaries
+  alike may abuse WMI and this commandlet for lateral movement and remote code execution.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: PowerShell
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (Message=\"*Invoke-WmiMethod*\" AND Message=\"\
+      *-CN*\" AND Message=\"*-Class Win32_Process*\" AND Message=\"*-Name create*\"\
+      ) \n  -  stats count min(_time) as firstTime max(_time) as lastTime by EventCode\
+      \ Message ComputerName User \n  -  `security_content_ctime(firstTime)` \n  -\
+      \  `remote_process_instantiation_via_wmi_and_powershell_script_block_filter`"
+  level: critical
+tags:
+- T1047
+- Windows Management Instrumentation
+- Execution
+references: Requires PowerShell logs
+notes: .nan

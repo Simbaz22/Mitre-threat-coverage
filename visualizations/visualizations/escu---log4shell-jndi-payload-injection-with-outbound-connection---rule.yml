@@ -1,0 +1,36 @@
+title: ESCU - Log4Shell JNDI Payload Injection with Outbound Connection - Rule
+description: CVE-2021-44228 Log4Shell payloads can be injected via various methods,
+  but on of the most common vectors injection is via Web calls. Many of the vulnerable
+  java web applications that are using log4j have a web component to them are specially
+  targets of this injection, specifically projects like Apache Struts, Flink, Druid,
+  and Solr. The exploit is triggered by a LDAP lookup function in the log4j package,
+  its invocation is similar to `${jndi:ldap://PAYLOAD_INJECTED}`, when executed against
+  vulnerable web applications the invocation can be seen in various part of web logs.
+  Specifically it has been successfully exploited via headers like X-Forwarded-For,
+  User-Agent, Referer, and X-Api-Version. In this detection we match the invocation
+  function with a network connection to a malicious ip address.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  from datamodel Web.Web \n  -  rex field=_raw max_match=0 \"[jJnNdDiI]{4}(\\\
+      :\n  - \\%3A\n  - \\/\n  - \\%2F)(?<proto>\\w+)(\\:\\/\\/\n  - \\%3A\\%2F\\\
+      %2F)(\\$\\{.*?\\}(\\.)?)?(?<affected_host>[a-zA-Z0-9\\.\\-\\_\\$]+)\" \n  -\
+      \  join affected_host type=inner [\n  -  tstats `security_content_summariesonly`\
+      \ count min(_time) as firstTime max(_time) as lastTime from datamodel=Network_Traffic.All_Traffic\
+      \ by All_Traffic.dest \n  -  `drop_dm_object_name(All_Traffic)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  rename dest AS affected_host]\
+      \ \n  -  fillnull \n  -  stats count by action, category, dest, dest_port, http_content_type,\
+      \ http_method, http_referrer, http_user_agent, site, src, url, url_domain, user\
+      \ \n  -  `log4shell_jndi_payload_injection_with_outbound_connection_filter`"
+  level: critical
+tags:
+- T1190
+- Exploit Public-Facing Application
+- Initial Access
+references: .nan
+notes: Activity already covered by network rules.

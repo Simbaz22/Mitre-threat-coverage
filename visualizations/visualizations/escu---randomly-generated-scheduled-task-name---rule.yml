@@ -1,0 +1,31 @@
+title: ESCU - Randomly Generated Scheduled Task Name - Rule
+description: The following hunting analytic leverages Event ID 4698, `A scheduled
+  task was created`, to identify the creation of a Scheduled Task with a suspicious,
+  high entropy, Task Name. To achieve this, this analytic also leverages the `ut_shannon`
+  function from the URL ToolBox Splunk application. Red teams and adversaries alike
+  may abuse the Task Scheduler to create and start a remote Scheduled Task and obtain
+  remote code execution. To achieve this goal, tools like Impacket or Crapmapexec,
+  typically create a Scheduled Task with a random task name on the victim host. This
+  hunting analytic may help defenders identify Scheduled Tasks created as part of
+  a lateral movement attack. The entropy threshold `ut_shannon > 3` should be customized
+  by users. The Command field can be used to determine if the task has malicious intent
+  or not.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4698 \n  -  xmlkv Message \n  -  lookup\
+      \ ut_shannon_lookup word as Task_Name \n  -  where ut_shannon > 3 \n  -  table\
+      \  _time, dest, Task_Name, ut_shannon, Command, Author, Enabled, Hidden \n \
+      \ -  `randomly_generated_scheduled_task_name_filter`"
+  level: critical
+tags:
+- "T1053\nT1053.005"
+- Scheduled Task/Job
+- Scheduled Task/Job
+references: Unsupported experimental detection by Splunk
+notes: .nan

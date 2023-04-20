@@ -1,0 +1,26 @@
+title: ESCU - Wermgr Process Create Executable File - Rule
+description: this search is designed to detect potential malicious wermgr.exe process
+  that drops or create executable file. Since wermgr.exe is an application trigger
+  when error encountered in a process, it is really un ussual to this process to drop
+  executable file. This technique is commonly seen in trickbot malware where it injects
+  it code to this process to execute it malicious behavior like downloading other
+  payload
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=11 process_name = \"wermgr.exe\" TargetFilename = \"\
+      *.exe\" \n  -  stats  min(_time) as firstTime max(_time) as lastTime count by\
+      \  Image TargetFilename process_name dest EventCode ProcessId \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `wermgr_process_create_executable_file_filter`"
+  level: critical
+tags:
+- T1027
+- Obfuscated Files or Information
+- Defense Evasion
+references: Requires Sysmon data
+notes: .nan

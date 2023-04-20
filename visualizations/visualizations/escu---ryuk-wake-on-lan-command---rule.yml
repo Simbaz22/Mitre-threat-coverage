@@ -1,0 +1,32 @@
+title: ESCU - Ryuk Wake on LAN Command - Rule
+description: This Splunk query identifies the use of Wake-on-LAN utilized by Ryuk
+  ransomware. The Ryuk Ransomware uses the Wake-on-Lan feature to turn on powered
+  off devices on a compromised network to have greater success encrypting them. This
+  is a high fidelity indicator of Ryuk ransomware executing on an endpoint. Upon triage,
+  isolate the endpoint. Additional file modification events will be within the users
+  profile (\appdata\roaming) and in public directories (users\public\). Review all
+  Scheduled Tasks on the isolated endpoint and across the fleet. Suspicious Scheduled
+  Tasks will include a path to a unknown binary and those endpoints should be isolated
+  until triaged.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where (Processes.process=\"\
+      *8 LAN*\" OR Processes.process=\"*9 REP*\") by Processes.dest Processes.user\
+      \ Processes.parent_process Processes.process_name Processes.process Processes.process_id\
+      \ Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)` \n  -\
+      \  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `ryuk_wake_on_lan_command_filter`"
+  level: critical
+tags:
+- T1059.003
+- 'Command and Scripting Interpreter: Windows Command Shell'
+- Execution
+references: Increase Windows logging to include command line data
+notes: .nan

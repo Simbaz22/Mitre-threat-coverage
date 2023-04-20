@@ -1,0 +1,27 @@
+title: DS_Successful Login after Multiple Failed Attempts
+description: Alerts on a successful login after multiple failed logins.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Linux\nWindows"
+detection:
+  condition:
+    sigma: "\n  -  tstats count(Authentication.action) as FailureCount max(_time)\
+      \ as LastFailureTime from datamodel=Authentication where Authentication.action=\"\
+      failure\" by Authentication.user Authentication.src _time\n\n  -  join Authentication.user\
+      \ Authentication.src  [ \n  - tstats count(Authentication.action) as SuccessCount\
+      \ max(_time) as LastSuccessTime from datamodel=Authentication where Authentication.action=\"\
+      success\" by Authentication.user Authentication.src _time]\n\n  -  bucket span=15m\
+      \ _time \n\n  -  Authentication.src!=unknown AND (FailureCount > 5 AND SuccessCount\
+      \ > 0) AND (LastFailureTime > LastSuccessTime) \n\n  -  `ctime(LastFailureTime)`\n\
+      \n  -  `ctime(LastSuccessTime)`\n\n  -  `drop_dm_object_name(Authentication)`\n\
+      \n  -  table src user FailureCount SuccessCount LastFailureTime LastSuccessTime"
+  level: critical
+tags:
+- T1110.001
+- 'Brute Force: Password Guessing'
+- Credential Access
+references: .nan
+notes: .nan

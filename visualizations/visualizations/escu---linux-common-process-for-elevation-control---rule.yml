@@ -1,0 +1,35 @@
+title: ESCU - Linux Common Process For Elevation Control - Rule
+description: This analytic is to look for possible elevation control access using
+  a common known process in linux platform to change the attribute and file ownership.
+  This technique is commonly abused by adversaries, malware author and red teamers
+  to gain persistence or privilege escalation on the target or compromised host. This
+  common process is used to modify file attribute, file ownership or SUID. This tools
+  can be used in legitimate purposes so filter is needed.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name\
+      \ IN (\"chmod\", \"chown\", \"fchmod\", \"fchmodat\", \"fchown\", \"fchownat\"\
+      , \"fremovexattr\", \"fsetxattr\", \"lchown\", \"lremovexattr\", \"lsetxattr\"\
+      , \"removexattr\", \"setuid\", \"setgid\", \"setreuid\", \"setregid\", \"chattr\"\
+      ) OR Processes.process IN (\"*chmod *\", \"*chown *\", \"*fchmod *\", \"*fchmodat\
+      \ *\", \"*fchown *\", \"*fchownat *\", \"*fremovexattr *\", \"*fsetxattr *\"\
+      , \"*lchown *\", \"*lremovexattr *\", \"*lsetxattr *\", \"*removexattr *\",\
+      \ \"*setuid *\", \"*setgid *\", \"*setreuid *\", \"*setregid *\", \"*setcap\
+      \ *\", \"*chattr *\") by Processes.dest Processes.user Processes.parent_process_name\
+      \ Processes.process_name Processes.process Processes.process_id Processes.parent_process_id\
+      \ Processes.process_guid \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `linux_common_process_for_elevation_control_filter`"
+  level: critical
+tags:
+- "T1548.001\nT1548"
+- 'Abuse Elevation Control Mechanism: Setuid and Setgid'
+- 'Abuse Elevation Control Mechanism: Setuid and Setgid'
+references: Increase Linux Logs to include Command Line data
+notes: .nan

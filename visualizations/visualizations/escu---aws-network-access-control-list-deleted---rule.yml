@@ -1,0 +1,26 @@
+title: ESCU - AWS Network Access Control List Deleted - Rule
+description: Enforcing network-access controls is one of the defensive mechanisms
+  used by cloud administrators to restrict access to a cloud instance. After the attacker
+  has gained control of the AWS console by compromising an admin account, they can
+  delete a network ACL and gain access to the instance from anywhere. This search
+  will query the AWS CloudTrail logs to detect users deleting network ACLs.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=DeleteNetworkAclEntry requestParameters.egress=false\
+      \ \n  -  fillnull \n  -  stats count min(_time) as firstTime max(_time) as lastTime\
+      \ by userName userIdentity.principalId eventName requestParameters.egress src\
+      \ userAgent \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `aws_network_access_control_list_deleted_filter`"
+  level: critical
+tags:
+- T1562.007
+- 'Impair Defenses: Disable or Modify Cloud Firewall'
+- Defense Evasion
+references: .nan
+notes: .nan

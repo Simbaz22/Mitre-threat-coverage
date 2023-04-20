@@ -1,0 +1,33 @@
+title: ESCU - Resize ShadowStorage volume - Rule
+description: The following analytics identifies the resizing of shadowstorage by ransomware
+  malware to avoid the shadow volumes being made again. this technique is an alternative
+  by ransomware attacker than deleting the shadowstorage which is known alert in defensive
+  team. one example of ransomware that use this technique is CLOP ransomware where
+  it drops a .bat file that will resize the shadowstorage to minimum size as much
+  as possible
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(Processes.process)\
+      \ as cmdline values(Processes.parent_process_name) as parent_process values(Processes.process_name)\
+      \ as process_name min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes\
+      \ where Processes.parent_process_name = \"cmd.exe\" OR Processes.parent_process_name\
+      \ = \"powershell.exe\" OR Processes.parent_process_name = \"powershell_ise.exe\"\
+      \ OR Processes.parent_process_name =  \"wmic.exe\" Processes.process_name =\
+      \ \"vssadmin.exe\" Processes.process=\"*resize*\" Processes.process=\"*shadowstorage*\"\
+      \ Processes.process=\"*/maxsize*\" by Processes.parent_process_name Processes.parent_process\
+      \ Processes.process_name Processes.process Processes.dest Processes.user Processes.process_id\
+      \ Processes.process_guid \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  - `security_content_ctime(lastTime)` \n  -  `resize_shadowstorage_volume_filter`"
+  level: critical
+tags:
+- T1490
+- Inhibit System Recovery
+- Impact
+references: Increase Windows logging to include command line data
+notes: .nan

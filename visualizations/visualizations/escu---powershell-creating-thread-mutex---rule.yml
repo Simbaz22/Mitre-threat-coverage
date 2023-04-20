@@ -1,0 +1,26 @@
+title: ESCU - Powershell Creating Thread Mutex - Rule
+description: The following analytic identifies suspicious PowerShell script execution
+  via EventCode 4104 that is using the `mutex` function. This function is commonly
+  seen in some obfuscated PowerShell scripts to make sure that only one instance of
+  there process is running on a compromise machine. During triage, review parallel
+  processes within the same timeframe. Review the full script block to identify other
+  related artifacts.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: PowerShell
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 Message = \"*Threading.Mutex*\" \n  -  stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by EventCode Message\
+      \ ComputerName User \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `powershell_creating_thread_mutex_filter`"
+  level: critical
+tags:
+- "T1027\nT1027.005"
+- Obfuscated Files or Information
+- Obfuscated Files or Information
+references: .nan
+notes: .nan

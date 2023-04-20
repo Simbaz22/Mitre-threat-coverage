@@ -1,0 +1,25 @@
+title: ESCU - AWS SAML Update identity provider - Rule
+description: This search provides detection of updates to SAML provider in AWS. Updates
+  to SAML provider need to be monitored closely as they may indicate possible perimeter
+  compromise of federated credentials, or backdoor access from another cloud provider
+  set by attacker.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=UpdateSAMLProvider \n  -  stats count min(_time)\
+      \ as firstTime max(_time) as lastTime by eventType eventName requestParameters.sAMLProviderArn\
+      \ userIdentity.sessionContext.sessionIssuer.arn sourceIPAddress userIdentity.accessKeyId\
+      \ userIdentity.principalId \n  -  `security_content_ctime(firstTime)`\n  - \
+      \ `security_content_ctime(lastTime)` \n  - `aws_saml_update_identity_provider_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: .nan

@@ -1,0 +1,36 @@
+title: ESCU - Windows Registry Certificate Added - Rule
+description: The following analytic identifies installation of a root CA certificate
+  by monitoring the registry. The base paths may be found [here](https://gist.github.com/mattifestation/75d6117707bcf8c26845b3cbb6ad2b6b/raw/ae65ef15c706140ffc2e165615204e20f2903028/RootCAInstallationDetection.xml).
+  In short, there are specific certificate registry paths that will be written to
+  (SetValue) when a new certificate is added. The high-fidelity events to pay attention
+  to are SetValue events where the TargetObject property ends with "<THUMBPRINT_VALUE>\Blob"
+  as this indicates the direct installation or modification of a root certificate
+  binary blob. The other high fidelity reference will be which process is making the
+  registry modifications. There are very few processes that modify these day to day,
+  therefore monitoring for all to start (hunting) provides a great beginning.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Registry\
+      \ where Registry.registry_path IN (\"*\\\\certificates\\\\*\") AND Registry.registry_value_name=\"\
+      Blob\" by _time span=1h Registry.dest Registry.user Registry.registry_path Registry.registry_value_name\
+      \ Registry.process_guid Registry.registry_key_name Registry.registry_value_data\
+      \ \n  -  `drop_dm_object_name(Registry)` \n  -  join process_guid _time [\n\
+      \  -  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ by _time span=1h Processes.process_id Processes.process_name Processes.process\
+      \ Processes.dest Processes.process_guid \n  -  `drop_dm_object_name(Processes)`]\
+      \ \n  -  table _time dest user process_name process process_guid registry_path\
+      \ registry_value_name registry_value_data registry_key_name \n  -  `windows_registry_certificate_added_filter`"
+  level: critical
+tags:
+- "T1553.004\nT1553"
+- 'Subvert Trust Controls: Install Root Certificate'
+- 'Subvert Trust Controls: Install Root Certificate'
+references: "Increase Windows logging to include Registry events\nIncrease Windows\
+  \ logging to include command line data"
+notes: .nan

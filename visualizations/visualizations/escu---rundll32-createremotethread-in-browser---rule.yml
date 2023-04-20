@@ -1,0 +1,26 @@
+title: ESCU - Rundll32 CreateRemoteThread In Browser - Rule
+description: This analytic identifies the suspicious Remote Thread execution of rundll32.exe
+  process to "firefox.exe" and "chrome.exe" browser. This technique was seen in IcedID
+  malware where it hooks the browser to parse banking information as user used the
+  targetted browser process.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=8 SourceImage = \"*\\\\rundll32.exe\" TargetImage IN\
+      \ (\"*\\\\firefox.exe\", \"*\\\\chrome.exe\", \"*\\\\iexplore.exe\",\"*\\\\\
+      microsoftedgecp.exe\") \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by SourceImage TargetImage TargetProcessId SourceProcessId StartAddress\
+      \ EventCode Computer \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `rundll32_createremotethread_in_browser_filter`"
+  level: critical
+tags:
+- T1055
+- Process Injection
+- Defense Evasion, Privilege Escalation
+references: Requires Sysmon data
+notes: .nan

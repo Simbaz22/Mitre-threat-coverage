@@ -1,0 +1,24 @@
+title: ESCU - WMI Temporary Event Subscription - Rule
+description: This search looks for the creation of WMI temporary event subscriptions.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wmi` EventCode=5860 Temporary \n  -  rex field=Message \"NotificationQuery\
+      \ =\\s+(?<query>[^;\n  - ^$]+)\" \n  -  query!=\"SELECT * FROM Win32_ProcessStartTrace\
+      \ WHERE ProcessName = 'wsmprovhost.exe'\" AND query!=\"SELECT * FROM __InstanceOperationEvent\
+      \ WHERE TargetInstance ISA 'AntiVirusProduct' OR TargetInstance ISA 'FirewallProduct'\
+      \ OR TargetInstance ISA 'AntiSpywareProduct'\" \n  -  stats count min(_time)\
+      \ as firstTime max(_time) as lastTime by ComputerName, query  \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `wmi_temporary_event_subscription_filter`"
+  level: critical
+tags:
+- T1047
+- Windows Management Instrumentation
+- Execution
+references: .nan
+notes: Experimental detection (not supported by splunk)

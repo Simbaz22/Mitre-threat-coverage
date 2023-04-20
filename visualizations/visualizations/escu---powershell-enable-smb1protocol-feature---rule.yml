@@ -1,0 +1,24 @@
+title: ESCU - Powershell Enable SMB1Protocol Feature - Rule
+description: This search is to detect a suspicious enabling of smb1protocol through
+  "powershell.exe". This technique was seen in some ransomware (like reddot) where
+  it enable smb share to do the lateral movement and encrypt other files within the
+  compromise network system.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 Message = \"*Enable-WindowsOptionalFeature*\"\
+      \ Message = \"*SMB1Protocol*\" \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by EventCode Message ComputerName User \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `powershell_enable_smb1protocol_feature_filter`"
+  level: critical
+tags:
+- "T1027\nT1027.005"
+- Obfuscated Files or Information
+- Obfuscated Files or Information
+references: Increase Windows logging to include command line data and powershell logs
+notes: .nan

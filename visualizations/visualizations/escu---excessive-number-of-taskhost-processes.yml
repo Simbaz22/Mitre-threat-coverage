@@ -1,0 +1,33 @@
+title: ESCU - Excessive number of taskhost processes
+description: This detection targets behaviors observed in post exploit kits like Meterpreter
+  and Koadic that are run in memory.  We have observed that these tools must invoke
+  an excessive number of taskhost.exe and taskhostex.exe processes to complete various
+  actions (discovery, lateral movement, etc.).  It is extremely uncommon in the course
+  of normal operations to see so many distinct taskhost and taskhostex processes running
+  concurrently in a short time frame.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(Processes.process_id)\
+      \ as process_ids  min(_time) as firstTime max(_time) as lastTime FROM datamodel=Endpoint.Processes\
+      \ WHERE Processes.process_name = \"taskhost.exe\" OR Processes.process_name\
+      \ = \"taskhostex.exe\" BY Processes.dest Processes.process_name _time span=1h\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  eval pid_count=mvcount(process_ids)\
+      \ \n  -  eval taskhost_count_=if(process_name == \"taskhost.exe\", pid_count,\
+      \ 0) \n  -  eval taskhostex_count_=if(process_name == \"taskhostex.exe\", pid_count,\
+      \ 0) \n  -  stats sum(taskhost_count_) as taskhost_count, sum(taskhostex_count_)\
+      \ as taskhostex_count by _time, dest, firstTime, lastTime \n  -  where taskhost_count\
+      \ > 10 and taskhostex_count > 10 \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `excessive_number_of_taskhost_processes_filter`"
+  level: critical
+tags:
+- T1059
+- Command and Scripting Interpreter
+- Execution
+references: .nan
+notes: .nan

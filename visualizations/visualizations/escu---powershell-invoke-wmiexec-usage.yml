@@ -1,0 +1,23 @@
+title: ESCU - PowerShell Invoke-WmiExec Usage
+description: This analytic detects the usage of the Invoke-WMIExec utility within
+  PowerShell Script Block Logging (EventCode 4104). The utility is used for executing
+  WMI commands on targets using NTLMv2 pass-the-hash authentication.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 ScriptBlockText IN (\"*invoke-wmiexec*\")\
+      \ \n  \n  -  stats count min(_time) as firstTime max(_time) as lastTime by Computer\
+      \ EventCode ScriptBlockText \n  \n  -  `security_content_ctime(firstTime)` \n\
+      \  \n  -  `security_content_ctime(lastTime)`\n  \n  -  `powershell_invoke_wmiexec_usage_filter`"
+  level: critical
+tags:
+- T1047
+- Windows Management Instrumentation
+- Execution
+references: Increase Windows logging to include command line data and powershell logs
+notes: .nan

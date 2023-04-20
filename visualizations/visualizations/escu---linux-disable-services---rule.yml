@@ -1,0 +1,28 @@
+title: ESCU - Linux Disable Services - Rule
+description: The following analytic is to detect events that attempts to disable a
+  service. This is typically identified in parallel with other instances of service
+  enumeration of attempts to stop a service and then delete it. Adversaries utilize
+  this technique like industroyer2 malware to terminate security services or other
+  related services to continue there objective as a destructive payload.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name\
+      \ IN (\"systemctl\", \"service\", \"svcadm\")  Processes.process = \"* disable*\"\
+      \ by Processes.parent_process_name Processes.process_name Processes.process\
+      \ Processes.process_id Processes.parent_process_id Processes.process_guid Processes.dest\
+      \ Processes.user \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `linux_disable_services_filter`"
+  level: critical
+tags:
+- T1489
+- Service Stop
+- Impact
+references: Increase Linux Logs to include Command Line data
+notes: .nan

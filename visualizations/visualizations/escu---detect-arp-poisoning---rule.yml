@@ -1,0 +1,24 @@
+title: ESCU - Detect ARP Poisoning - Rule
+description: By enabling Dynamic ARP Inspection as a Layer 2 Security measure on the
+  organization's network devices, we will be able to detect ARP Poisoning attacks
+  in the Infrastructure.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "`cisco_networks` facility=\"PM\" mnemonic=\"ERR_DISABLE\" disable_cause=\"\
+      arp-inspection\" \n  -  eval src_interface=src_int_prefix_long+src_int_suffix\
+      \ \n  -  stats min(_time) AS firstTime max(_time) AS lastTime count BY host\
+      \ src_interface \n  -  `security_content_ctime(firstTime)`\n  - `security_content_ctime(lastTime)`\n\
+      \  -  `detect_arp_poisoning_filter`"
+  level: critical
+tags:
+- T1557.002
+- 'Adversary-in-the-Middle: ARP Cache Poisoning'
+- Collection, Credential Access
+references: .nan
+notes: Missing datatype=cisco_ios logs

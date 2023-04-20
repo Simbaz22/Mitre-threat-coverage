@@ -1,0 +1,24 @@
+title: ESCU - Detect Zerologon via Zeek - Rule
+description: This search detects attempts to run exploits for the Zerologon CVE-2020-1472
+  vulnerability via Zeek RPC
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Network
+detection:
+  condition:
+    sigma: "`zeek_rpc` operation IN (NetrServerPasswordSet2,NetrServerReqChallenge,NetrServerAuthenticate3)\
+      \ \n  -  bin span=5m _time \n  -  stats values(operation) dc(operation) as opscount\
+      \ count(eval(operation==\"NetrServerReqChallenge\")) as challenge count(eval(operation==\"\
+      NetrServerAuthenticate3\")) as authcount count(eval(operation==\"NetrServerPasswordSet2\"\
+      )) as passcount count as totalcount by _time,src_ip,dest_ip \n  -  opscount=3\
+      \ authcount>4 passcount>0 \n  -  `detect_zerologon_via_zeek_filter`"
+  level: critical
+tags:
+- T1190
+- Exploit Public-Facing Application
+- Initial Access
+references: .nan
+notes: Experimental detection (not supported by splunk)

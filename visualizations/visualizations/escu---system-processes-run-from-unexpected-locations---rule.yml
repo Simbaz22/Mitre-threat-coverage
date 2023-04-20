@@ -1,0 +1,31 @@
+title: ESCU - System Processes Run From Unexpected Locations - Rule
+description: "This search looks for system processes that typically execute from `C:\\\
+  Windows\\System32\\` or `C:\\Windows\\SysWOW64`.  This may indicate a malicious\
+  \ process that is trying to hide as a legitimate process.\nThis detection utilizes\
+  \ a lookup that is deduped `system32` and `syswow64` directories from Server 2016\
+  \ and Windows 10.\nDuring triage, review the parallel processes - what process moved\
+  \ the native Windows binary? identify any artifacts on disk and review. If a remote\
+  \ destination is contacted, what is the reputation?"
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Processes where Processes.process_path\
+      \ !=\"C:\\\\Windows\\\\System32*\" Processes.process_path !=\"C:\\\\Windows\\\
+      \\SysWOW64*\" by Processes.dest Processes.user Processes.parent_process Processes.process_name\
+      \ Processes.process Processes.process_id Processes.parent_process_id Processes.process_hash\
+      \ \n  -  `drop_dm_object_name(\"Processes\")` \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)`\n  -  `is_windows_system_file` \n \
+      \ -  `system_processes_run_from_unexpected_locations_filter`"
+  level: critical
+tags:
+- T1036.003
+- 'Masquerading: Rename System Utilities'
+- Defense Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

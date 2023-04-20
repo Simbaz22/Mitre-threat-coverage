@@ -1,0 +1,26 @@
+title: ESCU - AWS CreateAccessKey - Rule
+description: This search looks for AWS CloudTrail events where a user A who has already
+  permission to create access keys, makes an API call to create access keys for another
+  user B. Attackers have been know to use this technique for Privilege Escalation
+  in case new victim(user B) has more permissions than old victim(user B)
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName = CreateAccessKey userAgent !=console.amazonaws.com\
+      \ errorCode = success \n  -  eval match=if(match(userIdentity.userName,requestParameters.userName),1,0)\
+      \ \n  -  match=0 \n  -  stats count min(_time) as firstTime max(_time) as lastTime\
+      \ by requestParameters.userName src eventName eventSource aws_account_id errorCode\
+      \ userAgent eventID awsRegion userIdentity.principalId user_arn \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  - `aws_createaccesskey_filter`"
+  level: critical
+tags:
+- T1136.003
+- 'Create Account: Cloud Account'
+- Persistence
+references: .nan
+notes: .nan

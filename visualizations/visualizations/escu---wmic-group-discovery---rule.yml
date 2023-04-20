@@ -1,0 +1,27 @@
+title: ESCU - Wmic Group Discovery - Rule
+description: "The following hunting analytic identifies the use of `wmic.exe` enumerating\
+  \ local groups on the endpoint. \nTypically, by itself, is not malicious but may\
+  \ raise suspicion based on time of day, endpoint and username. \nDuring triage,\
+  \ review parallel processes and identify any further suspicious behavior."
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=wmic.exe\
+      \ (Processes.process=\"*group get name*\") by Processes.dest Processes.user\
+      \ Processes.parent_process_name Processes.process_name Processes.process Processes.original_file_name\
+      \ Processes.process_id Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `wmic_group_discovery_filter`"
+  level: critical
+tags:
+- "T1069\nT1069.001"
+- Permission Groups Discovery
+- Permission Groups Discovery
+references: Increase Windows logging to include command line data
+notes: .nan

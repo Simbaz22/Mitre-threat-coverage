@@ -1,0 +1,25 @@
+title: ESCU - GetDomainController with PowerShell Script Block - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the execution of the `Get-DomainController` commandlet. `Get-DomainController`
+  is part of PowerView, a PowerShell tool used to perform enumeration on Windows domains.
+  Red Teams and adversaries alike may use PowerView to enumerate domain computers
+  for situational awareness and Active Directory Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (Message = \"*Get-DomainController*\") \n\
+      \  -  stats count min(_time) as firstTime max(_time) as lastTime by EventCode\
+      \ Message ComputerName User \n  -  `security_content_ctime(firstTime)` \n  -\
+      \  `getdomaincontroller_with_powershell_script_block_filter`"
+  level: critical
+tags:
+- T1018
+- Remote System Discovery
+- Discovery
+references: Requires PowerShell logs
+notes: .nan

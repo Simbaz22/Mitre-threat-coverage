@@ -1,0 +1,26 @@
+title: ESCU - Malicious Powershell Executed As A Service - Rule
+description: This detection is to identify the abuse the Windows SC.exe to execute
+  malicious commands or payloads via PowerShell.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_system` EventCode=7045 \n  -  eval l_Service_File_Name=lower(Service_File_Name)\
+      \ \n  -  regex l_Service_File_Name=\"powershell[.\\s]\n  - powershell_ise[.\\\
+      s]\n  - pwsh[.\\s]\n  - psexec[.\\s]\" \n  -  regex l_Service_File_Name=\"-nop[rofile\\\
+      s]+\n  - -w[indowstyle]*\\s+hid[den]*\n  - -noe[xit\\s]+\n  - -enc[odedcommand\\\
+      s]+\" \n  -  stats count min(_time) as firstTime max(_time) as lastTime by EventCode\
+      \ Service_File_Name Service_Name Service_Start_Type Service_Type Service_Account\
+      \ user \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `malicious_powershell_executed_as_a_service_filter`"
+  level: critical
+tags:
+- T1569.002
+- 'System Services: Service Execution'
+- Execution
+references: .nan
+notes: .nan

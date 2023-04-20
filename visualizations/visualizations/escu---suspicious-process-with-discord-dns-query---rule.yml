@@ -1,0 +1,27 @@
+title: ESCU - Suspicious Process With Discord DNS Query - Rule
+description: This analytic identifies a process making a DNS query to Discord, a well
+  known instant messaging and digital distribution platform. Discord can be abused
+  by adversaries, as seen in the WhisperGate campaign, to host and download malicious.
+  external files. A process resolving a Discord DNS name could be an indicator of
+  malware trying to download files from Discord for further execution.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=22 QueryName IN (\"*discord*\") process_path != \"\
+      *\\\\AppData\\\\Local\\\\Discord\\\\*\" AND process_path != \"*\\\\Program Files*\"\
+      \ AND process_name != \"discord.exe\" \n  -  stats count min(_time) as firstTime\
+      \ max(_time) as lastTime by Image QueryName QueryStatus process_name QueryResults\
+      \ Computer process_path \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `suspicious_process_with_discord_dns_query_filter`"
+  level: critical
+tags:
+- T1059.005
+- 'Command and Scripting Interpreter: Visual Basic'
+- Execution
+references: Requires Sysmon data
+notes: .nan

@@ -1,0 +1,26 @@
+title: ESCU - Windows Raw Access To Disk Volume Partition - Rule
+description: This analytic is to look for suspicious raw access read to device disk
+  partition of the host machine. This technique was seen in several attacks by adversaries
+  or threat actor to wipe, encrypt or overwrite the boot sector of each partition
+  as part of their impact payload for example the "hermeticwiper" malware. This detection
+  is a good indicator that there is a process try to read or write on boot sector.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=9 Device = \\\\Device\\\\HarddiskVolume* NOT (Image\
+      \ IN(\"*\\\\Windows\\\\System32\\\\*\", \"*\\\\Windows\\\\SysWOW64\\\\*\"))\
+      \ \n  -  stats count min(_time) as firstTime max(_time) as lastTime by Image\
+      \ Device ProcessGuid ProcessId EventDescription EventCode Computer \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `windows_raw_access_to_disk_volume_partition_filter`"
+  level: critical
+tags:
+- "T1561.002\nT1561"
+- 'Disk Wipe: Disk Structure Wipe'
+- 'Disk Wipe: Disk Structure Wipe'
+references: Requires Sysmon data
+notes: .nan

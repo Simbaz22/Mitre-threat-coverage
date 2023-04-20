@@ -1,0 +1,32 @@
+title: ESCU - Unusual Number of Kerberos Service Tickets Requested - Rule
+description: "The following hunting analytic leverages Kerberos Event 4769, A Kerberos\
+  \ service ticket was requested, to identify a potential kerberoasting attack against\
+  \ Active Directory networks. Kerberoasting allows an adversary to request kerberos\
+  \ tickets for domain accounts typically used as service accounts and attempt to\
+  \ crack them offline allowing them to obtain privileged access to the domain.\n\
+  The detection calculates the standard deviation for each host and leverages the\
+  \ 3-sigma statistical rule to identify an unusual number service ticket requests.\
+  \ To customize this analytic, users can try different combinations of the `bucket`\
+  \ span time and the calculation of the `upperBound` field."
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4769 Service_Name!=\"*$\" Ticket_Encryption_Type=0x17\
+      \ \n  -  bucket span=2m _time \n  -  stats dc(Service_Name) AS unique_services\
+      \ values(Service_Name) as requested_services by _time, Client_Address \n  -\
+      \  eventstats avg(unique_services) as comp_avg , stdev(unique_services) as comp_std\
+      \ by Client_Address \n  -  eval upperBound=(comp_avg+comp_std*3) \n  -  eval\
+      \ isOutlier=if(unique_services > 2 and unique_services >= upperBound, 1, 0)\
+      \ \n  -  isOutlier=1 \n  -  `unusual_number_of_kerberos_service_tickets_requested_filter`"
+  level: critical
+tags:
+- T1558.003
+- 'Steal or Forge Kerberos Tickets: Kerberoasting'
+- Credential Access
+references: .nan
+notes: Too many false positives.

@@ -1,0 +1,26 @@
+title: ESCU - Clear Unallocated Sector Using Cipher App - Rule
+description: this search is to detect execution of `cipher.exe` to clear the unallocated
+  sectors of a specific disk. This technique was seen in some ransomware to make it
+  impossible to forensically recover deleted files.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name\
+      \ = \"cipher.exe\" Processes.process = \"*/w:*\" by Processes.parent_process_name\
+      \ Processes.parent_process Processes.process_name Processes.process Processes.dest\
+      \ Processes.user Processes.process_id Processes.process_guid \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `clear_unallocated_sector_using_cipher_app_filter`"
+  level: critical
+tags:
+- "T1070.004\nT1070"
+- 'Indicator Removal: File Deletion'
+- 'Indicator Removal: File Deletion'
+references: Increase Windows logging to include command line data
+notes: .nan

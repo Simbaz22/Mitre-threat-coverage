@@ -1,0 +1,23 @@
+title: ESCU - Detect SNICat SNI Exfiltration - Rule
+description: This search looks for commands that the SNICat tool uses in the TLS SNI
+  field.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "`zeek_ssl` \n  -  rex field=server_name \"(?<snicat>(LIST\n  - LS\n  -\
+      \ SIZE\n  - LD\n  - CB\n  - CD\n  - EX\n  - ALIVE\n  - EXIT\n  - WHERE\n  -\
+      \ finito)-[A-Za-z0-9]{16}\\.)\" \n  -  stats count by src_ip dest_ip server_name\
+      \ snicat \n  -  where count>0 \n  -  table src_ip dest_ip server_name snicat\
+      \ \n  -  `detect_snicat_sni_exfiltration_filter`"
+  level: critical
+tags:
+- T1041
+- Exfiltration Over C2 Channel
+- Exfiltration
+references: .nan
+notes: Rule not applicable to this client

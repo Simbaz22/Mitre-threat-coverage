@@ -1,0 +1,20 @@
+title: Suspicious Process Activity - Potential Lateral Movement WinRM Execution Analytic-A2B
+description: 'Technology Used: Individual Event Analytics Usecase Type: A2B'
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: MISSING SPLUNK LOGIC
+  level: critical
+tags:
+- T1021.006
+- 'Remote Services: Windows Remote Management'
+- Lateral Movement
+references: Increase Windows logging to include command line data
+notes: "Securonix Logic:\nDestProcessName is not null\nAND\nDestProcessName contains\
+  \ winrm.vbs or DestProcessName contains winrm.cmd\nAND\ndevicecustomstring1 contains\
+  \ cscript or devicecustomstring1 contains nologo"

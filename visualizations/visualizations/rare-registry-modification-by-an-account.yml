@@ -1,0 +1,20 @@
+title: Rare registry modification by an account
+description: Rare registry modification attempts may be indicative of a possible circumvention
+  of control activity or a malicious presence on the endpoint
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: MISSING SPLUNK LOGIC
+  level: critical
+tags:
+- T1112
+- Modify Registry
+- Defense Evasion
+references: Increase Windows logging to include Registry events
+notes: "Securonix Logic:\neventid = 4657\nAND\nAccountName != \"-\" and !contain ANONYMOUS\
+  \ and !contain LOCAL and !contain $"

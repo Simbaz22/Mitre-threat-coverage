@@ -1,0 +1,21 @@
+title: ESCU - Okta Failed SSO Attempts - Rule
+description: Detect failed Okta SSO events
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Okta
+detection:
+  condition:
+    sigma: "`okta` displayMessage=\"User attempted unauthorized access to app\" \n\
+      \  -  stats  min(_time) as firstTime max(_time) as lastTime values(app) as Apps\
+      \ count by user, result ,displayMessage, src_ip \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `okta_failed_sso_attempts_filter`"
+  level: critical
+tags:
+- "T1078\nT1078.001"
+- Valid Accounts
+- Valid Accounts
+references: Requires Okta data feed
+notes: .nan

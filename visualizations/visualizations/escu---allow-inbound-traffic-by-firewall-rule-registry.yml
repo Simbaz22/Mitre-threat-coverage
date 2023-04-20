@@ -1,0 +1,38 @@
+title: ESCU - Allow Inbound Traffic By Firewall Rule Registry
+description: This analytic detects a potential suspicious modification of firewall
+  rule registry allowing inbound traffic in specific port with public profile. This
+  technique was identified when an adversary wants to grant remote access to a machine
+  by allowing the traffic in a firewall rule.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Registry\
+      \ where Registry.registry_path= \"*\\\\System\\\\CurrentControlSet\\\\Services\\\
+      \\SharedAccess\\\\Parameters\\\\FirewallPolicy\\\\FirewallRules\\\\*\" Registry.registry_value_data\
+      \ = \"*\n  - Action=Allow\n  - *\" Registry.registry_value_data = \"*\n  - Dir=In\n\
+      \  - *\" Registry.registry_value_data = \"*\n  - Profile=Public\n  - *\" Registry.registry_value_data\
+      \ = \"*\n  - LPort=*\" by _time span=1h Registry.dest Registry.user Registry.registry_path\
+      \ Registry.registry_value_name Registry.process_guid Registry.registry_key_name\
+      \ Registry.registry_value_data \n  -  `drop_dm_object_name(Registry)` \n  -\
+      \ rename process_guid as proc_guid \n  - join proc_guid, _time [\n  -  tstats\
+      \ `security_content_summariesonly` count FROM datamodel=Endpoint.Processes by\
+      \ _time span=1h Processes.process_id Processes.process_name Processes.process\
+      \ Processes.dest Processes.parent_process_name Processes.parent_process Processes.process_guid\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  - rename process_guid as proc_guid\
+      \ \n  -  fields _time dest user parent_process_name parent_process process_name\
+      \ process_path process proc_guid registry_path registry_value_name registry_value_data\
+      \ registry_key_name] \n  -  table _time dest user parent_process_name parent_process\
+      \ process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data registry_key_name \n  -  `allow_inbound_traffic_by_firewall_rule_registry_filter`"
+  level: critical
+tags:
+- T1562.004
+- 'Impair Defenses: Disable or Modify System Firewall'
+- Defense Evasion
+references: Increase Windows logging to include Registry events
+notes: .nan

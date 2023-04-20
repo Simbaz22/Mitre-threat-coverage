@@ -1,0 +1,31 @@
+title: ESCU - Abnormally High AWS Instances Launched by User - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  looks for AWS CloudTrail events where a user successfully launches an abnormally
+  high number of instances. This search is deprecated and have been translated to
+  use the latest Change Datamodel'
+status: Expired
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=RunInstances errorCode=success \n  -  bucket span=10m\
+      \ _time \n  -  stats count AS instances_launched by _time userName \n  -  eventstats\
+      \ avg(instances_launched) as total_launched_avg, stdev(instances_launched) as\
+      \ total_launched_stdev \n  -  eval threshold_value = 4 \n  -  eval isOutlier=if(instances_launched\
+      \ > total_launched_avg+(total_launched_stdev * threshold_value), 1, 0) \n  -\
+      \  isOutlier=1 AND _time >= relative_time(now(), \"-10m@m\") \n  -  eval num_standard_deviations_away\
+      \ = round(abs(instances_launched - total_launched_avg) / total_launched_stdev,\
+      \ 2) \n  -  table _time, userName, instances_launched, num_standard_deviations_away,\
+      \ total_launched_avg, total_launched_stdev \n  -  `abnormally_high_aws_instances_launched_by_user_filter`"
+  level: critical
+tags:
+- T1078.004
+- 'Valid Accounts: Cloud Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: .nan

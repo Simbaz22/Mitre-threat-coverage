@@ -1,0 +1,26 @@
+title: ESCU - Windows NirSoft Utilities - Rule
+description: The following hunting analytic assists with identifying the proces execution
+  of commonly used utilities from NirSoft. Potentially not adversary behavior, but
+  worth identifying to know if the software is present and being used.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Processes by Processes.dest\
+      \ Processes.user Processes.parent_process Processes.process_name Processes.process\
+      \ Processes.original_file_name Processes.process_path Processes.process_id Processes.parent_process_id\
+      \ \n  -  `drop_dm_object_name(\"Processes\")` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `is_nirsoft_software` \n\
+      \  -  `windows_nirsoft_utilities_filter`"
+  level: critical
+tags:
+- T1588.002
+- 'Obtain Capabilities: Tool'
+- Resource Development
+references: .nan
+notes: .nan

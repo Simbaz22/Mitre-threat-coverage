@@ -1,0 +1,33 @@
+title: ESCU - Kerberos User Enumeration - Rule
+description: The following analytic leverages Event Id 4768, A Kerberos authentication
+  ticket (TGT) was requested, to identify one source endpoint trying to obtain an
+  unusual number Kerberos TGT ticket for non existing users. This behavior could represent
+  an adversary abusing the Kerberos protocol to perform a user enumeration attack
+  against an Active Directory environment. When Kerberos is sent a TGT request with
+  no preauthentication for an invalid username, it responds with KRB5KDC_ERR_C_PRINCIPAL_UNKNOWN
+  or 0x6. Red teams and adversaries alike may abuse the Kerberos protocol to validate
+  a list of users use them to perform further attacks.\ The detection calculates the
+  standard deviation for each host and leverages the 3-sigma statistical rule to identify
+  an unusual number requests. To customize this analytic, users can try different
+  combinations of the `bucket` span time and the calculation of the `upperBound` field.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4768 Result_Code=0x6 Account_Name!=\"\
+      *$\" \n  -  bucket span=2m _time \n  -  stats dc(Account_Name) AS unique_accounts\
+      \ values(Account_Name) as tried_accounts by _time, Client_Address \n  -  eventstats\
+      \ avg(unique_accounts) as comp_avg , stdev(unique_accounts) as comp_std by Client_Address\
+      \ \n  -  eval upperBound=(comp_avg+comp_std*3) \n  -  eval isOutlier=if(unique_accounts\
+      \ > 10 and unique_accounts >= upperBound, 1, 0) \n  -  isOutlier=1 \n  -  `kerberos_user_enumeration_filter`"
+  level: critical
+tags:
+- "T1589\nT1589.002"
+- Gather Victim Identity Information
+- Gather Victim Identity Information
+references: .nan
+notes: .nan

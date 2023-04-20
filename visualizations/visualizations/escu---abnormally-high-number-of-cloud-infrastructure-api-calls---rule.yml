@@ -1,0 +1,21 @@
+title: ESCU - Abnormally High Number Of Cloud Infrastructure API Calls - Rule
+description: This search will detect a spike in the number of API calls made to your
+  cloud infrastructure environment by a user.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "\n  -  tstats count as api_calls values(All_Changes.command) as command\
+      \ from datamodel=Change where All_Changes.user!=unknown All_Changes.status=success\
+      \ by All_Changes.user _time span=1h \n  - "
+  level: critical
+tags:
+- T1078.004
+- 'Valid Accounts: Cloud Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: Requires Splunk MLTK
+notes: Machine Learning Toolkit (MLTK) required

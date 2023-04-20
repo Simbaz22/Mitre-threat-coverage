@@ -1,0 +1,29 @@
+title: ESCU - Cloud Network Access Control List Deleted - Rule
+description: "WARNING, this detection has been marked deprecated by the Splunk Threat\
+  \ Research team, this means that it will no longer be maintained or supported. If\
+  \ you have any questions feel free to email us at: research@splunk.com. Enforcing\
+  \ network-access controls is one of the defensive mechanisms used by cloud administrators\
+  \ to restrict access to a cloud instance. After the attacker has gained control\
+  \ of the console by compromising an admin account, they can delete a network ACL\
+  \ and gain access to the instance from anywhere. This search will query the Change\
+  \ datamodel to detect users deleting network ACLs. Deprecated because it's a duplicate"
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=DeleteNetworkAcl\n  - rename userIdentity.arn as\
+      \ arn \n  -  stats count min(_time) as firstTime max(_time) as lastTime values(errorMessage)\
+      \ values(errorCode) values(userAgent) values(userIdentity.*) by src userName\
+      \ arn eventName \n  -  `security_content_ctime(lastTime)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `cloud_network_access_control_list_deleted_filter`"
+  level: critical
+tags:
+- T1562.007
+- 'Impair Defenses: Disable or Modify Cloud Firewall'
+- Defense Evasion
+references: .nan
+notes: Deprecated by Splunk

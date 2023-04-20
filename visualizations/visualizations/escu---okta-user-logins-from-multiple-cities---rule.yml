@@ -1,0 +1,23 @@
+title: ESCU - Okta User Logins From Multiple Cities - Rule
+description: This search detects logins from the same user from different cities in
+  a 24 hour period.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Okta
+detection:
+  condition:
+    sigma: "`okta` displayMessage=\"User login to Okta\" client.geographicalContext.city!=null\
+      \ \n  -  stats min(_time) as firstTime max(_time) as lastTime dc(client.geographicalContext.city)\
+      \ as locations values(client.geographicalContext.city) as cities values(client.geographicalContext.state)\
+      \ as states by user \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `okta_user_logins_from_multiple_cities_filter` \n  -  locations > 1"
+  level: critical
+tags:
+- "T1078\nT1078.001"
+- Valid Accounts
+- Valid Accounts
+references: Requires Okta data feed
+notes: .nan

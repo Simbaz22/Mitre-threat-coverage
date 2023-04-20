@@ -1,0 +1,26 @@
+title: ESCU - MacOS LOLbin - Rule
+description: Detect multiple executions of Living off the Land (LOLbin) binaries in
+  a short period of time.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "`osquery` name=es_process_events columns.cmdline IN (\"find*\", \"crontab*\"\
+      , \"screencapture*\", \"openssl*\", \"curl*\", \"wget*\", \"killall*\", \"funzip*\"\
+      ) \n  -  rename columns.* as * \n  -  stats min(_time) as firstTime max(_time)\
+      \ as lastTime values(cmdline) as cmdline, values(pid) as pid, values(parent)\
+      \ as parent, values(path) as path, values(signing_id) as signing_id, dc(path)\
+      \ as dc_path by username host \n  -  rename username as User, cmdline as process,\
+      \ path as process_path \n  -  where dc_path > 3 \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `macos_lolbin_filter`"
+  level: critical
+tags:
+- T1059.004
+- 'Command and Scripting Interpreter: Unix Shell'
+- Execution
+references: .nan
+notes: MacOS logs required

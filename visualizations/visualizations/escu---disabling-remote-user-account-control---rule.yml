@@ -1,0 +1,24 @@
+title: ESCU - Disabling Remote User Account Control - Rule
+description: The search looks for modifications to registry keys that control the
+  enforcement of Windows User Account Control (UAC).
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Registry where Registry.registry_path=*HKLM\\\
+      \\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System\\\
+      \\EnableLUA* Registry.registry_value_data=\"0x00000000\" by Registry.dest, Registry.registry_key_name\
+      \ Registry.user Registry.registry_path Registry.registry_value_data Registry.action\
+      \ \n  -  `drop_dm_object_name(Registry)` \n  -  `disabling_remote_user_account_control_filter`"
+  level: critical
+tags:
+- T1548.002
+- 'Abuse Elevation Control Mechanism: Bypass User Account Control'
+- Defense Evasion, Privilege Escalation
+references: Increase Windows logging to include Registry events
+notes: .nan

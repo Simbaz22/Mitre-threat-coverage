@@ -1,0 +1,33 @@
+title: ESCU - Detect new API calls from user roles - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  detects new API calls that have either never been seen before or that have not been
+  seen in the previous hour, where the identity type is `AssumedRole`.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: AWS
+detection:
+  condition:
+    sigma: "`cloudtrail` eventType=AwsApiCall errorCode=success userIdentity.type=AssumedRole\
+      \ [`cloudtrail` eventType=AwsApiCall errorCode=success  userIdentity.type=AssumedRole\
+      \ \n  -  stats earliest(_time) as earliest latest(_time) as latest by userName\
+      \ eventName \n  -   inputlookup append=t previously_seen_api_calls_from_user_roles\
+      \ \n  -  stats min(earliest) as earliest, max(latest) as latest by userName\
+      \ eventName \n  -  outputlookup previously_seen_api_calls_from_user_roles\n\
+      \  -  eval newApiCallfromUserRole=if(earliest>=relative_time(now(), \"-70m@m\"\
+      ), 1, 0) \n  -  where newApiCallfromUserRole=1 \n  -  `security_content_ctime(earliest)`\
+      \ \n  -  `security_content_ctime(latest)` \n  -  table eventName userName] \
+      \ \n  - rename userName as user\n  -  stats values(eventName) earliest(_time)\
+      \ as earliest latest(_time) as latest by user \n  -  `security_content_ctime(earliest)`\
+      \ \n  -  `security_content_ctime(latest)` \n  -  `detect_new_api_calls_from_user_roles_filter`"
+  level: critical
+tags:
+- T1078.004
+- 'Valid Accounts: Cloud Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: Deprecated by splunk

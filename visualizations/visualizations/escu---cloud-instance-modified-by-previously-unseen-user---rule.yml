@@ -1,0 +1,28 @@
+title: ESCU - Cloud Instance Modified By Previously Unseen User - Rule
+description: This search looks for cloud instances being modified by users who have
+  not previously modified them.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count earliest(_time) as\
+      \ firstTime, latest(_time) as lastTime values(All_Changes.object_id) as object_id\
+      \ values(All_Changes.command) as command from datamodel=Change where All_Changes.action=modified\
+      \ All_Changes.change_type=EC2 All_Changes.status=success by All_Changes.user\
+      \ \n  -  `drop_dm_object_name(\"All_Changes\")` \n  -  lookup previously_seen_cloud_instance_modifications_by_user\
+      \ user as user OUTPUTNEW firstTimeSeen, enough_data \n  -  eventstats max(enough_data)\
+      \ as enough_data \n  -  where enough_data=1 \n  -  eval firstTimeSeenUser=min(firstTimeSeen)\
+      \ \n  -  where isnull(firstTimeSeenUser) OR firstTimeSeenUser > relative_time(now(),\
+      \ \"-24h@h\") \n  -  table firstTime user command object_id count \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `cloud_instance_modified_by_previously_unseen_user_filter`"
+  level: critical
+tags:
+- T1078.004
+- 'Valid Accounts: Cloud Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: THIS IS A EXPERIMENTAL DETECTION

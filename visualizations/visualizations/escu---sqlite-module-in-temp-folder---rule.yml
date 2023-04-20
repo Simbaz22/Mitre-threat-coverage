@@ -1,0 +1,25 @@
+title: ESCU - Sqlite Module In Temp Folder - Rule
+description: This search is to detect a suspicious file creation of sqlite3.dll in
+  %temp% folder. This behavior was seen in IcedID malware where it download sqlite
+  module to parse browser database like for chrome or firefox to stole browser information
+  related to bank, credit card or credentials.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=11 (TargetFilename = \"*\\\\sqlite32.dll\" OR TargetFilename\
+      \ = \"*\\\\sqlite64.dll\") (TargetFilename = \"*\\\\temp\\\\*\") \n  - stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by process_name TargetFilename\
+      \ EventCode ProcessId Image \n  -  `security_content_ctime(firstTime)` \n  -\
+      \  `security_content_ctime(lastTime)` \n  -  `sqlite_module_in_temp_folder_filter`"
+  level: critical
+tags:
+- T1005
+- Data from Local System
+- Collection
+references: Requires Sysmon data
+notes: .nan

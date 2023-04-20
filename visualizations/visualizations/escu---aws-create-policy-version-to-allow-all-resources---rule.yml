@@ -1,0 +1,26 @@
+title: ESCU - AWS Create Policy Version to allow all resources - Rule
+description: This search looks for AWS CloudTrail events where a user created a policy
+  version that allows them to access any resource in their account.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=CreatePolicyVersion eventSource = iam.amazonaws.com\
+      \ errorCode = success \n  -  spath input=requestParameters.policyDocument output=key_policy_statements\
+      \ path=Statement{} \n  -  mvexpand key_policy_statements \n  -  spath input=key_policy_statements\
+      \ output=key_policy_action_1 path=Action \n  -  where key_policy_action_1 =\
+      \ \"*\" \n  -  stats count min(_time) as firstTime max(_time) as lastTime values(key_policy_statements)\
+      \ as policy_added by eventName eventSource aws_account_id errorCode userAgent\
+      \ eventID awsRegion user user_arn \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)`\n  - `aws_create_policy_version_to_allow_all_resources_filter`"
+  level: critical
+tags:
+- "T1078.004\nT1078"
+- 'Valid Accounts: Cloud Accounts'
+- 'Valid Accounts: Cloud Accounts'
+references: .nan
+notes: .nan

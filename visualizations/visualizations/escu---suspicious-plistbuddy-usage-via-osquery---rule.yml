@@ -1,0 +1,29 @@
+title: ESCU - Suspicious PlistBuddy Usage via OSquery - Rule
+description: "The following analytic identifies the use of a native MacOS utility,\
+  \ PlistBuddy, creating or modifying a properly list (.plist) file. In the instance\
+  \ of Silver Sparrow, the following commands were executed:\n- PlistBuddy -c \"Add\
+  \ :Label string init_verx\" ~/Library/Launchagents/init_verx.plist\n- PlistBuddy\
+  \ -c \"Add :RunAtLoad bool true\" ~/Library/Launchagents/init_verx.plist\n- PlistBuddy\
+  \ -c \"Add :StartInterval integer 3600\" ~/Library/Launchagents/init_verx.plist\n\
+  - PlistBuddy -c \"Add :ProgramArguments array\" ~/Library/Launchagents/init_verx.plist\n\
+  - PlistBuddy -c \"Add :ProgramArguments:0 string /bin/sh\" ~/Library/Launchagents/init_verx.plist\n\
+  - PlistBuddy -c \"Add :ProgramArguments:1 string -c\" ~/Library/Launchagents/init_verx.plist\n\
+  Upon triage, capture the property list file being written to disk and review for\
+  \ further indicators. Contain the endpoint and triage further."
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Web
+detection:
+  condition:
+    sigma: "`osquery_process` \"columns.cmdline\"=\"*LaunchAgents*\" OR \"columns.cmdline\"\
+      =\"*RunAtLoad*\" OR \"columns.cmdline\"=\"*true*\" \n  -   `suspicious_plistbuddy_usage_via_osquery_filter`"
+  level: critical
+tags:
+- T1543.001
+- 'Create or Modify System Process: Launch Agent'
+- Persistence, Privilege Escalation
+references: .nan
+notes: Experimental detection (not supported by splunk)

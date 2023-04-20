@@ -1,0 +1,28 @@
+title: ESCU - Get DomainPolicy with Powershell - Rule
+description: This analytic looks for the execution of `powershell.exe` executing the
+  `Get-DomainPolicy` commandlet used to obtain the password policy in a Windows domain.
+  Red Teams and adversaries alike may use PowerShell to enumerate domain policies
+  for situational awareness and Active Directory Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where (Processes.process_name=\"\
+      cmd.exe\" OR Processes.process_name=\"powershell*\") AND Processes.process =\
+      \ \"*Get-DomainPolicy*\" by Processes.dest Processes.user Processes.parent_process\
+      \ Processes.process_name Processes.process Processes.process_id Processes.parent_process_id\
+      \ Processes.parent_process_name \n  -  `drop_dm_object_name(Processes)` \n \
+      \ -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `get_domainpolicy_with_powershell_filter`"
+  level: critical
+tags:
+- T1201
+- Password Policy Discovery
+- Discovery
+references: Increase Windows logging to include command line data and powershell logs
+notes: .nan

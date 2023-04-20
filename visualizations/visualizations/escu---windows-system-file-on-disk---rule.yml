@@ -1,0 +1,27 @@
+title: ESCU - Windows System File on Disk - Rule
+description: The following hunting analytic will assist with identifying new .sys
+  files introduced in the environment. This query is meant to identify sys file creates
+  on disk. There will be noise, but reducing common process names or applications
+  should help to limit any volume. The idea is to identify new sys files written to
+  disk and identify them before they're added as a new kernel mode driver.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Filesystem where Filesystem.file_name=\"\
+      *.sys*\" by _time span=1h Filesystem.dest Filesystem.file_create_time Filesystem.file_name\
+      \ Filesystem.file_path Filesystem.file_hash \n  -  `drop_dm_object_name(Filesystem)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\n\
+      \  -  `windows_system_file_on_disk_filter`"
+  level: critical
+tags:
+- T1068
+- Exploitation for Privilege Escalation
+- Privilege Escalation
+references: Increase Windows logging to include file modification data
+notes: .nan

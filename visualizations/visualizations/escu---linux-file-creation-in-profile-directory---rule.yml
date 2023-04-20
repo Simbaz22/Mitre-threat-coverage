@@ -1,0 +1,28 @@
+title: ESCU - Linux File Creation In Profile Directory - Rule
+description: This analytic looks for suspicious file creation in /etc/profile.d directory
+  to automatically execute scripts by shell upon boot up of a linux machine. This
+  technique is commonly abused by adversaries, malware and red teamers as a persistence
+  mechanism to the targeted or compromised host. This Anomaly detection is a good
+  indicator that someone wants to run a code after boot up which can be done also
+  by the administrator or network operator for automation purposes.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Filesystem where Filesystem.file_path\
+      \ IN (\"*/etc/profile.d/*\") by Filesystem.dest Filesystem.file_create_time\
+      \ Filesystem.file_name Filesystem.process_guid Filesystem.file_path \n  -  `drop_dm_object_name(Filesystem)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `linux_file_creation_in_profile_directory_filter`"
+  level: critical
+tags:
+- "T1546.004\nT1546"
+- 'Event Triggered Execution: Unix Shell Configuration Modification'
+- 'Event Triggered Execution: Unix Shell Configuration Modification'
+references: Increase Linux logging to include file creation, deletion and modification
+notes: .nan

@@ -1,0 +1,36 @@
+title: ESCU - Windows Multiple Invalid Users Fail To Authenticate Using Kerberos -
+  Rule
+description: "The following analytic identifies one source endpoint failing to authenticate\
+  \ with 30 unique invalid domain users using the Kerberos protocol. This behavior\
+  \ could represent an adversary performing a Password Spraying attack against an\
+  \ Active Directory environment using Kerberos to obtain initial access or elevate\
+  \ privileges. Active Directory environments can be very different depending on the\
+  \ organization. Users should test this detection and customize the arbitrary threshold\
+  \ when needed. As attackers progress in a breach, mistakes will be made. In certain\
+  \ scenarios, adversaries may execute a password spraying attack using an invalid\
+  \ list of users. Event 4768 is generated every time the Key Distribution Center\
+  \ issues a Kerberos Ticket Granting Ticket (TGT). Failure code 0x6 stands for client\
+  \ not found in Kerberos database (the attempted user is not a valid domain user).\n\
+  This logic can be used for real time security monitoring as well as threat hunting\
+  \ exercises. This detection will only trigger on domain controllers, not on member\
+  \ servers or workstations.\nThe analytics returned fields allow analysts to investigate\
+  \ the event further by providing fields like source ip and attempted user accounts."
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4768 TargetUserName!=*$ Status=0x6 \n\
+      \  -  bucket span=5m _time \n  -  stats dc(TargetUserName) AS unique_accounts\
+      \ values(TargetUserName) as tried_accounts by _time, IpAddress \n  -  where\
+      \ unique_accounts > 30 \n  -  `windows_multiple_invalid_users_fail_to_authenticate_using_kerberos_filter`"
+  level: critical
+tags:
+- T1110.003
+- 'Brute Force: Password Spraying'
+- Credential Access
+references: .nan
+notes: Too many false positives.

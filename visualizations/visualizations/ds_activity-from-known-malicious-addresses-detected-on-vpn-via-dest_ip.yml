@@ -1,0 +1,23 @@
+title: DS_Activity from known malicious addresses detected on VPN via dest_ip
+description: This rule compares the destination IP addresses for all VPN events against
+  Threat Intelligence IOCs and fires on any matches.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  from datamodel:\"Threat_Intelligence\".\"Threat_Activity\" \n\n\
+      \  -  rename threat_match_value as dest_ip \n\n  -  join dest_ip \n    [ index=firewall\
+      \ (sourcetype=\"pan:globalprotect\" OR rule=*vpn* OR signature=*vpn*)]\n\n \
+      \ -  table threat_key threat_collection_key src_ip dest_ip app src_user action\
+      \ rule signature portal"
+  level: critical
+tags:
+- T1205
+- Traffic Signaling
+- Command and Control, Defense Evasion, Persistence
+references: .nan
+notes: .nan

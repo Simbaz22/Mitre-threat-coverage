@@ -1,0 +1,29 @@
+title: ESCU - AWS Network Access Control List Created with All Open Ports - Rule
+description: The search looks for AWS CloudTrail events to detect if any network ACLs
+  were created with all the ports open to a specified CIDR.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=CreateNetworkAclEntry OR eventName=ReplaceNetworkAclEntry\
+      \ requestParameters.ruleAction=allow requestParameters.egress=false requestParameters.aclProtocol=-1\
+      \ \n  -  append [`cloudtrail` eventName=CreateNetworkAclEntry OR eventName=ReplaceNetworkAclEntry\
+      \ requestParameters.ruleAction=allow requestParameters.egress=false requestParameters.aclProtocol!=-1\
+      \ \n  -  eval port_range='requestParameters.portRange.to' - 'requestParameters.portRange.from'\
+      \ \n  -  where port_range>1024] \n  -  fillnull \n  -  stats count min(_time)\
+      \ as firstTime max(_time) as lastTime by userName userIdentity.principalId eventName\
+      \ requestParameters.ruleAction requestParameters.egress requestParameters.aclProtocol\
+      \ requestParameters.portRange.to requestParameters.portRange.from src userAgent\
+      \ requestParameters.cidrBlock \n  -  `security_content_ctime(firstTime)`\n \
+      \ -  `security_content_ctime(lastTime)` \n  -  `aws_network_access_control_list_created_with_all_open_ports_filter`"
+  level: critical
+tags:
+- "T1562.007\nT1562"
+- 'Impair Defenses: Disable or Modify Cloud Firewall'
+- 'Impair Defenses: Disable or Modify Cloud Firewall'
+references: .nan
+notes: .nan

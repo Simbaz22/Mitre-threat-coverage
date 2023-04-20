@@ -1,0 +1,24 @@
+title: ESCU - aws detect permanent key creation - Rule
+description: This search provides detection of accounts creating permanent keys. Permanent
+  keys are not created by default and they are only needed for programmatic calls.
+  Creation of Permanent key is an important event to monitor.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`aws_cloudwatchlogs_eks` CreateAccessKey \n  -  spath eventName \n  -\
+      \  eventName=CreateAccessKey \"userIdentity.type\"=IAMUser \n  -  table sourceIPAddress\
+      \ userName userIdentity.type userAgent action status responseElements.accessKey.createDate\
+      \ responseElements.accessKey.status responseElements.accessKey.accessKeyId \n\
+      \  - `aws_detect_permanent_key_creation_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: THIS IS A EXPERIMENTAL DETECTION

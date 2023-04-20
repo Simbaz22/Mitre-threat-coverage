@@ -1,0 +1,21 @@
+title: ESCU - Unusually Long Content-Type Length - Rule
+description: This search looks for unusually long strings in the Content-Type http
+  header that the client sends the server.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Web
+detection:
+  condition:
+    sigma: "`stream_http` \n  -  eval cs_content_type_length = len(cs_content_type)\
+      \ \n  -  where cs_content_type_length > 100 \n  -  table endtime src_ip dest_ip\
+      \ cs_content_type_length cs_content_type url \n  -  `unusually_long_content_type_length_filter`"
+  level: critical
+tags:
+- T1071.001
+- 'Application Layer Protocol: Web Protocols'
+- Command and Control
+references: .nan
+notes: Experimental detection (not supported by splunk)

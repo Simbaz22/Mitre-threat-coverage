@@ -1,0 +1,21 @@
+title: ESCU - GCP Kubernetes cluster pod scan detection - Rule
+description: This search provides information of unauthenticated requests via user
+  agent, and authentication data against Kubernetes cluster's pods
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: GCP
+detection:
+  condition:
+    sigma: "`google_gcp_pubsub_message` category=kube-audit \n  - spath input=properties.log\
+      \ \n  - responseStatus.code=401 \n  - table sourceIPs{} userAgent verb requestURI\
+      \ responseStatus.reason properties.pod \n  -  `gcp_kubernetes_cluster_pod_scan_detection_filter`"
+  level: critical
+tags:
+- T1526
+- Cloud Service Discovery
+- Discovery
+references: .nan
+notes: Experimental detection (not supported by splunk)

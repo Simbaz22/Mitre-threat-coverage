@@ -1,0 +1,30 @@
+title: ESCU - Detect API activity from users without MFA - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  looks for AWS CloudTrail events where a user logged into the AWS account, is making
+  API calls and has not enabled Multi Factor authentication. Multi factor authentication
+  adds a layer of security by forcing the users to type a unique authentication code
+  from an approved authentication device when they access AWS websites or services.
+  AWS Best Practices recommend that you enable MFA for privileged IAM users.'
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` userIdentity.sessionContext.attributes.mfaAuthenticated=false\
+      \ \n  -  NOT [\n  -  inputlookup aws_service_accounts \n  -  fields identity\
+      \ \n  -  rename identity as user]\n  -  stats count min(_time) as firstTime\
+      \ max(_time) as lastTime values(eventName) as eventName by userIdentity.arn\
+      \ userIdentity.type user \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `detect_api_activity_from_users_without_mfa_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: Deprecated by Splunk

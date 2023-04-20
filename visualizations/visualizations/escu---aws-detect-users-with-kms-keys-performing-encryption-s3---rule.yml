@@ -1,0 +1,25 @@
+title: ESCU - AWS Detect Users with KMS keys performing encryption S3 - Rule
+description: This search provides detection of users with KMS keys performing encryption
+  specifically against S3 buckets.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=CopyObject requestParameters.x-amz-server-side-encryption=\"\
+      aws:kms\" \n  -  rename requestParameters.bucketName AS bucket_name, requestParameters.x-amz-copy-source\
+      \ AS src_file, requestParameters.key AS dest_file \n  -  stats count min(_time)\
+      \ as firstTime max(_time) as lastTime values(src_file) AS src_file values(dest_file)\
+      \ AS dest_file values(userAgent) AS userAgent values(region) AS region values(src)\
+      \ AS src by user \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  - `aws_detect_users_with_kms_keys_performing_encryption_s3_filter`"
+  level: critical
+tags:
+- T1486
+- Data Encrypted for Impact
+- Impact
+references: .nan
+notes: .nan

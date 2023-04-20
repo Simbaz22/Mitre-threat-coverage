@@ -1,0 +1,26 @@
+title: ESCU - Windows Raw Access To Master Boot Record Drive - Rule
+description: This analytic is to look for suspicious raw access read to drive where
+  the master boot record is placed. This technique was seen in several attacks by
+  adversaries or threat actor to wipe, encrypt or overwrite the master boot record
+  code as part of their impact payload. This detection is a good indicator that there
+  is a process try to read or write on MBR sector.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=9 Device = \\\\Device\\\\Harddisk0\\\\DR0 NOT (Image\
+      \ IN(\"*\\\\Windows\\\\System32\\\\*\", \"*\\\\Windows\\\\SysWOW64\\\\*\"))\
+      \ \n  -  stats count min(_time) as firstTime max(_time) as lastTime by Computer\
+      \ Image Device ProcessGuid ProcessId EventDescription EventCode \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `windows_raw_access_to_master_boot_record_drive_filter`"
+  level: critical
+tags:
+- "T1561.002\nT1561"
+- 'Disk Wipe: Disk Structure Wipe'
+- 'Disk Wipe: Disk Structure Wipe'
+references: Requires Sysmon data
+notes: .nan

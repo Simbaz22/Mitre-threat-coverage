@@ -1,0 +1,28 @@
+title: ESCU - Detect Mimikatz Via PowerShell And EventCode 4703 - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  looks for PowerShell requesting privileges consistent with credential dumping. Deprecated,
+  looks like things changed from a logging perspective.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "PowerShell\nWindows"
+detection:
+  condition:
+    sigma: "`wineventlog_security` signature_id=4703 Process_Name=*powershell.exe\
+      \ \n  -  rex field=Message \"Enabled Privileges:\\s+(?<privs>\\w+)\\s+Disabled\
+      \ Privileges:\" \n  -  where privs=\"SeDebugPrivilege\" \n  -  stats count min(_time)\
+      \ as firstTime max(_time) as lastTime by dest, Process_Name, privs, Process_ID,\
+      \ Message \n  -  rename privs as \"Enabled Privilege\" \n  -  rename Process_Name\
+      \ as process \n  -   `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `detect_mimikatz_via_powershell_and_eventcode_4703_filter`"
+  level: critical
+tags:
+- T1003.001
+- 'OS Credential Dumping: LSASS Memory'
+- Credential Access
+references: .nan
+notes: Rule deprecated by Splunk

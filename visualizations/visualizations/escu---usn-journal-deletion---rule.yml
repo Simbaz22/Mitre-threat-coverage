@@ -1,0 +1,27 @@
+title: ESCU - USN Journal Deletion - Rule
+description: The fsutil.exe application is a legitimate Windows utility used to perform
+  tasks related to the file allocation table (FAT) and NTFS file systems. The update
+  sequence number (USN) change journal provides a log of all changes made to the files
+  on the disk. This search looks for fsutil.exe deleting the USN journal.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(Processes.process)\
+      \ as process values(Processes.parent_process) as parent_process min(_time) as\
+      \ firstTime max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=fsutil.exe\
+      \ by Processes.user Processes.process_name Processes.parent_process_name Processes.dest\
+      \  \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  process=\"*deletejournal*\"\
+      \ AND process=\"*usn*\" \n  -  `usn_journal_deletion_filter`"
+  level: critical
+tags:
+- T1070
+- Indicator Removal
+- Defense Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

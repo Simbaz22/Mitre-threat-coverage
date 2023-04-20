@@ -1,0 +1,26 @@
+title: ESCU - Interactive Session on Remote Endpoint with PowerShell - Rule
+description: The following analytic utilizes PowerShell Script Block Logging (EventCode=4104)
+  to identify the usage of the `Enter-PSSession`. This commandlet can be used to open
+  an interactive session on a remote endpoint leveraging the WinRM protocol. Red Teams
+  and adversaries alike may abuse WinRM and `Enter-PSSession` for lateral movement
+  and remote code execution.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "PowerShell\nWindows"
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 (ScriptBlockText=\"*Enter-PSSession*\" AND\
+      \ ScriptBlockText=\"*-ComputerName*\") \n  -  stats count min(_time) as firstTime\
+      \ max(_time) as lastTime by EventCode ScriptBlockText Computer user_id \n  -\
+      \  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `interactive_session_on_remote_endpoint_with_powershell_filter`"
+  level: critical
+tags:
+- "T1021\nT1021.006"
+- Remote Services
+- Remote Services
+references: Increase Windows logging to include command line data and powershell logs
+notes: .nan

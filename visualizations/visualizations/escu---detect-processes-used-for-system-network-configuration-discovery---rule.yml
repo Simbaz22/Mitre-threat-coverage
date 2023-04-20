@@ -1,0 +1,27 @@
+title: ESCU - Detect processes used for System Network Configuration Discovery - Rule
+description: This search looks for fast execution of processes used for system network
+  configuration discovery on the endpoint.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(Processes.process)\
+      \ as process values(Processes.parent_process) as parent_process min(_time) as\
+      \ firstTime max(_time) as lastTime from datamodel=Endpoint.Processes where NOT\
+      \ Processes.user IN (\"\",\"unknown\") by Processes.dest Processes.process_name\
+      \ Processes.user _time \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `system_network_configuration_discovery_tools`\
+      \ \n  -  transaction dest connected=false maxpause=5m \n  - where eventcount>=5\
+      \ \n  -  table firstTime lastTime dest user process_name process parent_process\
+      \ eventcount \n  -  `detect_processes_used_for_system_network_configuration_discovery_filter`"
+  level: critical
+tags:
+- T1016
+- System Network Configuration Discovery
+- Discovery
+references: .nan
+notes: .nan

@@ -1,0 +1,30 @@
+title: ESCU - Windows connhost exe started forcefully - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. The search
+  looks for the Console Window Host process (connhost.exe) executed using the force
+  flag -ForceV1. This is not regular behavior in the Windows OS and is often seen
+  executed by the Ryuk Ransomware. DEPRECATED This event is actually seen in the windows
+  10 client of attack_range_local. After further testing we realized this is not specific
+  to Ryuk.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Processes WHERE Processes.process=\"\
+      *C:\\\\Windows\\\\system32\\\\conhost.exe* 0xffffffff *-ForceV1*\" by Processes.user\
+      \ Processes.process_name Processes.process Processes.dest \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `windows_connhost_exe_started_forcefully_filter`"
+  level: critical
+tags:
+- T1059.003
+- 'Command and Scripting Interpreter: Windows Command Shell'
+- Execution
+references: Increase Windows logging to include command line data
+notes: Deprecated by Splunk

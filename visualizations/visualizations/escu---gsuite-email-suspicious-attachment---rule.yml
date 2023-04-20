@@ -1,0 +1,30 @@
+title: ESCU - GSuite Email Suspicious Attachment - Rule
+description: This search is to detect a suspicious attachment file extension in Gsuite
+  email that may related to spear phishing attack. This file type is commonly used
+  by malware to lure user to click on it to execute malicious code to compromised
+  targetted machine. But this search can also catch some normal files related to this
+  file type that maybe send by employee or network admin.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: GCP
+detection:
+  condition:
+    sigma: "`gsuite_gmail` \"attachment{}.file_extension_type\" IN (\"pl\", \"py\"\
+      , \"rb\", \"sh\", \"bat\", \"exe\", \"dll\", \"cpl\", \"com\", \"js\", \"vbs\"\
+      , \"ps1\", \"reg\",\"swf\", \"cmd\", \"go\") \n  -  eval phase=\"plan\" \n \
+      \ -  eval severity=\"medium\" \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime values(attachment{}.file_extension_type) as email_attachments,\
+      \ values(attachment{}.sha256) as attachment_sha256, values(payload_size) as\
+      \ payload_size by destination{}.service num_message_attachments  subject destination{}.address\
+      \ source.address phase severity \n  -  `security_content_ctime(firstTime)` \n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `gsuite_email_suspicious_attachment_filter`"
+  level: critical
+tags:
+- T1566.001
+- 'Phishing: Spearphishing Attachment'
+- Initial Access
+references: Missing Gsuite Logs
+notes: .nan

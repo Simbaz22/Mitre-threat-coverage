@@ -1,0 +1,27 @@
+title: ESCU - Modification Of Wallpaper - Rule
+description: This analytic identifies suspicious modification of registry to deface
+  or change the wallpaper of a compromised machines as part of its payload. This technique
+  was commonly seen in ransomware like REVIL where it create a bitmap file contain
+  a note that the machine was compromised and make it as a wallpaper.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode =13 (TargetObject= \"*\\\\Control Panel\\\\Desktop\\\
+      \\Wallpaper\" AND Image != \"*\\\\explorer.exe\") OR (TargetObject= \"*\\\\\
+      Control Panel\\\\Desktop\\\\Wallpaper\" AND Details = \"*\\\\temp\\\\*\") \n\
+      \  -  stats count min(_time) as firstTime max(_time) as lastTime by EventCode\
+      \ Image TargetObject Details Computer process_guid process_id user_id \n  -\
+      \  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `modification_of_wallpaper_filter`"
+  level: critical
+tags:
+- T1491
+- Defacement
+- Impact
+references: Requires Sysmon data
+notes: .nan

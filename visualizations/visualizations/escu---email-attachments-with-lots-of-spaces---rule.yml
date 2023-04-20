@@ -1,0 +1,26 @@
+title: ESCU - Email Attachments With Lots Of Spaces - Rule
+description: Attackers often use spaces as a means to obfuscate an attachment's file
+  extension. This search looks for messages with email attachments that have many
+  spaces within the file names.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Network
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(All_Email.recipient)\
+      \ as recipient_address min(_time) as firstTime max(_time) as lastTime from datamodel=Email\
+      \ where All_Email.file_name=\"*\" by All_Email.src_user, All_Email.file_name\
+      \ All_Email.message_id \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `drop_dm_object_name(\"All_Email\")` \n  -  eval space_ratio = (mvcount(split(file_name,\"\
+      \ \"))-1)/len(file_name) \n  -  space_ratio >= 0.1 \n  -   rex field=recipient_address\
+      \ \"(?<recipient_user>.*)@\" \n  -  `email_attachments_with_lots_of_spaces_filter`"
+  level: critical
+tags:
+- T1027
+- Obfuscated Files or Information
+- Defense Evasion
+references: .nan
+notes: Experimental detection (not supported by splunk)

@@ -1,0 +1,30 @@
+title: ESCU - Non Firefox Process Access Firefox Profile Dir - Rule
+description: This search is to detect an anomaly event of non-firefox process accessing
+  the files in  profile folder. This folder contains all the sqlite database of the
+  firefox browser related to users login, history, cookies and etc. Most of the RAT,
+  trojan spy as well as FIN7 jssloader try to parse the those sqlite database to collect
+  information on the compromised host. This SACL Event (4663) need to be enabled to
+  tthe firefox profile directory to be eable to use this. Since you monitoring this
+  access to the folder a noise coming from firefox need to be filter and also sqlite
+  db browser and explorer .exe to make this detection more stable.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4663 NOT (process_name IN (\"*\\\\firefox.exe\"\
+      , \"*\\\\explorer.exe\", \"*sql*\")) Object_Name=\"*\\\\AppData\\\\Roaming\\\
+      \\Mozilla\\\\Firefox\\\\Profiles*\" \n  -  stats count min(_time) as firstTime\
+      \ max(_time) as lastTime by Object_Name Object_Type process_name Access_Mask\
+      \ Accesses process_id EventCode dest user \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `non_firefox_process_access_firefox_profile_dir_filter`"
+  level: critical
+tags:
+- "T1555\nT1555.003"
+- Credentials from Password Stores
+- Credentials from Password Stores
+references: Increase Windows logging to include file modification data
+notes: .nan

@@ -1,0 +1,28 @@
+title: ESCU - Linux DD File Overwrite - Rule
+description: This analytic is to look for dd command to overwrite file. This technique
+  was abused by adversaries or threat actor to destroy files or data on specific system
+  or in a large number of host within network to interrupt host avilability, services
+  and many more. This is also used to destroy data where it make the file irrecoverable
+  by forensic techniques through overwriting files, data or local and remote drives.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name\
+      \ = \"dd\" AND Processes.process = \"*of=*\" by Processes.dest Processes.user\
+      \ Processes.parent_process_name Processes.process_name Processes.process Processes.process_id\
+      \ Processes.parent_process_id Processes.process_guid \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `linux_dd_file_overwrite_filter`"
+  level: critical
+tags:
+- T1485
+- Data Destruction
+- Impact
+references: Increase Linux Logs to include Command Line data
+notes: .nan

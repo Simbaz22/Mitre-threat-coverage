@@ -1,0 +1,26 @@
+title: ESCU - Logon Script Event Trigger Execution - Rule
+description: This search is to detect a suspicious modification of registry entry
+  to persist and gain privilege escalation upon booting up of compromised host. This
+  technique was seen in several APT and malware where it modify UserInitMprLogonScript
+  registry entry to its malicious payload to be executed upon boot up of the machine.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Registry where Registry.registry_path\
+      \ IN (\"*\\\\Environment\\\\UserInitMprLogonScript\") by Registry.dest Registry.user\
+      \ Registry.registry_path Registry.registry_key_name Registry.registry_value_name\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `drop_dm_object_name(Registry)` \n  -  `logon_script_event_trigger_execution_filter`"
+  level: critical
+tags:
+- T1037.001
+- 'Boot or Logon Initialization Scripts: Logon Script (Windows)'
+- Persistence, Privilege Escalation
+references: Increase Windows logging to include Registry events
+notes: .nan

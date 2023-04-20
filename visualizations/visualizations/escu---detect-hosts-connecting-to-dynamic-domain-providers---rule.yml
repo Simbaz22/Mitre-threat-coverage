@@ -1,0 +1,26 @@
+title: ESCU - Detect hosts connecting to dynamic domain providers - Rule
+description: Malicious actors often abuse legitimate Dynamic DNS services to host
+  malicious payloads or interactive command and control nodes. Attackers will automate
+  domain resolution changes by routing dynamic domains to countless IP addresses to
+  circumvent firewall blocks, block lists as well as frustrate a network defenders
+  analytic and investigative processes. This search will look for DNS queries made
+  from within your infrastructure to suspicious dynamic domains.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(DNS.answer)\
+      \ as answer min(_time) as firstTime from datamodel=Network_Resolution by DNS.query\
+      \ host \n  -  `drop_dm_object_name(\"DNS\")` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `dynamic_dns_providers` \n  -  `detect_hosts_connecting_to_dynamic_domain_providers_filter`"
+  level: critical
+tags:
+- T1189
+- Drive-by Compromise
+- Initial Access
+references: Requires DNS data
+notes: .nan

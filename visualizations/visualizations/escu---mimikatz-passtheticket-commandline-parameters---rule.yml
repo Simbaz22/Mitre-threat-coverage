@@ -1,0 +1,29 @@
+title: ESCU - Mimikatz PassTheTicket CommandLine Parameters - Rule
+description: The following analytic looks for the use of Mimikatz command line parameters
+  leveraged to execute pass the ticket attacks. Red teams and adversaries alike may
+  use the pass the ticket technique using stolen Kerberos tickets to move laterally
+  within an environment, bypassing normal system access controls. Defenders should
+  be aware that adversaries may customize the source code of Mimikatz and modify the
+  command line parameters. This would effectively bypass this analytic.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where (Processes.process\
+      \ = \"*sekurlsa::tickets /export*\" OR Processes.process = \"*kerberos::ptt*\"\
+      ) by Processes.dest Processes.user Processes.parent_process Processes.process_name\
+      \ Processes.process Processes.process_id Processes.parent_process_id Processes.parent_process_name\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `mimikatz_passtheticket_commandline_parameters_filter`"
+  level: critical
+tags:
+- T1550.003
+- 'Use Alternate Authentication Material: Pass the Ticket'
+- Defense Evasion, Lateral Movement
+references: Increase Windows logging to include command line data
+notes: .nan

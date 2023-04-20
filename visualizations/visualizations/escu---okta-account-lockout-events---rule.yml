@@ -1,0 +1,21 @@
+title: ESCU - Okta Account Lockout Events - Rule
+description: Detect Okta user lockout events
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Okta
+detection:
+  condition:
+    sigma: "`okta` displayMessage=\"Max sign in attempts exceeded\" \n  -  rename\
+      \ client.geographicalContext.country as country, client.geographicalContext.state\
+      \ as state, client.geographicalContext.city as city \n  -  table _time, user,\
+      \ country, state, city, src_ip \n  -  `okta_account_lockout_events_filter`"
+  level: critical
+tags:
+- "T1078\nT1078.001"
+- Valid Accounts
+- Valid Accounts
+references: Requires Okta data feed
+notes: .nan

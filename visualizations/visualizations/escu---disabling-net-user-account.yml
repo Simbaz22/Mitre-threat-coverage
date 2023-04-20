@@ -1,0 +1,28 @@
+title: ESCU - Disabling Net User Account
+description: This analytic will identify a suspicious command-line that disables a
+  user account using the `net.exe` utility native to Windows. This technique may used
+  by the adversaries to interrupt availability of such users to do their malicious
+  act.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(Processes.process)\
+      \ as process values(Processes.parent_process) as parent_process values(Processes.process_id)\
+      \ as process_id count min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes\
+      \ where `process_net` AND Processes.process=\"*user*\" AND Processes.process=\"\
+      */active:no*\" by  Processes.process_name Processes.original_file_name Processes.dest\
+      \ Processes.user Processes.parent_process_name \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `disabling_net_user_account_filter`"
+  level: critical
+tags:
+- T1531
+- Account Access Removal
+- Impact
+references: Increase Windows logging to include command line data
+notes: .nan

@@ -1,0 +1,31 @@
+title: ESCU - GCP Kubernetes cluster scan detection - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  provides information of unauthenticated requests via user agent, and authentication
+  data against Kubernetes cluster'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: GCP
+detection:
+  condition:
+    sigma: "`google_gcp_pubsub_message` data.protoPayload.requestMetadata.callerIp!=127.0.0.1\
+      \ data.protoPayload.requestMetadata.callerIp!=::1 \"data.labels.authorization.k8s.io/decision\"\
+      =forbid \"data.protoPayload.status.message\"=PERMISSION_DENIED data.protoPayload.authenticationInfo.principalEmail=\"\
+      system:anonymous\" \n  -  rename data.protoPayload.requestMetadata.callerIp\
+      \ as src_ip \n  -  stats count min(_time) as firstTime max(_time) as lastTime\
+      \ values(data.protoPayload.methodName) as method_name values(data.protoPayload.resourceName)\
+      \ as resource_name values(data.protoPayload.requestMetadata.callerSuppliedUserAgent)\
+      \ as http_user_agent by src_ip data.resource.labels.cluster_name \n  -  rename\
+      \ data.resource.labels.cluster_name as cluster_name\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `security_content_ctime(firstTime)`  \n  -  `gcp_kubernetes_cluster_scan_detection_filter`"
+  level: critical
+tags:
+- T1526
+- Cloud Service Discovery
+- Discovery
+references: .nan
+notes: Experimental detection (not supported by splunk)

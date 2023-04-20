@@ -1,0 +1,34 @@
+title: ESCU - Detect Long DNS TXT Record Response - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  is used to detect attempts to use DNS tunneling, by calculating the length of responses
+  to DNS TXT queries. Endpoints using DNS as a method of transmission for data exfiltration,
+  command and control, or evasion of security controls can often be detected by noting
+  unusually large volumes of DNS traffic. Deprecated because this detection should
+  focus on DNS queries instead of DNS responses.'
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Network_Resolution where DNS.message_type=response\
+      \ AND DNS.record_type=TXT by DNS.src DNS.dest DNS.answer DNS.record_type \n\
+      \  -   `drop_dm_object_name(\"DNS\")` \n  -  eval anslen=len(answer) \n  - \
+      \ anslen>100 \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  rename src as \"Source IP\", dest as \"Destination IP\", answer as\
+      \ \"DNS Answer\" anslen as \"Answer Length\" record_type as \"DNS Record Type\"\
+      \ firstTime as \"First Time\" lastTime as \"Last Time\" count as Count \n  -\
+      \  table \"Source IP\" \"Destination IP\" \"DNS Answer\" \"DNS Record Type\"\
+      \  \"Answer Length\" Count \"First Time\" \"Last Time\" \n  -  `detect_long_dns_txt_record_response_filter`"
+  level: critical
+tags:
+- T1048.003
+- 'Exfiltration Over Alternative Protocol: Exfiltration Over Unencrypted Non-C2 Protocol'
+- Exfiltration
+references: Requires Network Resolution data
+notes: .nan

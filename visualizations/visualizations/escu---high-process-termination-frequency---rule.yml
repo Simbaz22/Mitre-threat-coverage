@@ -1,0 +1,24 @@
+title: ESCU - High Process Termination Frequency - Rule
+description: This analytics are designed to indentify a high frequency of process
+  termination on a machine which is a common behavior of ransomware malware before
+  encrypting files. This technique is designed to avoid an exception error while accessing
+  (docs, images, database and etc..) in the infected machine for encryption.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventCode=5 \n  - bin _time span=3s \n  - stats values(Image)\
+      \ as proc_terminated min(_time) as firstTime max(_time) as lastTime  count by\
+      \ Computer EventCode ProcessID \n  -  where count >= 15 \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `high_process_termination_frequency_filter`"
+  level: critical
+tags:
+- T1486
+- Data Encrypted for Impact
+- Impact
+references: Requires Sysmon data
+notes: .nan

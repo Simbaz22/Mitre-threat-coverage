@@ -1,0 +1,27 @@
+title: ESCU - Linux Possible Append Cronjob Entry on Existing Cronjob File - Rule
+description: This analytic looks for possible suspicious commandline that may use
+  to append a code to any existing cronjob files for persistence or privilege escalation.
+  This technique is commonly abused by malware, adversaries and red teamers to automatically
+  execute their code within a existing or sometimes in normal cronjob script file.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Endpoint.Processes\
+      \ where Processes.process = \"*echo*\" AND Processes.process IN(\"*/etc/cron*\"\
+      , \"*/var/spool/cron/*\", \"*/etc/anacrontab*\") by Processes.dest Processes.user\
+      \ Processes.parent_process_name Processes.process_name Processes.process Processes.process_id\
+      \ Processes.parent_process_id Processes.process_guid \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `linux_possible_append_cronjob_entry_on_existing_cronjob_file_filter`"
+  level: critical
+tags:
+- "T1053.003\nT1053"
+- 'Scheduled Task/Job: Cron'
+- 'Scheduled Task/Job: Cron'
+references: Increase Linux Logs to include Command Line data
+notes: .nan

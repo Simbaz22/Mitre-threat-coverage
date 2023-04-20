@@ -1,0 +1,31 @@
+title: ESCU - 7zip CommandLine To SMB Share Path
+description: This search is to detect a suspicious 7z process with commandline pointing
+  to SMB network share. This technique was seen in CONTI LEAK tools where it use 7z
+  to archive a sensitive files and place it in network share tmp folder. This search
+  is a good hunting query that may give analyst a hint why specific user try to archive
+  a file pointing to SMB user which is un usual.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where (Processes.process_name\
+      \ =\"7z.exe\" OR Processes.process_name = \"7za.exe\" OR Processes.original_file_name\
+      \ = \"7z.exe\" OR Processes.original_file_name =  \"7za.exe\") AND (Processes.process=\"\
+      *\\\\C$\\\\*\" OR Processes.process=\"*\\\\Admin$\\\\*\" OR Processes.process=\"\
+      *\\\\IPC$\\\\*\") by Processes.original_file_name Processes.parent_process_name\
+      \ Processes.parent_process Processes.process_name Processes.process Processes.parent_process_id\
+      \ Processes.process_id  Processes.dest Processes.user \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `7zip_commandline_to_smb_share_path_filter`"
+  level: critical
+tags:
+- T1560.001
+- 'Archive Collected Data: Archive via Utility'
+- Collection
+references: Increase Windows logging to include command line data
+notes: .nan

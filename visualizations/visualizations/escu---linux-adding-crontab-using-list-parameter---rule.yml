@@ -1,0 +1,28 @@
+title: ESCU - Linux Adding Crontab Using List Parameter - Rule
+description: The following analytic identifies a suspicious cron jobs modification
+  using crontab list parameters. This command line parameter can be abused by malware
+  like industroyer2, adversaries, and red teamers to add a crontab entry to their
+  malicious code to execute to the schedule they want. This event can also be executed
+  by administrator or normal user for automation purposes so filter is needed.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name\
+      \ = \"crontab\" Processes.process= \"* -l*\" by  Processes.parent_process_name\
+      \ Processes.process_name Processes.process Processes.process_id Processes.parent_process_id\
+      \ Processes.dest Processes.user \n  -  `drop_dm_object_name(Processes)` \n \
+      \ -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `linux_adding_crontab_using_list_parameter_filter`"
+  level: critical
+tags:
+- "T1053.003\nT1053"
+- 'Scheduled Task/Job: Cron'
+- 'Scheduled Task/Job: Cron'
+references: Increase Linux Logging to include command line
+notes: .nan

@@ -1,0 +1,26 @@
+title: ESCU - Kerberos Pre-Authentication Flag Disabled in UserAccountControl - Rule
+description: The following analytic leverages Windows Security Event 4738, `A user
+  account was changed`, to identify a change performed on a domain user object that
+  disables Kerberos Pre-Authentication. Disabling the Pre Authentication flag in the
+  UserAccountControl property allows an adversary to easily perform a brute force
+  attack against the user's password offline leveraging the ASP REP Roasting technique.
+  Red Teams and adversaries alike who have obtained privileges in an Active Directory
+  network may use this technique as a backdoor or a way to escalate privileges.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4738 MSADChangedAttributes=\"*Don't Require\
+      \ Preauth' - Enabled*\" \n  -  table EventCode, Account_Name, Security_ID, MSADChangedAttributes\
+      \ \n  -  `kerberos_pre_authentication_flag_disabled_in_useraccountcontrol_filter`"
+  level: critical
+tags:
+- "T1558\nT1558.004"
+- Steal or Forge Kerberos Tickets
+- Steal or Forge Kerberos Tickets
+references: .nan
+notes: .nan

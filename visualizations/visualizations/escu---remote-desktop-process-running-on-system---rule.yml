@@ -1,0 +1,25 @@
+title: ESCU - Remote Desktop Process Running On System - Rule
+description: This search looks for the remote desktop process mstsc.exe running on
+  systems upon which it doesn't typically run. This is accomplished by filtering out
+  all systems that are noted in the `common_rdp_source category` in the Assets and
+  Identity framework.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process=*mstsc.exe\
+      \ AND Processes.dest_category!=common_rdp_source by Processes.dest Processes.user\
+      \ Processes.process \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `remote_desktop_process_running_on_system_filter`"
+  level: critical
+tags:
+- T1021.001
+- 'Remote Services: Remote Desktop Protocol'
+- Lateral Movement
+references: .nan
+notes: Experimental Detection (Not supported by Splunk)

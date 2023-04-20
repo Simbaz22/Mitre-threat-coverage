@@ -1,0 +1,29 @@
+title: ESCU - Detect Renamed RClone - Rule
+description: The following analytic identifies the usage of `rclone.exe`, renamed,
+  being used to exfiltrate data to a remote destination. RClone has been used by multiple
+  ransomware groups to exfiltrate data. In many instances, it will be downloaded from
+  the legitimate site and executed accordingly. During triage, isolate the endpoint
+  and begin to review parallel processes for additional behavior. At this stage, the
+  adversary may have staged data to be exfiltrated.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where (Processes.original_file_name=rclone.exe\
+      \ AND Processes.process_name!=rclone.exe) by Processes.dest Processes.user Processes.parent_process_name\
+      \ Processes.process_name Processes.process Processes.process_id Processes.parent_process_id\
+      \ Processes.original_file_name \n  -  `drop_dm_object_name(Processes)` \n  -\
+      \  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `detect_renamed_rclone_filter`"
+  level: critical
+tags:
+- T1020
+- Automated Exfiltration
+- Exfiltration
+references: .nan
+notes: .nan

@@ -1,0 +1,29 @@
+title: ESCU - Kerberoasting spn request with RC4 encryption - Rule
+description: The following analytic leverages Kerberos Event 4769, A Kerberos service
+  ticket was requested, to identify a potential kerberoasting attack against Active
+  Directory networks. Kerberoasting allows an adversary to request kerberos tickets
+  for domain accounts typically used as service accounts and attempt to crack them
+  offline allowing them to obtain privileged access to the domain. This analytic looks
+  for a specific combination of the Ticket_Options field based on common kerberoasting
+  tools. Defenders should be aware that it may be possible for a Kerberoast attack
+  to use different Ticket_Options.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4769 Service_Name!=\"*$\" (Ticket_Options=0x40810000\
+      \ OR Ticket_Options=0x40800000 OR Ticket_Options=0x40810010) Ticket_Encryption_Type=0x17\
+      \ \n  -  stats count min(_time) as firstTime max(_time) as lastTime by dest,\
+      \ service, service_id, Ticket_Encryption_Type, Ticket_Options \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `kerberoasting_spn_request_with_rc4_encryption_filter`"
+  level: critical
+tags:
+- "T1558\nT1558.003"
+- Steal or Forge Kerberos Tickets
+- Steal or Forge Kerberos Tickets
+references: .nan
+notes: Too many false positives.

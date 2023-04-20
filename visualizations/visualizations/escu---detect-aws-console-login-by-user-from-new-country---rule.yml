@@ -1,0 +1,34 @@
+title: ESCU - Detect AWS Console Login by User from New Country - Rule
+description: This search looks for AWS CloudTrail events wherein a console login event
+  by a user was recorded within the last hour, then compares the event to a lookup
+  file of previously seen users (by ARN values) who have logged into the console.
+  The alert is fired if the user has logged into the console for the first time within
+  the last hour
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "\n  -  tstats earliest(_time) as firstTime latest(_time) as lastTime from\
+      \ datamodel=Authentication where Authentication.signature=ConsoleLogin by Authentication.user\
+      \ Authentication.src \n  -  iplocation Authentication.src \n  -  `drop_dm_object_name(Authentication)`\
+      \ \n  -  table firstTime lastTime user Country \n  -  join user type=outer [\n\
+      \  -  inputlookup previously_seen_users_console_logins \n  -  stats min(firstTime)\
+      \ AS earliestseen by user Country \n  -  fields earliestseen user Country] \n\
+      \  -  eval userCountry=if(firstTime >= relative_time(now(), \"-24h@h\"), \"\
+      New Country\",\"Previously Seen Country\") \n  -  eval userStatus=if(earliestseen\
+      \ >= relative_time(now(),\"-24h@h\") OR isnull(earliestseen), \"New User\",\"\
+      Old User\") \n  -  where userCountry = \"New Country\" AND userStatus != \"\
+      Old User\" \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  table firstTime lastTime user Country userStatus userCountry \n  -\
+      \  `detect_aws_console_login_by_user_from_new_country_filter`"
+  level: critical
+tags:
+- T1535
+- Unused/Unsupported Cloud Regions
+- Defense Evasion
+references: .nan
+notes: .nan

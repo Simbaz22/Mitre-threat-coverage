@@ -1,0 +1,26 @@
+title: ESCU - Delete ShadowCopy With PowerShell - Rule
+description: This following analytic detects PowerShell command to delete shadow copy
+  using the WMIC PowerShell module. This technique was seen used by a recent adversary
+  to deploy DarkSide Ransomware where it executed a child process of PowerShell to
+  execute a hex encoded command to delete shadow copy. This hex encoded command was
+  able to be decrypted by PowerShell log.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 Message= \"*ShadowCopy*\" (Message = \"*Delete*\"\
+      \ OR Message = \"*Remove*\") \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by EventCode Message ComputerName User \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `delete_shadowcopy_with_powershell_filter`"
+  level: critical
+tags:
+- T1490
+- Inhibit System Recovery
+- Impact
+references: "Increase Windows logging to include command line data\nRequires PowerShell\
+  \ logs"
+notes: .nan

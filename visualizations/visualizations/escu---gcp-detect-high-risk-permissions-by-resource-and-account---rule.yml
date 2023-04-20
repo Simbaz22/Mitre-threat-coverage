@@ -1,0 +1,28 @@
+title: ESCU - GCP Detect high risk permissions by resource and account - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  provides detection of high risk permissions by resource and accounts. These are
+  permissions that can allow attackers with compromised accounts to move laterally
+  and escalate privileges.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: GCP
+detection:
+  condition:
+    sigma: "`google_gcp_pubsub_message` data.protoPayload.authorizationInfo{}.permission=iam.serviceAccounts.getaccesstoken\
+      \ OR iam.serviceAccounts.setIamPolicy OR iam.serviceAccounts.actas OR dataflow.jobs.create\
+      \ OR composer.environments.create OR dataproc.clusters.create \n  - table data.protoPayload.requestMetadata.callerIp\
+      \ data.protoPayload.authenticationInfo.principalEmail data.protoPayload.authorizationInfo{}.permission\
+      \ data.protoPayload.response.bindings{}.members{} data.resource.labels.project_id\
+      \ \n  -  `gcp_detect_high_risk_permissions_by_resource_and_account_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: Deprecated by Splunk

@@ -1,0 +1,32 @@
+title: ESCU - Kubernetes Nginx Ingress RFI - Rule
+description: This search uses the Kubernetes logs from a nginx ingress controller
+  to detect remote file inclusion attacks.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Cloud
+detection:
+  condition:
+    sigma: "`kubernetes_container_controller` \n  -  rex field=_raw \"^(?<remote_addr>\\\
+      S+)\\s+-\\s+-\\s+\\[(?<time_local>[^\\]]*)\\]\\s\\\"(?<request>[^\\\"]*)\\\"\
+      \\s(?<status>\\S*)\\s(?<body_bytes_sent>\\S*)\\s\\\"(?<http_referer>[^\\\"]*)\\\
+      \"\\s\\\"(?<http_user_agent>[^\\\"]*)\\\"\\s(?<request_length>\\S*)\\s(?<request_time>\\\
+      S*)\\s\\[(?<proxy_upstream_name>[^\\]]*)\\]\\s\\[(?<proxy_alternative_upstream_name>[^\\\
+      ]]*)\\]\\s(?<upstream_addr>\\S*)\\s(?<upstream_response_length>\\S*)\\s(?<upstream_response_time>\\\
+      S*)\\s(?<upstream_status>\\S*)\\s(?<req_id>\\S*)\" \n  -  rex field=request\
+      \ \"^(?<http_method>\\S+)?\\s(?<url>\\S+)\\s\" \n  -  rex field=url \"(?<dest_ip>\\\
+      d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\" \n  -  dest_ip=* \n  -  rename remote_addr\
+      \ AS src_ip, upstream_status as status, proxy_upstream_name as proxy \n  - \
+      \ eval phase=\"operate\" \n  -  eval severity=\"medium\" \n  -  stats count\
+      \ min(_time) as firstTime max(_time) as lastTime by src_ip, dest_ip status,\
+      \ url, http_method, host, http_user_agent, proxy, phase, severity \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `kubernetes_nginx_ingress_rfi_filter`"
+  level: critical
+tags:
+- T1212
+- Exploitation for Credential Access
+- Credential Access
+references: .nan
+notes: 'Missing SourceType: kube:container:controller'

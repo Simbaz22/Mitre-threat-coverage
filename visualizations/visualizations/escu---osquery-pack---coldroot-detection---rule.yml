@@ -1,0 +1,24 @@
+title: ESCU - Osquery pack - ColdRoot detection - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  looks for ColdRoot events from the osx-attacks osquery pack.'
+status: Expired
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  from datamodel Alerts.Alerts \n  -  app=osquery:results (name=pack_osx-attacks_OSX_ColdRoot_RAT_Launchd\
+      \ OR name=pack_osx-attacks_OSX_ColdRoot_RAT_Files) \n  -  rename columns.path\
+      \ as path \n  -  bucket _time span=30s \n  -  stats count(path) by _time, host,\
+      \ user, path \n  -  `osquery_pack___coldroot_detection_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: .nan
+notes: Deprecated by Splunk

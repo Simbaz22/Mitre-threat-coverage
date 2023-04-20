@@ -1,0 +1,24 @@
+title: ESCU - GitHub Pull Request from Unknown User - Rule
+description: This search looks for Pull Request from unknown user.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: AWS
+detection:
+  condition:
+    sigma: "`github` check_suite.pull_requests{}.id=* \n  -  stats count by check_suite.head_commit.author.name\
+      \ repository.full_name check_suite.pull_requests{}.head.ref check_suite.head_commit.message\
+      \ \n  -  rename check_suite.head_commit.author.name as user repository.full_name\
+      \ as repository check_suite.pull_requests{}.head.ref as ref_head check_suite.head_commit.message\
+      \ as commit_message \n  -  NOT `github_known_users` \n  -  eval phase=\"code\"\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `github_pull_request_from_unknown_user_filter`"
+  level: critical
+tags:
+- T1195.001
+- 'Supply Chain Compromise: Compromise Software Dependencies and Development Tools'
+- Initial Access
+references: Requires errorMessage field in AWS logs
+notes: .nan

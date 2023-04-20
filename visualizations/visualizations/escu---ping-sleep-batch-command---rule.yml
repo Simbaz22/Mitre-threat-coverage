@@ -1,0 +1,32 @@
+title: ESCU - Ping Sleep Batch Command - Rule
+description: This analytic will identify the possible execution of ping sleep batch
+  commands. This technique was seen in several malware samples and is used to trigger
+  sleep times without explicitly calling sleep functions or commandlets. The goal
+  is to delay the execution of malicious code and bypass detection or sandbox analysis.
+  This  detection can be a good indicator of a process delaying its execution for
+  malicious purposes.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where `process_ping`\
+      \ (Processes.parent_process = \"*ping*\" Processes.parent_process = *-n* Processes.parent_process=\"\
+      * Nul*\"Processes.parent_process=\"*&gt;*\") OR (Processes.process = \"*ping*\"\
+      \ Processes.process = *-n* Processes.process=\"* Nul*\"Processes.process=\"\
+      *&gt;*\") by Processes.parent_process_name Processes.parent_process Processes.process_name\
+      \ Processes.original_file_name Processes.process Processes.process_id Processes.process_guid\
+      \ Processes.user Processes.dest \n  -  `drop_dm_object_name(\"Processes\")`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  - `security_content_ctime(lastTime)`\
+      \ \n  -  `ping_sleep_batch_command_filter`"
+  level: critical
+tags:
+- "T1497\nT1497.003"
+- Virtualization/Sandbox Evasion
+- Virtualization/Sandbox Evasion
+references: Increase Windows logging to include command line data
+notes: .nan

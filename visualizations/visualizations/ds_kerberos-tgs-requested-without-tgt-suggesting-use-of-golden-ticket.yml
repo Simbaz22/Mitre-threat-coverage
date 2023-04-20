@@ -1,0 +1,21 @@
+title: DS_Kerberos TGS Requested without TGT Suggesting Use of Golden Ticket
+description: Identifies a Kerberos Goldent Ticket attack.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "index=winlog (EventCode=4768 OR EventCode=4769) Client_Address!=\"::1\"\
+      \ Certificate_Thumbprint!=\"\" Account_Name=*$ \n\n  -  stats count min(_time)\
+      \ as firstTime max(_time) as lastTime by dest, Account_Name, Client_Address,\
+      \ action, Message \n\n  -  `security_content_ctime(firstTime)` \n\n  -  `security_content_ctime(lastTime)`"
+  level: critical
+tags:
+- T1558.001
+- 'Steal or Forge Kerberos Tickets: Golden Ticket'
+- Credential Access
+references: .nan
+notes: .nan

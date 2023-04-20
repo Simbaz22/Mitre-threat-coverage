@@ -1,0 +1,34 @@
+title: ESCU - Office Product Spawning CertUtil - Rule
+description: The following detection identifies the latest behavior utilized by different
+  malware families (including TA551, IcedID). This detection identifies any Windows
+  Office Product spawning `certutil.exe`. In malicious instances, the command-line
+  of `certutil.exe` will contain a URL to a remote destination. In addition, Threat
+  Research has released a detections identifying suspicious use of `certutil.exe`.
+  In this instance, we narrow our detection down to the Office suite as a parent process.
+  During triage, review all file modifications. Capture and analyze any artifacts
+  on disk. The Office Product, or `certutil.exe` will have reached out to a remote
+  destination, capture and block the IPs or domain. Review additional parallel processes
+  for further activity.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.parent_process_name\
+      \ IN (\"winword.exe\",\"excel.exe\",\"powerpnt.exe\",\"mspub.exe\",\"visio.exe\"\
+      ) `process_certutil` by Processes.dest Processes.user Processes.parent_process\
+      \ Processes.process_name Processes.original_file_name Processes.process Processes.process_id\
+      \ Processes.parent_process_id \n  -  `drop_dm_object_name(Processes)` \n  -\
+      \  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `office_product_spawning_certutil_filter`"
+  level: critical
+tags:
+- "T1566\nT1566.001"
+- Phishing
+- Phishing
+references: .nan
+notes: .nan

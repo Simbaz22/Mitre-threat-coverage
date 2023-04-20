@@ -1,0 +1,40 @@
+title: ESCU - Linux High Frequency Of File Deletion In Etc Folder - Rule
+description: This analytic is to detect a high frequency of file deletion relative
+  to process name and process id /etc/ folder. These events was seen in acidrain wiper
+  malware where it tries to delete all files in a non-standard directory in linux
+  directory. This detection already contains some filter that might cause false positive
+  during our testing. But we recommend to add more filter if needed.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(Filesystem.file_name)\
+      \ as deletedFileNames values(Filesystem.file_path) as deletedFilePath dc(Filesystem.file_path)\
+      \ as numOfDelFilePath count min(_time) as firstTime max(_time) as lastTime FROM\
+      \ datamodel=Endpoint.Filesystem where Filesystem.action=deleted Filesystem.file_path\
+      \ = \"/etc/*\" by _time span=1h  Filesystem.dest Filesystem.process_guid Filesystem.action\
+      \ \n  -  `drop_dm_object_name(Filesystem)` \n  - rename process_guid as proc_guid\
+      \ \n  - join proc_guid, _time [ \n  -  tstats `security_content_summariesonly`\
+      \ count FROM datamodel=Endpoint.Processes where Processes.parent_process_name\
+      \ != unknown NOT (Processes.parent_process_name IN (\"/usr/bin/dpkg\", \"*usr/bin/python*\"\
+      , \"*/usr/bin/apt-*\", \"/bin/rm\", \"*splunkd\", \"/usr/bin/mandb\")) by _time\
+      \ span=1h Processes.process_id Processes.process_name Processes.process Processes.dest\
+      \ Processes.parent_process_name Processes.parent_process Processes.process_path\
+      \ Processes.process_guid \n  -  `drop_dm_object_name(Processes)` \n  - rename\
+      \ process_guid as proc_guid \n  -  fields _time dest user parent_process_name\
+      \ parent_process process_name process_path process proc_guid registry_path registry_value_name\
+      \ registry_value_data registry_key_name action] \n  -  table  process_name process\
+      \ proc_guid action _time  deletedFileNames deletedFilePath numOfDelFilePath\
+      \ parent_process_name parent_process  process_path dest user \n  -  where  numOfDelFilePath\
+      \ >= 200 \n  -  `linux_high_frequency_of_file_deletion_in_etc_folder_filter`"
+  level: critical
+tags:
+- "T1485\nT1070.004\nT1070"
+- Data Destruction
+- Data Destruction
+references: Increase Linux logging to include file creation, deletion and modification
+notes: .nan

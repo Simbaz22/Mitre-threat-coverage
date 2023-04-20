@@ -1,0 +1,23 @@
+title: ESCU - aws detect attach to role policy - Rule
+description: This search provides detection of an user attaching itself to a different
+  role trust policy. This can be used for lateral movement and escalation of privileges.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`aws_cloudwatchlogs_eks` attach policy\n  -  spath requestParameters.policyArn\
+      \ \n  -  table sourceIPAddress user_access_key userIdentity.arn userIdentity.sessionContext.sessionIssuer.arn\
+      \ eventName errorCode errorMessage status action requestParameters.policyArn\
+      \ userIdentity.sessionContext.attributes.mfaAuthenticated userIdentity.sessionContext.attributes.creationDate\
+      \ \n  -  `aws_detect_attach_to_role_policy_filter`"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: THIS IS A EXPERIMENTAL DETECTION

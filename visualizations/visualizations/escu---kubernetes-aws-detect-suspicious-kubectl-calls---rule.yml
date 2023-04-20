@@ -1,0 +1,21 @@
+title: ESCU - Kubernetes AWS detect suspicious kubectl calls - Rule
+description: This search provides information on anonymous Kubectl calls with IP,
+  verb namespace and object access context
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`aws_cloudwatchlogs_eks` userAgent=kubectl* sourceIPs{}!=127.0.0.1 sourceIPs{}!=::1\
+      \ src_user=system:anonymous  \n  -  table  src_ip src_user verb userAgent requestURI\
+      \  \n  -  stats  count by src_ip src_user verb userAgent requestURI \n  - `kubernetes_aws_detect_suspicious_kubectl_calls_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: .nan
+notes: Missing SourceType aws:cloudwatchlogs:eks

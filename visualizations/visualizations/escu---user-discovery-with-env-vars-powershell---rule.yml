@@ -1,0 +1,28 @@
+title: ESCU - User Discovery With Env Vars PowerShell - Rule
+description: This analytic looks for the execution of `powershell.exe` with command-line
+  arguments that leverage PowerShell environment variables to identify the current
+  logged user. Red Teams and adversaries may leverage this method to identify the
+  logged user on a compromised endpoint for situational awareness and Active Directory
+  Discovery.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where (Processes.process_name=\"\
+      powershell.exe\") (Processes.process=\"*$env:UserName*\" OR Processes.process=\"\
+      *[System.Environment]::UserName*\") by Processes.dest Processes.user Processes.parent_process\
+      \ Processes.process_name Processes.process Processes.process_id Processes.parent_process_id\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `user_discovery_with_env_vars_powershell_filter`"
+  level: critical
+tags:
+- T1033
+- System Owner/User Discovery
+- Discovery
+references: Increase Windows logging to include command line data
+notes: .nan

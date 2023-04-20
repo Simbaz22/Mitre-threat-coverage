@@ -1,0 +1,19 @@
+title: VPN activity by Terminated Users_NGFirewall
+description: Activity by terminated users may be indicative of a possible account
+  misuse or a gap in the deprovisioning process
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Firewall &\nList of Terminated Users"
+detection:
+  condition:
+    sigma: MISSING SPLUNK LOGIC
+  level: critical
+tags:
+- T1078.002
+- 'Valid Accounts: Domain Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: Requires a list of terminated users
+notes: "Securonix: \nSTATUS = 0 and EventTime > TERMINATION DATE"

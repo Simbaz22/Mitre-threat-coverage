@@ -1,0 +1,23 @@
+title: DS_Child or parent process involving MSHTA executable detected
+description: This policy detects scenarios where the process mshta.exe was either
+  executed by a rare parent process or was used to execute a rare child process.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.parent_process_name=\"\
+      *mshta*\" OR Processes.process_name=\"*mshta*\" by Processes.dest Processes.parent_process\
+      \ Processes.process Processes.user \n\n  -  `drop_dm_object_name(Processes)`\
+      \ \n\n  -  `security_content_ctime(firstTime)` \n\n  -  `security_content_ctime(lastTime)`"
+  level: critical
+tags:
+- T1218.005
+- 'System Binary Proxy Execution: Mshta'
+- Defense Evasion
+references: .nan
+notes: .nan

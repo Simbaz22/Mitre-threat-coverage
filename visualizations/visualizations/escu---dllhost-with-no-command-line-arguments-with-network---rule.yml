@@ -1,0 +1,33 @@
+title: ESCU - DLLHost with no Command Line Arguments with Network - Rule
+description: The following analytic identifies DLLHost.exe with no command line arguments
+  with a network connection. It is unusual for DLLHost.exe to execute with no command
+  line arguments present. This particular behavior is common with malicious software,
+  including Cobalt Strike. During investigation, triage any network connections and
+  parallel processes. Identify any suspicious module loads related to credential dumping
+  or file writes. DLLHost.exe is natively found in C:\Windows\system32 and C:\Windows\syswow64.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count FROM datamodel=Endpoint.Processes\
+      \ where Processes.process_name=dllhost.exe by _time span=1h  Processes.process_id\
+      \ Processes.process_name Processes.dest Processes.process_path Processes.process\
+      \ Processes.parent_process_name \n  -  `drop_dm_object_name(Processes)` \n \
+      \ -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  regex process=\"(?i)(dllhost\\.exe.{0,4}$)\" \n  -  join  process_id\
+      \ [\n  -  tstats `security_content_summariesonly` count FROM datamodel=Network_Traffic.All_Traffic\
+      \ where All_Traffic.dest_port != 0 by All_Traffic.process_id All_Traffic.dest\
+      \ All_Traffic.dest_port \n  -  `drop_dm_object_name(All_Traffic)` \n  -  rename\
+      \ dest as C2 ] \n  -  table _time dest parent_process_name process_name process_path\
+      \ process process_id dest_port C2 \n  -  `dllhost_with_no_command_line_arguments_with_network_filter`"
+  level: critical
+tags:
+- T1055
+- Process Injection
+- Defense Evasion, Privilege Escalation
+references: Increase Windows logging to include command line data
+notes: .nan

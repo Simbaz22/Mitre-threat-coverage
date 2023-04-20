@@ -1,0 +1,29 @@
+title: ESCU - PetitPotam Suspicious Kerberos TGT Request - Rule
+description: The following analytic identifes Event Code 4768, A `Kerberos authentication
+  ticket (TGT) was requested`, successfull occurs. This behavior has been identified
+  to assist with detecting PetitPotam, CVE-2021-36942. Once an attacer obtains a computer
+  certificate by abusing Active Directory Certificate Services in combination with
+  PetitPotam, the next step would be to leverage the certificate for malicious purposes.
+  One way of doing this is to request a Kerberos Ticket Granting Ticket using a tool
+  like Rubeus. This request will generate a 4768 event with some unusual fields depending
+  on the environment. This analytic will require tuning, we recommend filtering Account_Name
+  to Domain Controllers for your environment.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4768 Client_Address!=\"::1\" Certificate_Thumbprint!=\"\
+      \" Account_Name=*$ \n  -  stats count min(_time) as firstTime max(_time) as\
+      \ lastTime by dest, Account_Name, Client_Address, action, Message \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `petitpotam_suspicious_kerberos_tgt_request_filter`"
+  level: critical
+tags:
+- T1003
+- OS Credential Dumping
+- Credential Access
+references: .nan
+notes: .nan

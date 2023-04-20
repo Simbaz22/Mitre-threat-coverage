@@ -1,0 +1,25 @@
+title: ESCU - Powershell Execute COM Object - Rule
+description: This search is to detect a COM CLSID execution through powershell. This
+  technique was seen in several adversaries and malware like ransomware conti where
+  it has a feature to execute command using COM Object. This technique may use by
+  network operator at some cases but a good indicator if some application want to
+  gain privilege escalation or bypass uac.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 ScriptBlockText = \"*CreateInstance([type]::GetTypeFromCLSID*\"\
+      \ \n  -  stats count min(_time) as firstTime max(_time) as lastTime by EventCode\
+      \ ScriptBlockText Computer user_id \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `powershell_execute_com_object_filter`"
+  level: critical
+tags:
+- "T1546.015\nT1546"
+- 'Event Triggered Execution: Component Object Model Hijacking'
+- 'Event Triggered Execution: Component Object Model Hijacking'
+references: Increase Windows logging to include command line data and powershell logs
+notes: .nan

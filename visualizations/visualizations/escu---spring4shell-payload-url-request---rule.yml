@@ -1,0 +1,26 @@
+title: ESCU - Spring4Shell Payload URL Request - Rule
+description: The following analytic is static indicators related to CVE-2022-22963,
+  Spring4Shell. The 3 indicators provide an amount of fidelity that source IP is attemping
+  to exploit a web shell on the destination. The filename and cmd are arbitrary in
+  this exploitation. Java will write a JSP to disk and a process will spawn from Java
+  based on the cmd passed. This is indicative of typical web shell activity.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Web
+detection:
+  condition:
+    sigma: "\n  -  tstats count from datamodel=Web where Web.http_method IN (\"GET\"\
+      ) Web.url IN (\"*tomcatwar.jsp*\",\"*poc.jsp*\",\"*shell.jsp*\") by Web.http_user_agent\
+      \ Web.http_method, Web.url,Web.url_length Web.src, Web.dest sourcetype \n  -\
+      \  `drop_dm_object_name(\"Web\")` \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `spring4shell_payload_url_request_filter`"
+  level: critical
+tags:
+- T1505.003
+- 'Server Software Component: Web Shell'
+- Persistence
+references: .nan
+notes: .nan

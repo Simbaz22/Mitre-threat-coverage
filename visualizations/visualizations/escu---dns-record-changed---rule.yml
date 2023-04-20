@@ -1,0 +1,33 @@
+title: ESCU - DNS record changed - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. The search
+  takes the DNS records and their answers results of the discovered_dns_records lookup
+  and finds if any records have changed by searching DNS response from the Network_Resolution
+  datamodel across the last day.'
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  inputlookup discovered_dns_records \n  -  rename answer as discovered_answer\
+      \ \n  -  join domain[\n  - tstats `security_content_summariesonly` count values(DNS.record_type)\
+      \ as type, values(DNS.answer) as current_answer values(DNS.src) as src from\
+      \ datamodel=Network_Resolution where DNS.message_type=RESPONSE DNS.answer!=\"\
+      unknown\" DNS.answer!=\"\" by DNS.query \n  -  rename DNS.query as query \n\
+      \  -  where query!=\"unknown\" \n  -  rex field=query \"(?<domain>\\w+\\.\\\
+      w+?)(?:$\n  - /)\"] \n  -  makemv delim=\" \" answer \n  -  makemv delim=\"\
+      \ \" type \n  -  sort -count \n  -  table count,src,domain,type,query,current_answer,discovered_answer\
+      \ \n  -  makemv current_answer \n  -  mvexpand current_answer \n  -  makemv\
+      \ discovered_answer \n  -  eval n=mvfind(discovered_answer, current_answer)\
+      \ \n  -  where isnull(n) \n  -  `dns_record_changed_filter`"
+  level: critical
+tags:
+- T1071.004
+- 'Application Layer Protocol: DNS'
+- Command and Control
+references: Requires DNS Data
+notes: Deprecated by Splunk

@@ -1,0 +1,25 @@
+title: ESCU - Monitor DNS For Brand Abuse - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  looks for DNS requests for faux domains similar to the domains that you want to
+  have monitored for abuse.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` values(DNS.answer) as IPs\
+      \ min(_time) as firstTime from datamodel=Network_Resolution by DNS.src, DNS.query\
+      \ \n  -  `drop_dm_object_name(\"DNS\")` \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `brand_abuse_dns` \n  -  `monitor_dns_for_brand_abuse_filter`"
+  level: critical
+tags:
+- .nan
+- .nan
+- .nan
+references: Requires a lookup list for brand monitoring
+notes: Rule deprecated by Splunk

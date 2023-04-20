@@ -1,0 +1,26 @@
+title: ESCU - GCP GCR container uploaded - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  show information on uploaded containers including source user, account, action,
+  bucket name event name, http user agent, message and destination path.'
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: GCP
+detection:
+  condition:
+    sigma: "\n  - tstats count min(_time) as firstTime max(_time) as lastTime  FROM\
+      \ datamodel=Cloud_Infrastructure.Storage where Storage.event_name=storage.objects.create\
+      \ by Storage.src_user Storage.account Storage.action Storage.bucket_name Storage.event_name\
+      \ Storage.http_user_agent Storage.msg Storage.object_path \n  -  `drop_dm_object_name(\"\
+      Storage\")`  \n  -  `gcp_gcr_container_uploaded_filter`"
+  level: critical
+tags:
+- T1525
+- Implant Internal Image
+- Persistence
+references: .nan
+notes: Deprecated by Splunk

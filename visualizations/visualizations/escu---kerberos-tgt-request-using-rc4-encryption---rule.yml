@@ -1,0 +1,28 @@
+title: ESCU - Kerberos TGT Request Using RC4 Encryption - Rule
+description: The following analytic leverages Event 4768, A Kerberos authentication
+  ticket (TGT) was requested, to identify a TGT request with encryption type 0x17,
+  or RC4-HMAC. This encryption type is no longer utilized by newer systems and could
+  represent evidence of an OverPass The Hash attack. Similar to Pass The Hash, OverPass
+  The Hash is a form of credential theft that allows adversaries to move laterally
+  or consume resources in a target network. Leveraging this attack, an adversary who
+  has stolen the NTLM hash of a valid domain account is able to authenticate to the
+  Kerberos Distribution Center(KDC) on behalf of the legitimate account and obtain
+  a Kerberos TGT ticket. Depending on the privileges of the compromised account, this
+  ticket may be used to obtain unauthorized access to systems and other network resources.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4768 Ticket_Encryption_Type=0x17 Account_Name!=*$\
+      \ \n  -  `kerberos_tgt_request_using_rc4_encryption_filter`"
+  level: critical
+tags:
+- T1550
+- Use Alternate Authentication Material
+- Defense Evasion, Lateral Movement
+references: .nan
+notes: Too many false positives.

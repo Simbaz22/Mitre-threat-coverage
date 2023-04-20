@@ -1,0 +1,31 @@
+title: ESCU - Impacket Lateral Movement Commandline Parameters - Rule
+description: This analytic looks for the presence of suspicious commandline parameters
+  typically present when using Impacket tools. Impacket is a collection of python
+  classes meant to be used with Microsoft network protocols. There are multiple scripts
+  that leverage impacket libraries like `wmiexec.py`, `smbexec.py`, `dcomexec.py`
+  and `atexec.py` used to execute commands on remote endpoints. By default, these
+  scripts leverage administrative shares and hardcoded parameters that can be used
+  as a signature to detect its use. Red Teams and adversaries alike may leverage Impackets
+  tools for lateral movement and remote code execution.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime from datamodel=Endpoint.Processes where (Processes.process\
+      \ = \"*/c* \\\\\\\\127.0.0.1\\\\*\" OR Processes.process= \"*/c* 2>&1\") by\
+      \ Processes.dest Processes.user Processes.parent_process_name Processes.process_name\
+      \ Processes.process Processes.process_id Processes.parent_process_id \n  - \
+      \ `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `impacket_lateral_movement_commandline_parameters_filter`"
+  level: critical
+tags:
+- "T1021\nT1021.002\nT1021.003\nT1047\nT1543.003"
+- Remote Services
+- Remote Services
+references: Increase Windows logging to include command line data
+notes: .nan

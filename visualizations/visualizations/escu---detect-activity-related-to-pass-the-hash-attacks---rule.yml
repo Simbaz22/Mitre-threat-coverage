@@ -1,0 +1,24 @@
+title: ESCU - Detect Activity Related to Pass the Hash Attacks - Rule
+description: This search looks for specific authentication events from the Windows
+  Security Event logs to detect potential attempts at using the Pass-the-Hash technique.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_security` EventCode=4624 (Logon_Type=3 Logon_Process=NtLmSsp\
+      \ Workstation_Name=WORKSTATION NOT AccountName=\"ANONYMOUS LOGON\") OR (Logon_Type=9\
+      \ Logon_Process=seclogo) \n  -  fillnull \n  -  stats count min(_time) as firstTime\
+      \ max(_time) as lastTime by EventCode, Logon_Type, WorkstationName, user, dest\
+      \ \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `detect_activity_related_to_pass_the_hash_attacks_filter`"
+  level: critical
+tags:
+- T1550.002
+- 'Use Alternate Authentication Material: Pass the Hash'
+- Defense Evasion, Lateral Movement
+references: .nan
+notes: .nan

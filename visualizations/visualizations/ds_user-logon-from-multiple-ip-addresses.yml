@@ -1,0 +1,22 @@
+title: DS_User Logon from Multiple IP Addresses
+description: Identifies a user logged onto multiple devices.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "Linux\nWindows"
+detection:
+  condition:
+    sigma: "\n  -  tstats distinct_count(Authentication.src) as distinct_count values(Authentication.src)\
+      \ as src from datamodel=Authentication where Authentication.action=\"success\"\
+      \ AND Authentication.src_user!=unknown AND Authentication.src!=unknown by Authentication.user\
+      \ \n\n  -  rename Authentication.user as user \n\n  -  where distinct_count\
+      \ > 3\n\n  -  table user src distinct_count"
+  level: critical
+tags:
+- T1036
+- Masquerading
+- Defense Evasion
+references: .nan
+notes: .nan

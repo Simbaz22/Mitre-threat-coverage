@@ -1,0 +1,29 @@
+title: ESCU - Detect New Open S3 buckets - Rule
+description: This search looks for AWS CloudTrail events where a user has created
+  an open/public S3 bucket.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventSource=s3.amazonaws.com eventName=PutBucketAcl \n  -\
+      \  rex field=_raw \"(?<json_field>{.+})\" \n  -  spath input=json_field output=grantees\
+      \ path=requestParameters.AccessControlPolicy.AccessControlList.Grant{} \n  -\
+      \  grantees=* \n  -  mvexpand grantees \n  -  spath input=grantees output=uri\
+      \ path=Grantee.URI \n  -  spath input=grantees output=permission path=Permission\
+      \ \n  -  uri IN (\"http://acs.amazonaws.com/groups/global/AllUsers\",\"http://acs.amazonaws.com/groups/global/AuthenticatedUsers\"\
+      ) \n  -  permission IN (\"READ\",\"READ_ACP\",\"WRITE\",\"WRITE_ACP\",\"FULL_CONTROL\"\
+      ) \n  -  rename requestParameters.bucketName AS bucketName \n  -  stats count\
+      \ min(_time) as firstTime max(_time) as lastTime by user_arn userIdentity.principalId\
+      \ userAgent uri permission bucketName \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `detect_new_open_s3_buckets_filter`"
+  level: critical
+tags:
+- T1530
+- Data from Cloud Storage
+- Collection
+references: .nan
+notes: .nan

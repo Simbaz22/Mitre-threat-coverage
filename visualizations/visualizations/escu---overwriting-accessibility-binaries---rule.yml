@@ -1,0 +1,31 @@
+title: ESCU - Overwriting Accessibility Binaries - Rule
+description: Microsoft Windows contains accessibility features that can be launched
+  with a key combination before a user has logged in. An adversary can modify or replace
+  these programs so they can get a command prompt or backdoor without logging in to
+  the system. This search looks for modifications to these binaries.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime values(Filesystem.user) as user values(Filesystem.dest)\
+      \ as dest values(Filesystem.file_path) as file_path from datamodel=Endpoint.Filesystem\
+      \ where (Filesystem.file_path=*\\\\Windows\\\\System32\\\\sethc.exe* OR Filesystem.file_path=*\\\
+      \\Windows\\\\System32\\\\utilman.exe* OR Filesystem.file_path=*\\\\Windows\\\
+      \\System32\\\\osk.exe* OR Filesystem.file_path=*\\\\Windows\\\\System32\\\\\
+      Magnify.exe* OR Filesystem.file_path=*\\\\Windows\\\\System32\\\\Narrator.exe*\
+      \ OR Filesystem.file_path=*\\\\Windows\\\\System32\\\\DisplaySwitch.exe* OR\
+      \ Filesystem.file_path=*\\\\Windows\\\\System32\\\\AtBroker.exe*) by Filesystem.file_name\
+      \ Filesystem.dest \n  -  `drop_dm_object_name(Filesystem)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `security_content_ctime(firstTime)` \n  -  `overwriting_accessibility_binaries_filter`"
+  level: critical
+tags:
+- "T1546\nT1546.008"
+- Event Triggered Execution
+- Event Triggered Execution
+references: Increase Windows logging to include file modification data
+notes: .nan

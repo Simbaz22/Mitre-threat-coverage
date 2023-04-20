@@ -1,0 +1,31 @@
+title: ESCU - WinEvent Windows Task Scheduler Event Action Started - Rule
+description: The following hunting analytic assists with identifying suspicious tasks
+  that have been registered and ran in Windows using EventID 200 (action run) and
+  201 (action completed). It is recommended to filter based on ActionName by specifying
+  specific paths not used in your environment. After some basic tuning, this may be
+  effective in capturing evasive ways to register tasks on Windows. Review parallel
+  events related to tasks being scheduled. EventID 106 will generate when a new task
+  is generated, however, that does not mean it ran. Capture any files on disk and
+  analyze.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`wineventlog_task_scheduler` EventCode IN (\"200\",\"201\") \n  -  rename\
+      \ ComputerName as dest \n  -  stats count min(_time) as firstTime max(_time)\
+      \ as lastTime by Message dest EventCode category \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `winevent_windows_task_scheduler_event_action_started_filter`"
+  level: critical
+tags:
+- T1053.005
+- 'Scheduled Task/Job: Scheduled Task'
+- Execution, Persistence, Privilege Escalation
+references: Increase Windows logging to include command line data
+notes: Task Scheduler logs are required to be collected. Enable logging with inputs.conf
+  by adding a stanza for [WinEventLog://Microsoft-Windows-TaskScheduler/Operational]
+  and renderXml=false. Note, not translating it in XML may require a proper extraction
+  of specific items in the Message.

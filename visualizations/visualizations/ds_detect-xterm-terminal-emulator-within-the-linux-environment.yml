@@ -1,0 +1,20 @@
+title: DS_Detect Xterm Terminal Emulator Within the Linux Environment
+description: This rule will detect the use of the Xterm terminal emulator within the
+  Linux environment.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Linux
+detection:
+  condition:
+    sigma: "index=linux (app=\"xterm\" OR eventtype=\"xterm*\" OR process=\"xterm\"\
+      )\n\n  -  table name process user app action dest eventtype"
+  level: critical
+tags:
+- T1205
+- Traffic Signaling
+- Command and Control, Defense Evasion, Persistence
+references: .nan
+notes: .nan

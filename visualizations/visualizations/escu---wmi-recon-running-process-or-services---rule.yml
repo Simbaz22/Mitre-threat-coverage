@@ -1,0 +1,26 @@
+title: ESCU - WMI Recon Running Process Or Services - Rule
+description: The following analytic identifies suspicious PowerShell script execution
+  via EventCode 4104, where WMI is performing an event query looking for running processes
+  or running services. This technique is commonly found in malware and APT events
+  where the adversary will map all running security applications or services on the
+  compromised machine. During triage, review parallel processes within the same timeframe.
+  Review the full script block to identify other related artifacts.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 Message= \"*SELECT*\" AND (Message=\"*Win32_Process*\"\
+      \ OR Message=\"*Win32_Service*\") \n  -  stats count min(_time) as firstTime\
+      \ max(_time) as lastTime by EventCode Message ComputerName User \n  -  `security_content_ctime(firstTime)`\
+      \ \n  -  `security_content_ctime(lastTime)` \n  -  `wmi_recon_running_process_or_services_filter`"
+  level: critical
+tags:
+- T1592
+- Gather Victim Host Information
+- Reconnaissance
+references: Requires PowerShell logs
+notes: .nan

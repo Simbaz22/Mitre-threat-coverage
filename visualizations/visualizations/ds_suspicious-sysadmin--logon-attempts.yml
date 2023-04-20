@@ -1,0 +1,21 @@
+title: DS_Suspicious Sysadmin  Logon Attempts
+description: Sysadmin authentication could indicate a malicious activity.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: .nan
+detection:
+  condition:
+    sigma: "\n  -  tstats count from datamodel=\"Authentication\".\"Authentication\"\
+      \ where Authentication.signature_id=4624 AND (Authentication.user=AD-* OR AUthentication.user=*-SA)\
+      \ by Authentication.signature_id Authentication.action Authentication.src Authentication.dest\
+      \ Authentication.user"
+  level: critical
+tags:
+- T1078
+- Valid Accounts
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: .nan

@@ -1,0 +1,28 @@
+title: ESCU - Mailsniper Invoke functions - Rule
+description: This search is to detect known mailsniper.ps1 functions executed in a
+  machine. This technique was seen in some attacker to harvest some sensitive e-mail
+  in a compromised exchange server.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`powershell` EventCode=4104 Message IN (\"*Invoke-GlobalO365MailSearch*\"\
+      , \"*Invoke-GlobalMailSearch*\", \"*Invoke-SelfSearch*\", \"*Invoke-PasswordSprayOWA*\"\
+      , \"*Invoke-PasswordSprayEWS*\",\"*Invoke-DomainHarvestOWA*\", \"*Invoke-UsernameHarvestOWA*\"\
+      ,\"*Invoke-OpenInboxFinder*\",\"*Invoke-InjectGEventAPI*\",\"*Invoke-InjectGEvent*\"\
+      ,\"*Invoke-SearchGmail*\", \"*Invoke-MonitorCredSniper*\", \"*Invoke-AddGmailRule*\"\
+      ,\"*Invoke-PasswordSprayEAS*\",\"*Invoke-UsernameHarvestEAS*\") \n  -  stats\
+      \ count min(_time) as firstTime max(_time) as lastTime by EventCode Message\
+      \ ComputerName User \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `mailsniper_invoke_functions_filter`"
+  level: critical
+tags:
+- T1114.001
+- 'Email Collection: Local Email Collection'
+- Collection
+references: Requires PowerShell logs
+notes: .nan

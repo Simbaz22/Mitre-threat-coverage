@@ -1,0 +1,26 @@
+title: DS_Abnormal number of Kerberos authentication failures
+description: This rule detects an abnormal amount of Kerberos authentication failures
+  based on a standard deviation of 3.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "index=winlog EventCode=4771\n\n  -  bucket span=10m _time \n\n  -  stats\
+      \ count AS number_failures by _time Account_Name \n\n  -  eventstats avg(number_failures)\
+      \ as failure_avg, stdev(number_failures) as failure_stdev \n\n  -  eval threshold_value\
+      \ = 3 \n\n  -  eval isOutlier=if(number_failures > failure_avg+(failure_stdev\
+      \ * threshold_value), \"TRUE\", \"FALSE\") \n\n  -  isOutlier=\"TRUE\" \n\n\
+      \  -  eval num_standard_deviations_away = round(abs(number_failures - failure_avg)\
+      \ / failure_stdev, 2) \n\n  -  table _time, Account_Name, number_failures, num_standard_deviations_away,\
+      \ failure_avg, failure_stdev"
+  level: critical
+tags:
+- T1110
+- Brute Force
+- Credential Access
+references: .nan
+notes: .nan

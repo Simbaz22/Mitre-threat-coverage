@@ -1,0 +1,30 @@
+title: ESCU - Cloud Provisioning Activity From Previously Unseen Country - Rule
+description: This search looks for cloud provisioning activities from previously unseen
+  countries. Provisioning activities are defined broadly as any event that runs or
+  creates something.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "\n  -  tstats earliest(_time) as firstTime, latest(_time) as lastTime\
+      \ from datamodel=Change where (All_Changes.action=started OR All_Changes.action=created)\
+      \ All_Changes.status=success by All_Changes.src, All_Changes.user, All_Changes.object,\
+      \ All_Changes.command \n  -  `drop_dm_object_name(\"All_Changes\")` \n  -  iplocation\
+      \ src \n  -  where isnotnull(Country) \n  -  lookup previously_seen_cloud_provisioning_activity_sources\
+      \ Country as Country OUTPUT firstTimeSeen, enough_data \n  -  eventstats max(enough_data)\
+      \ as enough_data \n  -  where enough_data=1 \n  -  eval firstTimeSeenCountry=min(firstTimeSeen)\
+      \ \n  -  where isnull(firstTimeSeenCountry) OR firstTimeSeenCountry > relative_time(now(),\
+      \ \"-24h@h\") \n  -  table firstTime, src, Country, user, object, command \n\
+      \  -  `cloud_provisioning_activity_from_previously_unseen_country_filter` \n\
+      \  -  `security_content_ctime(firstTime)`"
+  level: critical
+tags:
+- T1079
+- '#INVALID VALUE'
+- '#INVALID VALUE'
+references: .nan
+notes: .nan

@@ -1,0 +1,25 @@
+title: ESCU - Attacker Tools On Endpoint - Rule
+description: This search looks for execution of commonly used attacker tools on an
+  endpoint.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime values(Processes.process) as process values(Processes.parent_process)\
+      \ as parent_process from datamodel=Endpoint.Processes where Processes.dest!=unknown\
+      \ Processes.user!=unknown by Processes.dest Processes.user Processes.process_name\
+      \ Processes.process \n  -  `security_content_ctime(firstTime)` \n  -  `security_content_ctime(lastTime)`\
+      \ \n  -  `drop_dm_object_name(Processes)` \n  -  lookup attacker_tools attacker_tool_names\
+      \ AS process_name OUTPUT description \n  -  description !=false\n  -  `attacker_tools_on_endpoint_filter`"
+  level: critical
+tags:
+- "T1036.005\nT1036\nT1003\nT1595"
+- 'Masquerading: Match Legitimate Name or Location'
+- 'Masquerading: Match Legitimate Name or Location'
+references: .nan
+notes: .nan

@@ -1,0 +1,26 @@
+title: ESCU - Deleting Shadow Copies - Rule
+description: The vssadmin.exe utility is used to interact with the Volume Shadow Copy
+  Service.  Wmic is an interface to the Windows Management Instrumentation.  This
+  search looks for either of these tools being used to delete shadow copies.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count values(Processes.process)\
+      \ as process values(Processes.parent_process) as parent_process min(_time) as\
+      \ firstTime max(_time) as lastTime from datamodel=Endpoint.Processes where (Processes.process_name=vssadmin.exe\
+      \ OR Processes.process_name=wmic.exe) Processes.process=*delete* Processes.process=*shadow*\
+      \ by Processes.user Processes.process_name Processes.parent_process_name Processes.dest\
+      \  \n  -  `drop_dm_object_name(Processes)` \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `deleting_shadow_copies_filter`"
+  level: critical
+tags:
+- T1490
+- Inhibit System Recovery
+- Impact
+references: Increase Windows logging to include command line data
+notes: .nan

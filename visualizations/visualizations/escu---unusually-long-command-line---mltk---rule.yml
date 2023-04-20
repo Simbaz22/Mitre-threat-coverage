@@ -1,0 +1,27 @@
+title: ESCU - Unusually Long Command Line - MLTK - Rule
+description: Command lines that are extremely long may be indicative of malicious
+  activity on your hosts. This search leverages the Machine Learning Toolkit (MLTK)
+  to help identify command lines with lengths that are unusual for a given user.
+status: Inactive
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count min(_time) as firstTime\
+      \ max(_time) as lastTime FROM datamodel=Endpoint.Processes by Processes.user\
+      \ Processes.dest Processes.process_name Processes.process \n  -  `drop_dm_object_name(Processes)`\
+      \ \n  -  `security_content_ctime(firstTime)`\n  -  `security_content_ctime(lastTime)`\n\
+      \  -  eval processlen=len(process) \n  -  user!=unknown \n  -  apply cmdline_pdfmodel\
+      \ threshold=0.01 \n  -  rename \"IsOutlier(processlen)\" as isOutlier \n  -\
+      \  isOutlier > 0 \n  -  table firstTime lastTime user dest process_name process\
+      \ processlen count \n  -  `unusually_long_command_line___mltk_filter`"
+  level: critical
+tags:
+- T1059.003
+- 'Command and Scripting Interpreter: Windows Command Shell'
+- Execution
+references: .nan
+notes: Experimental detection (not supported by splunk)

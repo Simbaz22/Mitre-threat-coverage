@@ -1,0 +1,21 @@
+title: DS_Possible Privilege Enumeration
+description: This may be indicative of a possible LDAP scanning event caused by a
+  malicious presence. Enumeration of privileges is typically leveraged by malwares
+  to achieve privilege escalation.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "index=winlog (EventCode=4798 OR EventCode=4799) AND Account_Name!=\"*$\"\
+      \ \n\n  -  table Account_Name Process_Name dest status"
+  level: critical
+tags:
+- T1087.002
+- 'Account Discovery: Domain Account'
+- Discovery
+references: .nan
+notes: .nan

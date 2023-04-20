@@ -1,0 +1,21 @@
+title: DS_Member added to built-in admin groups
+description: Adding members to built-in admin group could indicate a possible privilege
+  escalation
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "index=winlog EventCode=636 AND (Group_Name=Administrators OR Group_Name=\"\
+      Power Users\")\n\n  -  table Account_Name Group_Name Member_Account_Name action\
+      \ src_user dest result"
+  level: critical
+tags:
+- T1098
+- Account Manipulation
+- Persistence
+references: .nan
+notes: .nan

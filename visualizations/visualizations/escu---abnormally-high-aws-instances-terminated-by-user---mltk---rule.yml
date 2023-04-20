@@ -1,0 +1,26 @@
+title: ESCU - Abnormally High AWS Instances Terminated by User - MLTK - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  looks for AWS CloudTrail events where a user successfully terminates an abnormally
+  high number of instances. This search is deprecated and have been translated to
+  use the latest Change Datamodel.'
+status: Expired
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: "AWS\nCloud"
+detection:
+  condition:
+    sigma: "`cloudtrail` eventName=TerminateInstances errorCode=success `abnormally_high_aws_instances_terminated_by_user___mltk_filter`\
+      \ \n  -  bucket span=10m _time \n  -  stats count as instances_terminated by\
+      \ _time src_user \n  -  apply ec2_excessive_terminateinstances_v1 \n  -  rename\
+      \ \"IsOutlier(instances_terminated)\" as isOutlier \n  -  where isOutlier=1"
+  level: critical
+tags:
+- T1078.004
+- 'Valid Accounts: Cloud Accounts'
+- Defense Evasion, Initial Access, Persistence, Privilege Escalation
+references: .nan
+notes: .nan

@@ -1,0 +1,24 @@
+title: ESCU - Unsigned Image Loaded by LSASS - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  detects loading of unsigned images by LSASS. Deprecated because too noisy.'
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "`sysmon` EventID=7 Image=*lsass.exe Signed=false \n  -  stats count min(_time)\
+      \ as firstTime max(_time) as lastTime by Computer, Image, ImageLoaded, Signed,\
+      \ SHA1 \n  -  rename Computer as dest \n  -  `security_content_ctime(firstTime)`\n\
+      \  -  `security_content_ctime(lastTime)` \n  -  `unsigned_image_loaded_by_lsass_filter`"
+  level: critical
+tags:
+- T1003.001
+- 'OS Credential Dumping: LSASS Memory'
+- Credential Access
+references: Requires Sysmon data
+notes: .nan

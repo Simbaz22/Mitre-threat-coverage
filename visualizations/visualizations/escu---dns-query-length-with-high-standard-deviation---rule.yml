@@ -1,0 +1,27 @@
+title: ESCU - DNS Query Length With High Standard Deviation - Rule
+description: This search allows you to identify DNS requests and compute the standard
+  deviation on the length of the names being resolved, then filter on two times the
+  standard deviation to show you those queries that are unusually large for your environment.
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Windows
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count from datamodel=Network_Resolution\
+      \ where NOT DNS.message_type IN(\"Pointer\",\"PTR\") by DNS.query \n  -  `drop_dm_object_name(\"\
+      DNS\")` \n  -  eval tlds=split(query,\".\") \n  -  eval tld=mvindex(tlds,-1)\
+      \ \n  -  eval tld_len=len(tld) \n  -  tld_len<=24 \n  -  eval query_length =\
+      \ len(query) \n  -  table query query_length record_type count \n  -  eventstats\
+      \ stdev(query_length) AS stdev avg(query_length) AS avg p50(query_length) AS\
+      \ p50\n  -  where query_length>(avg+stdev*2) \n  -  eval z_score=(query_length-avg)/stdev\
+      \ \n  -  `dns_query_length_with_high_standard_deviation_filter`"
+  level: critical
+tags:
+- T1048.003
+- 'Exfiltration Over Alternative Protocol: Exfiltration Over Unencrypted Non-C2 Protocol'
+- Exfiltration
+references: Requires Sysmon data
+notes: .nan

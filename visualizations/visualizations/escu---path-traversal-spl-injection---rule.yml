@@ -1,0 +1,23 @@
+title: ESCU - Path traversal SPL injection - Rule
+description: On May 3rd, 2022, Splunk published a security advisory for a Path traversal
+  in search parameter that can potentiall allow SPL injection. An attacker can cause
+  the application to load data from incorrect endpoints, urls leading to outcomes
+  such as running arbitrary SPL queries.
+status: Active
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Splunk Internal Logs
+detection:
+  condition:
+    sigma: "`path_traversal_spl_injection` \n  -  \"\\/..\\/..\\/..\\/..\\/..\\/..\\\
+      /..\\/..\\/..\\/\"  \n  -  stats count by status clientip method uri_path uri_query\
+      \ \n  -  `path_traversal_spl_injection_filter`"
+  level: critical
+tags:
+- T1083
+- File and Directory Discovery
+- Discovery
+references: .nan
+notes: .nan

@@ -1,0 +1,25 @@
+title: ESCU - Clients Connecting to Multiple DNS Servers - Rule
+description: 'WARNING, this detection has been marked deprecated by the Splunk Threat
+  Research team, this means that it will no longer be maintained or supported. If
+  you have any questions feel free to email us at: research@splunk.com. This search
+  allows you to identify the endpoints that have connected to more than five DNS servers
+  and made DNS Queries over the time frame of the search.'
+status: Missing Data Source
+author: DS
+logsource:
+  product: Splunk
+  service: splunkd
+  category: Firewall
+detection:
+  condition:
+    sigma: "\n  -  tstats `security_content_summariesonly` count, values(DNS.dest)\
+      \ AS dest dc(DNS.dest) as dest_count from datamodel=Network_Resolution where\
+      \ DNS.message_type=QUERY by DNS.src \n  -  `drop_dm_object_name(\"Network_Resolution\"\
+      )` \n  - where dest_count > 5 \n  -  `clients_connecting_to_multiple_dns_servers_filter`"
+  level: critical
+tags:
+- T1048.003
+- 'Exfiltration Over Alternative Protocol: Exfiltration Over Unencrypted Non-C2 Protocol'
+- Exfiltration
+references: Requires DNS Data
+notes: Deprecated by Splunk
